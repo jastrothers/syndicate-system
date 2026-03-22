@@ -1,0 +1,69 @@
+{
+  "metadata": {
+    "title": "Untitled Board Game",
+    "version": "0.1.0",
+    "lastUpdated": "2026-03-08T00:02:58.143Z"
+  },
+  "sections": {
+    "overview": {
+      "title": "Idea of the Game",
+      "content": "»Friday« is a solo deckbuilding adventure. You guide Robinson through the game, helping him survive hazards to improve his fighting deck.\n\nHe must win against two pirates at the end of the game to successfully leave the island. To help him, you can either win against hazards to gain them as improved fighting cards, or deliberately lose and pay with life points to remove unwanted cards from your deck. As the game progresses, Robinson will age, adding difficult aging cards to the deck."
+    },
+    "components": {
+      "title": "Game Components",
+      "content": "- **72 playing cards**, consisting of:\n  - 3 step cards (green, yellow, red)\n  - 59 fighting cards:\n    - 18 Robinson starting cards\n    - 11 aging cards (8 normal, 3 difficult)\n    - 30 hazard/knowledge cards\n  - 10 pirate cards\n- **22 life points**\n- **3 storage boards**"
+    },
+    "setup": {
+      "title": "setup",
+      "subsections": {
+        "general": {
+          "title": "Setup (Level 1)",
+          "content": "1. Place the Green, Yellow, and Red step cards in a pile with Green on top, Yellow in the middle, and Red on the bottom. The game starts in the Green step.\n2. Remove the \"Very Stupid\" aging card from the game (for Level 1). Separate the remaining 10 aging cards into 7 Normal and 3 Difficult. Shuffle both separately and place Normal on top of Difficult to form the Aging Deck.\n3. Shuffle the 18 Robinson starting cards and place them face-down as your first Robinson (fighting) Deck.\n4. Shuffle the 30 Hazard cards and place them face-down as the Hazard Deck.\n5. Shuffle the Pirate cards, pick two randomly, and place them face-up as the final opponents. The rest are returned to the box.\n6. Give Robinson 20 life points and place 2 more life points next to the play area as the reserve."
+        },
+        "levels": {
+          "title": "Difficulty Levels",
+          "content": "The game offers four different difficulty levels.\n\n**Level 1**: The aging card »Very Stupid« is removed from the game. Start with 18 Robinson starting cards and 20 life points plus 2 more life points in the reserve.\n**Level 2**: Like Level 1. In addition you draw a face-down aging card and shuffle it into the 18 Robinson starting cards (do not look at the aging card!).\n**Level 3**: Like Level 2. Before performing all the steps above, shuffle the »Very Stupid« card together with the other aging cards (so the Difficult Aging pile has 3 cards instead of 2).\n**Level 4**: Like Level 3. Start with only 18 life points plus 2 life points in the reserve. This is the real game!"
+        }
+      }
+    },
+    "turn": {
+      "title": "turn",
+      "subsections": {
+        "structure": {
+          "title": "structure",
+          "subsections": {
+            "hazard": {
+              "title": "1. Drawing Hazard Cards",
+              "content": "Draw the two topmost cards of the Hazard pile. Choose one to be the actual hazard for the turn and place it face-up. Discard the other on the hazard discard pile."
+            },
+            "fight": {
+              "title": "2. Fight against the hazard",
+              "content": "The white box on the left of the hazard card shows the number of fighting cards you can draw for free. Check the hazard value corresponding to the current Step (Green, Yellow, or Red). \n\nDraw free cards from the Robinson deck one by one, placing them to the left of the hazard. You can stop at any time before drawing all free cards to either intentionally end the fight or resolve your status.\n\nAfter drawing free cards, you may \"sacrifice\" life points (pay back to reserve) to draw 1 additional fighting card per life point sacrificed, placing them to the right. \n\nYou may use special abilities of drawn cards at any time, but must finish resolving one before starting another. You MUST use abilities of Aging cards."
+            },
+            "win": {
+              "title": "3. Winning the fight",
+              "content": "If the sum of fighting points of your face-up fighting cards is at least the hazard value for the current Step, you win the fight. The hazard card is yours: it is placed on the Robinson discard pile along with your played fighting cards, to be used later via its knowledge (bottom) side."
+            },
+            "loss": {
+              "title": "4. Losing the fight",
+              "content": "If you deliberately lose the fight (fighting points less than hazard value), you must pay life points equal to the difference between the hazard value and your total points. \n\nFor each life point paid this way, you can optionally destroy 1 played face-up fighting card to remove it from the game (Starting/Knowledge cards cost 1 life point to destroy; Aging cards cost 2 life points). You cannot sacrifice extra life points just to destroy more cards. \n\nThe undefeated hazard card goes to the hazard discard pile, and surviving playing cards go to the Robinson discard pile."
+            }
+          }
+        }
+      }
+    },
+    "deck_depletion": {
+      "title": "deck_depletion",
+      "subsections": {
+        "robinson": {
+          "title": "Robinson Deck Depletion",
+          "content": "If you need to draw a fighting card but the Robinson deck is empty, draw whatever is left. Then, take the topmost face-down Aging card from the aging deck and shuffle it into the Robinson discard pile (without looking at it) to form the new Robinson deck, before continuing to draw."
+        }
+      }
+    },
+    "game_end": {
+      "title": "Steps, Pirates, and Game End",
+      "content": "After completing the Hazard deck, discard any single remaining unused card, then proceed to the next Step color (Yellow step follows Green, Red step follows Yellow). The hazard discard pile is shuffled to form the new hazard deck. \n\nWhen the Red step is finished, Robinson must face the two Pirates drawn during setup. Pick one pirate to fight, then the other. You must win these fights—you cannot deliberately lose. If you don't have enough points, you must sacrifice life to draw more cards. If both pirates are defeated, you win the game!\n\nIf you need to pay a life token at any point in the game and do not have any left, you lose immediately."
+    }
+  }
+}

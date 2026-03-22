@@ -1,0 +1,71 @@
+{
+  "metadata": {
+    "title": "Syndicate Deckbuilder: Heist Theme",
+    "version": "1.0.0",
+    "lastUpdated": "2026-03-08T20:00:00.000Z"
+  },
+  "sections": {
+    "overview": {
+      "title": "Game Overview",
+      "content": "Syndicate Deckbuilder: Heist Theme is an asymmetric deckbuilding game focused on recruiting a specialized crew, planning an operation, executing central challenges, and extracting with rewards. Players compete to accumulate the most Victory Points (VP) by acquiring Rewards."
+    },
+    "core_mechanics": {
+      "title": "Core Mechanics",
+      "content": "The game relies on tension, dual currencies, and specialized crew drafting.",
+      "subsections": {
+        "tension": {
+          "title": "Tension (Heat)",
+          "content": "Tension represents the risk and attention players draw during the operation. Higher Tension increases the difficulty of the Extraction Phase (Phase IV). Some powerful cards or 'loud' actions may increase Tension as a cost for immediate power."
+        },
+        "currencies": {
+          "title": "Dual Currencies (Gear & Intel)",
+          "content": "Cards in the market are acquired using two distinct currency types: Gear (Physical) and Intel (Intangible). Acquiring a card with its matching currency type is more efficient."
+        }
+      }
+    },
+    "setup": {
+      "title": "Setup (Phase I: Recruiting)",
+      "content": "Players choose or draft Specialist Packs (The Hacker, The Grifter, The Muscle, The Fixer, The Driver) to form their asymmetric starting decks."
+    },
+    "gameplay": {
+      "title": "Gameplay",
+      "content": "The game is played over exactly four phases.",
+      "subsections": {
+        "planning": {
+          "title": "Phase II: Planning (The Legwork)",
+          "content": "Players take sequential turns drafting cards from an open market to enhance their decks. Players may spend 2 of any combination of currencies to cycle the market. At the end of each round, the oldest market card degrades."
+        },
+        "execution": {
+          "title": "Phase III: Execution (The Score)",
+          "content": "Players encounter Central Challenges (Obstacles). They must meet the Gear/Intel requirements to succeed and gain Rewards (Loot). Failure results in Penalties or added Heat."
+        },
+        "extraction": {
+          "title": "Phase IV: Extraction (The Getaway)",
+          "content": "Players must overcome Extraction Challenges to keep their loot. Extraction Difficulty = Base (3) + Total Heat + (Number of Rewards carried). Full Success: Keep all. Partial Success: Drop lowest reward. Failure: Drop highest reward."
+        },
+        "nuances": {
+          "title": "Thematic Nuances",
+          "content": "Specific rules governing the Heist theme.",
+          "subsections": {
+            "loud_quiet": {
+              "title": "Loud vs. Quiet Actions",
+              "content": "Cards may have 'Loud' (generates Heat but high power) or 'Quiet' (no Heat, higher resource cost) keywords."
+            },
+            "contraband": {
+              "title": "Contraband (Loot Types)",
+              "content": "Cash (Low VP, easy extraction), Gold Bullion (High VP, adds Getaway penalty), Data Drives (Variable VP)."
+            },
+            "alarm": {
+              "title": "The Alarm (Escalation)",
+              "content": "Once collective Heat reaches a threshold, Obstacle decks escalate to harder tiers (e.g., Tier 2 Security, Tier 3 Vault)."
+            }
+          }
+        }
+      }
+    },
+    "endgame": {
+      "title": "Endgame & Scoring",
+      "content": "The game ends after the Extraction Phase. The player with the highest total Victory Points (VP) from extracted Loot is the winner."
+    }
+  }
+}

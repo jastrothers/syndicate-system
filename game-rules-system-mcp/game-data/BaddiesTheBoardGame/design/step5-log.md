@@ -1,0 +1,1 @@
+"Adversarial Balance Review: Identified high-severity issues with Solo Segment rewards and Turn Up risk/reward. Medium-severity issue with Reputation end-game value."

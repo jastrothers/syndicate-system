@@ -1,0 +1,129 @@
+import * as path from "path";
+
+export const DATA_DIR = process.env.TEST_DATA_DIR || path.join(process.cwd(), "game-data");
+export const SESSION_INDEX_DB = path.join(DATA_DIR, "session_index.db");
+export const REFERENCE_INDEX_DB = path.join(DATA_DIR, "reference_index.db");
+
+export function sanitizeFileName(name: string): string {
+  // Allow only alphanumeric, dashes, and underscores
+  return name.replace(/[^a-zA-Z0-9_-]/g, "");
+}
+
+/**
+ * Returns the root directory for a specific game's data.
+ * e.g. game-data/heist/
+ */
+export function getGameDir(gameName: string): string {
+  const safeName = sanitizeFileName(gameName) || "_general";
+  return path.join(DATA_DIR, safeName);
+}
+
+/**
+ * Returns the directory for a specific game's rulebook versions.
+ * e.g. game-data/heist/rulebooks/
+ */
+export function getRulebookDir(name: string): string {
+  const safeName = sanitizeFileName(name);
+  if (!safeName) {
+    return path.join(DATA_DIR, "rulebook");
+  }
+  const gameDir = getGameDir(name);
+  return path.join(gameDir, "rulebooks");
+}
+
+/**
+ * Returns the path for a specific version of a rulebook.
+ * Defaults to "latest" which is the current working copy.
+ * e.g. game-data/heist/rulebooks/latest.json
+ */
+export function getRulebookPath(name: string, options?: { versionTag?: string; isDraft?: boolean }): string {
+  const dir = getRulebookDir(name);
+  if (options?.isDraft) {
+    return path.join(dir, "draft.json");
+  }
+  const fileName = options?.versionTag ? `v${sanitizeVersionTag(options.versionTag)}` : "latest";
+  const filePath = path.join(dir, `${fileName}.json`);
+  return filePath;
+}
+
+/**
+ * Legacy flat path — used for migration detection only.
+ */
+export function getLegacyRulebookPath(name: string): string {
+  const safeName = sanitizeFileName(name) || "rulebook";
+  return path.join(DATA_DIR, `${safeName}.json`);
+}
+
+export function getRulebookMdPath(name: string, versionTag?: string): string {
+  const dir = getRulebookDir(name);
+  const fileName = versionTag ? `v${sanitizeVersionTag(versionTag)}` : "latest";
+  return path.join(dir, `${fileName}.md`);
+}
+
+export function getPlaytestLogPath(name: string): string {
+  const dir = getRulebookDir(name);
+  return path.join(dir, `playtest_logs.md`);
+}
+
+/**
+ * Returns the directory for a specific game's sessions.
+ * e.g. game-data/heist/sessions/latest/
+ */
+export function getSessionDir(rulebookName: string, rulebookVersion?: string): string {
+  const gameDir = getGameDir(rulebookName);
+  const versionDir = rulebookVersion ? sanitizeVersionTag(rulebookVersion) : "latest";
+  return path.join(gameDir, "sessions", versionDir);
+}
+
+export function getSessionPath(sessionId: string, rulebookName?: string, rulebookVersion?: string): string {
+  if (rulebookName) {
+    const dir = getSessionDir(rulebookName, rulebookVersion);
+    return path.join(dir, `${sessionId}.json`);
+  }
+  // Generic fallback if rulebook is unknown (should be rare in new structure)
+  return path.join(DATA_DIR, "_unknown", "sessions", "latest", `${sessionId}.json`);
+}
+
+/**
+ * Returns the directory for a specific game's design sessions.
+ */
+export function getDesignSessionDir(gameName: string): string {
+  const gameDir = getGameDir(gameName);
+  return path.join(gameDir, "design");
+}
+
+/**
+ * Returns the path for a specific design session.
+ */
+export function getDesignSessionPath(gameName: string, sessionId: string): string {
+  const dir = getDesignSessionDir(gameName);
+  return path.join(dir, `${sessionId}.json`);
+}
+
+export function getReferenceFilePath(name: string, game?: string, version?: string): string {
+  const safeName = sanitizeFileName(name) || "unnamed";
+  const gameDir = getGameDir(game || "general");
+  const versionDir = version ? sanitizeVersionTag(version) : "latest";
+  
+  return path.join(gameDir, "reference", versionDir, `${safeName}.md`);
+}
+
+export function sanitizeVersionTag(tag: string): string {
+  // Allow alphanumeric, dashes, dots, and underscores for version tags
+  return tag.replace(/[^a-zA-Z0-9._-]/g, "");
+}
+
+/**
+ * Returns the path for the global designer profile.
+ */
+export function getDesignerProfilePath(): string {
+  return path.join(DATA_DIR, "designer_profile.json");
+}
+
+/**
+ * Returns the path for a game's decision log.
+ */
+export function getDecisionLogPath(gameName: string): string {
+  const gameDir = getGameDir(gameName);
+  return path.join(gameDir, "decision_log.json");
+}
