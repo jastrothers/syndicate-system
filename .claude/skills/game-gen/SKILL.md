@@ -7,7 +7,7 @@ description: Multi-agent pipeline to generate a complete board game design from 
 
 Use this workflow to generate a complete board game design from a simple theme and set of constraints, fully integrated with the MCP for data persistence.
 
-> **Auto-Pilot Mode**: To run this entire workflow without per-step approvals, set `"workflowAutomation": true` in your `game-data/designer_profile.json`.
+> **Autonomous Mode**: This workflow runs straight through from theme to finished rulebook without stopping for user feedback. For interactive co-design with preference learning, use `/designer` instead.
 
 ## Step 0: Initialize Workspace
 
@@ -22,18 +22,15 @@ Use this workflow to generate a complete board game design from a simple theme a
 Spawn the `mechanics-architect` subagent. It will:
 
 ### Phase 1: Context Loading
-1. Call `get_designer_profile`.
-2. Call `get_design_session` using the current `sessionId`.
+1. Call `get_design_session` using the current `sessionId`.
 
 ### Phase 2: Creative Execution
 1. Read `.claude/skills/BoardGameDesign/resources/mechanisms.json`.
 2. Propose 3-5 mechanisms with core parameters and justifications.
 
-### Phase 3: Nova Loop & Persistence
-1. **Trace**: Output Trace Block (Observation, Data, Mechanism, Impact).
-2. **Log**: Call `add_design_step` with the proposal.
-3. **Reason**: If `workflowAutomation` is false, ask: "Does this core loop align with your vision?" Otherwise proceed.
-4. **Sync**: `cmd /c npx ts-node .claude/skills/BoardGameDesign/scripts/session_manager.ts log [gameSlug] 1 --summary "Defined core engine with [Mechanisms]."`
+### Phase 3: Persistence
+1. **Log**: Call `add_design_step` with the proposal.
+2. **Sync**: `cmd /c npx ts-node .claude/skills/BoardGameDesign/scripts/session_manager.ts log [gameSlug] 1 --summary "Defined core engine with [Mechanisms]."`
 
 **MCP Integration**: Use `save_reference` for each selected mechanism to the game's reference library.
 
@@ -44,19 +41,16 @@ Spawn the `mechanics-architect` subagent. It will:
 Spawn the `theme-weaver` subagent. It will:
 
 ### Phase 1: Context Loading
-1. Call `get_designer_profile`.
-2. Call `get_design_session` using the current `sessionId`.
+1. Call `get_design_session` using the current `sessionId`.
 
 ### Phase 2: Creative Execution
 1. Map every mechanism to a thematic action or concept.
 2. Define setting, narrative stakes, and player roles.
 3. Ensure all language reflects the chosen theme.
 
-### Phase 3: Nova Loop & Persistence
-1. **Trace**: Output Trace Block.
-2. **Log**: Call `add_design_step` with the thematic specification.
-3. **Reason**: If `workflowAutomation` is false, ask: "Does this setting resonate?" Otherwise proceed.
-4. **Sync**: `cmd /c npx ts-node .claude/skills/BoardGameDesign/scripts/session_manager.ts log [gameSlug] 2 --summary "Applied theme: [Theme Name]."`
+### Phase 3: Persistence
+1. **Log**: Call `add_design_step` with the thematic specification.
+2. **Sync**: `cmd /c npx ts-node .claude/skills/BoardGameDesign/scripts/session_manager.ts log [gameSlug] 2 --summary "Applied theme: [Theme Name]."`
 
 **MCP Integration**: Update the draft rulebook's `thematicBrief` using `update_rule`.
 
@@ -67,19 +61,16 @@ Spawn the `theme-weaver` subagent. It will:
 Spawn the `component-designer` subagent. It will:
 
 ### Phase 1: Context Loading
-1. Call `get_designer_profile`.
-2. Call `get_design_session` using the current `sessionId`.
+1. Call `get_design_session` using the current `sessionId`.
 
 ### Phase 2: Creative Execution
 1. List every physical component required (cards, tiles, etc.).
 2. Provide precise counts and justifications.
 3. Ensure specs are sufficient for a first prototype build.
 
-### Phase 3: Nova Loop & Persistence
-1. **Trace**: Output Trace Block.
-2. **Log**: Call `add_design_step` with the component manifest.
-3. **Reason**: If `workflowAutomation` is false, ask: "Does this component volume feel manageable?" Otherwise proceed.
-4. **Sync**: `cmd /c npx ts-node .claude/skills/BoardGameDesign/scripts/session_manager.ts log [gameSlug] 3 --summary "Generated component manifest."`
+### Phase 3: Persistence
+1. **Log**: Call `add_design_step` with the component manifest.
+2. **Sync**: `cmd /c npx ts-node .claude/skills/BoardGameDesign/scripts/session_manager.ts log [gameSlug] 3 --summary "Generated component manifest."`
 
 **MCP Integration**: Use `update_rule` with `isDraft: true` to add a "Component Manifest" section.
 
@@ -90,19 +81,16 @@ Spawn the `component-designer` subagent. It will:
 Spawn the `details-architect` subagent. It will:
 
 ### Phase 1: Context Loading
-1. Call `get_designer_profile`.
-2. Call `get_design_session` using the current `sessionId`.
+1. Call `get_design_session` using the current `sessionId`.
 
 ### Phase 2: Creative Execution
 1. Define the core turn loop and phase structure.
 2. Write unambiguous rules with clear win conditions.
 3. Compile the final rulebook artifact.
 
-### Phase 3: Nova Loop & Persistence
-1. **Trace**: Output Trace Block.
-2. **Log**: Call `add_design_step` with the final rulebook content.
-3. **Reason**: If `workflowAutomation` is false, ask: "Does this rule structure feel accessible?" Otherwise proceed.
-4. **Sync**: `cmd /c npx ts-node .claude/skills/BoardGameDesign/scripts/session_manager.ts log [gameSlug] 4 --summary "Finalized rulebook draft."`
+### Phase 3: Persistence
+1. **Log**: Call `add_design_step` with the final rulebook content.
+2. **Sync**: `cmd /c npx ts-node .claude/skills/BoardGameDesign/scripts/session_manager.ts log [gameSlug] 4 --summary "Finalized rulebook draft."`
 
 **MCP Integration**: Use `update_rule` with `isDraft: true` to populate all remaining rule sections.
 

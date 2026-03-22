@@ -26,6 +26,7 @@ This skill provides the necessary knowledge and tools to design, analyze, and it
 
 ## Usage Guidelines
 
-- Use the **mechanics-architect** subagent to select initial mechanisms from the taxonomy.
+- Both `/game-gen` (autonomous pipeline) and `/designer` (interactive co-design) use the subagents and scripts provided by this skill.
+- Use the **mechanics-architect** subagent to select mechanisms from the taxonomy.
 - Use the **consistency_checker** after the **component-designer** has specified the physical pieces.
-- Always run the **balance-critic** and **fun-factor-judge** subagents on a complete design before concluding a generation pass.
+- Always run the **balance-critic** and **fun-factor-judge** subagents on a complete design before concluding.
