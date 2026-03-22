@@ -1,0 +1,400 @@
+{
+  "categories": [
+    {
+      "id": "turn_order",
+      "name": "Turn Order",
+      "description": "Mechanisms that determine the sequence in which players take their actions.",
+      "mechanisms": [
+        {
+          "id": "fixed_turn_order",
+          "name": "Fixed Turn Order",
+          "description": "Players always take turns in the same sequence (e.g., clockwise).",
+          "complexity": 1,
+          "synergies": ["action_points", "hand_management"]
+        },
+        {
+          "id": "stat_based_turn_order",
+          "name": "Stat-Based Turn Order",
+          "description": "Turn order is determined by an in-game attribute or resource count.",
+          "complexity": 2,
+          "synergies": ["resource_conversion", "auction_bidding"]
+        },
+        {
+          "id": "auction_for_turn_order",
+          "name": "Auction for Turn Order",
+          "description": "Players bid resources to determine who goes first.",
+          "complexity": 3,
+          "synergies": ["auction_bidding", "market"]
+        },
+        {
+          "id": "pass_order",
+          "name": "Pass Order",
+          "description": "The order in which players pass determines the turn order for the next round.",
+          "complexity": 2,
+          "synergies": ["worker_placement", "action_blocking"]
+        }
+      ]
+    },
+    {
+      "id": "action_selection",
+      "name": "Action Selection",
+      "description": "How players choose what to do on their turn.",
+      "mechanisms": [
+        {
+          "id": "action_points",
+          "name": "Action Points",
+          "description": "Spend a budget of points per turn on various actions with different costs.",
+          "complexity": 2,
+          "synergies": ["area_movement", "pick_up_and_deliver"]
+        },
+        {
+          "id": "worker_placement",
+          "name": "Worker Placement",
+          "description": "Assign limited tokens to specific board locations to claim actions and block others.",
+          "complexity": 3,
+          "synergies": ["resource_management", "contracts"]
+        },
+        {
+          "id": "drafting",
+          "name": "Drafting",
+          "description": "Select items (usually cards or dice) from a common pool or passing hand.",
+          "complexity": 2,
+          "synergies": ["set_collection", "deck_building"]
+        },
+        {
+          "id": "follow_actions",
+          "name": "Follow Actions",
+          "description": "When the active player selects an action, others can perform a weaker version of it.",
+          "complexity": 3,
+          "synergies": ["simultaneous_action_selection"]
+        },
+        {
+          "id": "rondel",
+          "name": "Rondel",
+          "description": "Actions are arranged in a circle; players move a marker around the circle to select.",
+          "complexity": 3,
+          "synergies": ["resource_conversion"]
+        },
+        {
+          "id": "bag_building",
+          "name": "Bag Building",
+          "description": "Pull random chips or tokens from a bag to determine available actions or resources.",
+          "complexity": 3,
+          "synergies": ["deck_building", "push_your_luck"]
+        },
+        {
+          "id": "action_blocking",
+          "name": "Action Blocking",
+          "description": "Actions that, once taken, prevent others from taking them in the same round.",
+          "complexity": 2,
+          "synergies": ["worker_placement", "auction_bidding"]
+        },
+        {
+          "id": "simultaneous_action_selection",
+          "name": "Simultaneous Action Selection",
+          "description": "Players secretly choose actions and reveal them at the same time.",
+          "complexity": 2,
+          "synergies": ["follow_actions", "hidden_information"]
+        },
+        {
+          "id": "auction_bidding",
+          "name": "Auction / Bidding",
+          "description": "Players compete for resources or turn order by offering increasing amounts of currency.",
+          "complexity": 3,
+          "synergies": ["market", "resource_management"]
+        }
+      ]
+    },
+    {
+      "id": "cards_deck",
+      "name": "Cards and Deck Management",
+      "description": "Mechanisms centered around card usage and construction.",
+      "mechanisms": [
+        {
+          "id": "deck_building",
+          "name": "Deck Building",
+          "description": "Start with a basic deck and add better cards during play.",
+          "complexity": 3,
+          "synergies": ["hand_management", "market"]
+        },
+        {
+          "id": "hand_management",
+          "name": "Hand Management",
+          "description": "The order, timing, and combination of cards played are critical.",
+          "complexity": 2,
+          "synergies": ["set_collection", "multi_use_cards"]
+        },
+        {
+          "id": "multi_use_cards",
+          "name": "Multi-Use Cards",
+          "description": "Cards can be used for different purposes (e.g., money vs. action vs. resource).",
+          "complexity": 3,
+          "synergies": ["hand_management"]
+        },
+        {
+          "id": "tuck_under_effects",
+          "name": "Tuck-under Effects",
+          "description": "Placing cards under another card to upgrade it or store value.",
+          "complexity": 2,
+          "synergies": ["engine_building"]
+        },
+        {
+          "id": "trick_taking",
+          "name": "Trick-Taking",
+          "description": "Card play in discrete 'tricks' where the highest card or specific suit wins.",
+          "complexity": 3,
+          "synergies": ["auction_bidding", "hidden_information"]
+        },
+        {
+          "id": "set_collection",
+          "name": "Set Collection",
+          "description": "Collecting groups of identical or related items for points or abilities.",
+          "complexity": 2,
+          "synergies": ["hand_management", "drafting"]
+        }
+      ]
+    },
+    {
+      "id": "economy",
+      "name": "Economy and Resources",
+      "description": "Managing assets, currencies, and engine efficiency.",
+      "mechanisms": [
+        {
+          "id": "market",
+          "name": "Market",
+          "description": "Players buy/sell items from a dynamic pool with shifting prices.",
+          "complexity": 2,
+          "synergies": ["resource_conversion", "economic_sim"]
+        },
+        {
+          "id": "resource_conversion",
+          "name": "Resource Conversion",
+          "description": "Convert Resource A into Resource B (often at a better rate through upgrades).",
+          "complexity": 2,
+          "synergies": ["engine_building", "tableau_building"]
+        },
+        {
+          "id": "engine_building",
+          "name": "Engine Building",
+          "description": "Constructing systems where actions become more powerful and efficient over time.",
+          "complexity": 3,
+          "synergies": ["tableau_building", "income"]
+        },
+        {
+          "id": "tableau_building",
+          "name": "Tableau Building",
+          "description": "Creating a persistent personal area of cards/tiles that grant abilities.",
+          "complexity": 3,
+          "synergies": ["engine_building", "set_collection"]
+        },
+        {
+          "id": "resource_management",
+          "name": "Resource Management",
+          "description": "The strategic accumulation and spending of in-game resources.",
+          "complexity": 2,
+          "synergies": ["worker_placement", "income"]
+        },
+        {
+          "id": "income",
+          "name": "Income",
+          "description": "Periodic generation of resources or currency based on game state.",
+          "complexity": 1,
+          "synergies": ["engine_building", "resource_management"]
+        },
+        {
+          "id": "economic_sim",
+          "name": "Economic Simulation",
+          "description": "Complex interactions involving production, supply, and demand.",
+          "complexity": 4,
+          "synergies": ["market", "resource_conversion"]
+        },
+        {
+          "id": "contracts",
+          "name": "Contracts",
+          "description": "Fulfilling specific resource combinations to gain rewards or points.",
+          "complexity": 2,
+          "synergies": ["pick_up_and_deliver", "resource_management"]
+        }
+      ]
+    },
+    {
+      "id": "territory_conflict",
+      "name": "Territory and Conflict",
+      "description": "Spatial control and player-vs-player interaction.",
+      "mechanisms": [
+        {
+          "id": "area_control",
+          "name": "Area Control / Majority",
+          "description": "Gain bonuses for having the most influence/units in a specific region.",
+          "complexity": 3,
+          "synergies": ["area_movement", "combat"]
+        },
+        {
+          "id": "area_movement",
+          "name": "Area Movement",
+          "description": "Moving pieces between discrete regions on a board.",
+          "complexity": 1,
+          "synergies": ["combat", "hidden_movement"]
+        },
+        {
+          "id": "combat",
+          "name": "Combat",
+          "description": "Conflict resolution between entities, often involving dice or cards.",
+          "complexity": 3,
+          "synergies": ["dice_rolling", "asymmetric_powers"]
+        },
+        {
+          "id": "hidden_movement",
+          "name": "Hidden Movement",
+          "description": "One player tracks their location secretly while others try to hunt them down.",
+          "complexity": 4,
+          "synergies": ["deduction", "team_play"]
+        }
+      ]
+    },
+    {
+      "id": "randomness_luck",
+      "name": "Randomness and Luck",
+      "description": "Managing uncertainty and chance.",
+      "mechanisms": [
+        {
+          "id": "dice_rolling",
+          "name": "Dice Rolling",
+          "description": "Using polyhedral dice to determine outcomes or generate values.",
+          "complexity": 1,
+          "synergies": ["push_your_luck", "combat"]
+        },
+        {
+          "id": "push_your_luck",
+          "name": "Push Your Luck",
+          "description": "Deciding whether to take a safe gain or risk it all for more.",
+          "complexity": 2,
+          "synergies": ["dice_rolling", "bag_building"]
+        },
+        {
+          "id": "roll_and_write",
+          "name": "Roll and Write",
+          "description": "Rolling dice and recording outcomes on a personal score sheet.",
+          "complexity": 2,
+          "synergies": ["pattern_building"]
+        },
+        {
+          "id": "pick_up_and_deliver",
+          "name": "Pick-up and Deliver",
+          "description": "Moving items from one location to another to fulfill objectives.",
+          "complexity": 2,
+          "synergies": ["area_movement", "contracts"]
+        },
+        {
+          "id": "pattern_building",
+          "name": "Pattern Building",
+          "description": "Arranging components in specific spatial configurations for bonuses.",
+          "complexity": 2,
+          "synergies": ["tile_placement", "set_collection"]
+        },
+        {
+          "id": "tile_placement",
+          "name": "Tile Placement",
+          "description": "Placing physical tiles to build the board or personal area.",
+          "complexity": 2,
+          "synergies": ["area_control", "pattern_building"]
+        }
+      ]
+    },
+    {
+      "id": "information",
+      "name": "Information",
+      "description": "Managing what players know and when.",
+      "mechanisms": [
+        {
+          "id": "hidden_information",
+          "name": "Hidden Information",
+          "description": "Information known only to some players or none until revealed.",
+          "complexity": 2,
+          "synergies": ["deduction", "simultaneous_action_selection"]
+        },
+        {
+          "id": "deduction",
+          "name": "Deduction",
+          "description": "Using logic and available clues to determine secret game states.",
+          "complexity": 3,
+          "synergies": ["hidden_information", "communication_limits"]
+        }
+      ]
+    },
+    {
+      "id": "systems_meta",
+      "name": "Systems and Meta",
+      "description": "Overarching game structures and rules-bending.",
+      "mechanisms": [
+        {
+          "id": "asymmetric_powers",
+          "name": "Variable Player Powers",
+          "description": "Each player has a unique ability or starting setup.",
+          "complexity": 3,
+          "synergies": ["any"]
+        },
+        {
+          "id": "legacy",
+          "name": "Legacy",
+          "description": "Permanent changes to the game components or rules across sessions.",
+          "complexity": 5,
+          "synergies": ["campaign"]
+        },
+        {
+          "id": "campaign",
+          "name": "Campaign",
+          "description": "A series of linked sessions where state is carried over.",
+          "complexity": 4,
+          "synergies": ["legacy", "story_driven"]
+        },
+        {
+          "id": "story_driven",
+          "name": "Story Driven",
+          "description": "Narrative elements heavily influence game choices and outcomes.",
+          "complexity": 2,
+          "synergies": ["campaign", "asymmetric_powers"]
+        },
+        {
+          "id": "cooperative",
+          "name": "Cooperative Play",
+          "description": "Players work together to defeat the game engine.",
+          "complexity": 2,
+          "synergies": ["communication_limits", "team_play"]
+        },
+        {
+          "id": "team_play",
+          "name": "Team Play",
+          "description": "Players are divided into competing groups or teams.",
+          "complexity": 2,
+          "synergies": ["cooperative", "communication_limits"]
+        },
+        {
+          "id": "communication_limits",
+          "name": "Communication Limits",
+          "description": "Restricting what players can say or signal to one another.",
+          "complexity": 3,
+          "synergies": ["cooperative", "deduction"]
+        }
+      ]
+    }
+  ],
+  "compatibility_notes": [
+    {
+      "mechanisms": ["action_points", "set_collection"],
+      "note": "Efficiency challenge: Action points create scarcity for collection efficiency."
+    },
+    {
+      "mechanisms": ["area_movement", "hidden_information"],
+      "note": "Fog of War: Creates spatial discovery and exploration tension."
+    },
+    {
+      "mechanisms": ["worker_placement", "action_blocking"],
+      "note": "High interaction: Prevents opponents from taking critical paths."
+    },
+    {
+      "mechanisms": ["deck_building", "market"],
+      "note": "Core Loop: The market provides the cards that define the deck's power."
+    }
+  ]
+}
