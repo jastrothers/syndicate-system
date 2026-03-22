@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep \"name:\" c:/Users/Julian/git/syndicate-system/game-rules-system-mcp/**)",
+      "Edit(/.claude/skills/game-gen/**)",
+      "Edit(/.claude/skills/game-critique/**)",
+      "Bash(cmd /c dir \"c:\\\\Users\\\\Julian\\\\git\\\\syndicate-system\\\\.claude\\\\skills\\\\BoardGameDesign\\\\resources\\\\mechanisms.json\")",
+      "Edit(/.claude/skills/BoardGameDesign/**)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\Julian\\git\\syndicate-system"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"const p = process.env.TOOL_INPUT_FILE_PATH || process.env.CLAUDE_TOOL_INPUT_FILE_PATH || ''; if (p.match(/rulebooks[\\\\/]latest\\.json/)) { process.stdout.write('Direct edit blocked: use the update_rule MCP tool to modify latest.json'); process.exit(2); }\"",
+            "pattern": ".*rulebooks[/\\\\]latest\\.json"
+          }
+        ]
+      }
+    ]
+  }
+}

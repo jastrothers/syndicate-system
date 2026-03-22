@@ -18,7 +18,7 @@ async function checkConsistency(targetPath: string) {
 
     if (stats.isDirectory()) {
         const files = getAllFiles(absoluteTargetPath).filter(f => f.endsWith('.md') || f.endsWith('.json'));
-        
+
         for (const file of files) {
             if (file.endsWith('.json')) {
                 try {
@@ -60,11 +60,11 @@ async function checkConsistency(targetPath: string) {
     const componentRegex = /[-*]?\s*(\d+)\s+([A-Za-z0-9\s]+?)(?:\s*[:(].*|\s*$)/gm;
     const components: { count: number, name: string }[] = [];
     let match;
-    
+
     const componentsSectionStart = content.search(/#+\s*(?:Components|Pieces|Manifest)/i);
     const rulesSectionStart = content.search(/#+\s*(?:Rules|Gameplay|Turn Structure)/i);
-    
-    const componentsText = (componentsSectionStart !== -1 && rulesSectionStart !== -1) 
+
+    const componentsText = (componentsSectionStart !== -1 && rulesSectionStart !== -1)
         ? content.substring(componentsSectionStart, rulesSectionStart)
         : content;
 
@@ -81,11 +81,11 @@ async function checkConsistency(targetPath: string) {
 
     // 2. Verify Component Usage in Rules
     const rulesText = (rulesSectionStart !== -1) ? content.substring(rulesSectionStart) : content;
-    
+
     components.forEach(comp => {
         const singular = comp.name.replace(/s$/, '').trim();
         const usageRegex = new RegExp(`\\b${singular}(s)?\\b`, 'i');
-        
+
         if (!usageRegex.test(rulesText)) {
             warnings.push(`Component "${comp.name}" is defined but never mentioned in the rules section.`);
         }
@@ -98,7 +98,7 @@ async function checkConsistency(targetPath: string) {
         const count = match[1];
         const name = match[2];
         const alreadyKnown = components.some(c => name.toLowerCase().includes(c.name.toLowerCase().replace(/s$/, '').trim()));
-        
+
         if (!alreadyKnown && !ignoreTerms.some(term => name.toLowerCase().includes(term.toLowerCase().replace(/s$/, '')))) {
             warnings.push(`Rules mention "${count} ${name}", but this is not clearly defined in the Components section.`);
         }
@@ -106,14 +106,14 @@ async function checkConsistency(targetPath: string) {
 
     console.log(`\nAdvanced Consistency Report: ${path.basename(absoluteTargetPath)}`);
     console.log('-------------------------------------------');
-    
+
     if (errors.length === 0 && warnings.length === 0) {
         console.log('✅ Design matches manifest perfectly.');
     } else {
         errors.forEach(err => console.log(`❌ ERROR: ${err}`));
         warnings.forEach(warn => console.log(`⚠️ WARNING: ${warn}`));
     }
-    
+
     process.exit(errors.length > 0 ? 1 : 0);
 }
 

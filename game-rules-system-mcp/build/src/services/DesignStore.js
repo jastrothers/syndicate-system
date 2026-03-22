@@ -42,6 +42,12 @@ export async function addDesignStep(gameName, sessionId, step) {
     await saveDesignSession(session);
     return session;
 }
+export async function summarizePreferences(gameName, sessionId, summary) {
+    const session = await getDesignSession(gameName, sessionId);
+    session.preferencesSummarized = summary;
+    await saveDesignSession(session);
+    return session;
+}
 export async function listDesignSessions(gameName) {
     const dir = getDesignSessionDir(gameName);
     try {

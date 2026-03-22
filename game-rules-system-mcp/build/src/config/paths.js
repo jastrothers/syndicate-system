@@ -97,3 +97,16 @@ export function sanitizeVersionTag(tag) {
     // Allow alphanumeric, dashes, dots, and underscores for version tags
     return tag.replace(/[^a-zA-Z0-9._-]/g, "");
 }
+/**
+ * Returns the path for the global designer profile.
+ */
+export function getDesignerProfilePath() {
+    return path.join(DATA_DIR, "designer_profile.json");
+}
+/**
+ * Returns the path for a game's decision log.
+ */
+export function getDecisionLogPath(gameName) {
+    const gameDir = getGameDir(gameName);
+    return path.join(gameDir, "decision_log.json");
+}

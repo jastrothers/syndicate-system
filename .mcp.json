@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "game-rules-system": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["game-rules-system-mcp/build/src/index.js"]
+    }
+  }
+}

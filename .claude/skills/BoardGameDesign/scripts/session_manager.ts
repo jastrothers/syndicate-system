@@ -3,10 +3,10 @@ import * as path from 'path';
 
 /**
  * Session Manager for Board Game Design Workflows.
- * Handles directory creation and step-based logging in 'game-gens/'.
+ * Handles directory creation and step-based logging in 'game-data/'.
  */
 
-const BASE_DIR = path.resolve('game-rules-system-mcp/game-data');
+const BASE_DIR = path.resolve('game-data');
 
 function initSession(gameSlug: string, theme: string) {
     const targetDir = path.join(BASE_DIR, gameSlug, 'design');
@@ -19,7 +19,7 @@ function initSession(gameSlug: string, theme: string) {
     if (!fs.existsSync(summaryPath)) {
         fs.writeFileSync(summaryPath, `# Process Summary: ${gameSlug}\n\nTheme: ${theme}\n\n`);
     }
-    
+
     console.log(`Initialized design logs in: ${targetDir}`);
     return targetDir;
 }

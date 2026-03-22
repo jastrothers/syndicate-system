@@ -1,7 +1,7 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { ListToolsRequestSchema, CallToolRequestSchema } from "@modelcontextprotocol/sdk/types.js";
-import { cardTools, rulebookTools, sessionTools, referenceTools, gameTools, designTools } from "./handlers/index.js";
+import { cardTools, rulebookTools, sessionTools, referenceTools, gameTools, designTools, novaTools } from "./handlers/index.js";
 import { ensureDataDirectory } from "./services/RulebookStore.js";
 import { zodToJsonSchema } from "zod-to-json-schema";
 export function registerHandlers(server) {
@@ -12,6 +12,7 @@ export function registerHandlers(server) {
         ...referenceTools,
         ...gameTools,
         ...designTools,
+        ...novaTools,
     ];
     server.setRequestHandler(ListToolsRequestSchema, async () => ({
         tools: allTools.map((t) => ({ name: t.name, description: t.description, inputSchema: zodToJsonSchema(t.schema) })),

@@ -5,7 +5,7 @@ description: Specialized capabilities for board game creation, mechanical taxono
 
 # Board Game Design Skill
 
-This skill provides the necessary knowledge and tools to design, analyze, and iterate on board game designs using a multi-agent pipeline inspired by GameGrammar.
+This skill provides the necessary knowledge and tools to design, analyze, and iterate on board game designs using a multi-agent pipeline.
 
 ## Capabilities
 
@@ -26,6 +26,6 @@ This skill provides the necessary knowledge and tools to design, analyze, and it
 
 ## Usage Guidelines
 
-- Use the **MechanicsArchitect** persona to selection initial mechanisms from the taxonomy.
-- Use the **ConsistencyChecker** after the **ComponentDesigner** has specified the physical pieces.
-- Always run the **BalanceCritic** and **FunFactorJudge** on a complete design before concluding a generation pass.
+- Use the **mechanics-architect** subagent to select initial mechanisms from the taxonomy.
+- Use the **consistency_checker** after the **component-designer** has specified the physical pieces.
+- Always run the **balance-critic** and **fun-factor-judge** subagents on a complete design before concluding a generation pass.

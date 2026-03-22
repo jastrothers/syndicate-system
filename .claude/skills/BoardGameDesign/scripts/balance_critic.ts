@@ -18,7 +18,7 @@ async function analyzeBalance(targetPath: string) {
 
     if (stats.isDirectory()) {
         const files = getAllFiles(absoluteTargetPath).filter(f => f.endsWith('.md') || f.endsWith('.json'));
-        
+
         for (const file of files) {
             if (file.endsWith('.json')) {
                 try {
@@ -74,7 +74,6 @@ async function analyzeBalance(targetPath: string) {
     }
 
     // 2. Variable Reward Variance (QA Recommendation)
-    // Look for patterns like "Gain X Clout and Y Reputation" or "Solo: X, Shared: Y"
     const rewardPairs = content.matchAll(/(\d+)\s*(?:Clout|Reputation|Points|Tokens).*?(?:vs|or|and).*?(\d+)/gi);
     for (const pair of rewardPairs) {
         const v1 = parseInt(pair[1]);
@@ -91,8 +90,7 @@ async function analyzeBalance(targetPath: string) {
         }
     }
 
-    // 3. Trap Actions / Risk Analysis (QA Recommendation)
-    // Look for Push-Your-Luck mechanics with high penalties
+    // 3. Trap Actions / Risk Analysis
     const bustPenalty = content.match(/Bust:.*?(?:Lose|Penalty).*?(\d+)\s*(\w+)/i);
     const successReward = content.match(/Success:.*?(\d+)\s*(\w+)/i);
     if (bustPenalty && successReward) {
