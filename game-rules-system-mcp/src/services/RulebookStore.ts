@@ -2,6 +2,7 @@ import * as fs from "fs/promises";
 import { Rulebook, VersionInfo } from "../types/index.js";
 import {
   DATA_DIR,
+  SYSTEM_DIR,
   getRulebookDir,
   getRulebookPath,
   getLegacyRulebookPath,
@@ -33,6 +34,7 @@ export function invalidateVersionsCache(name: string): void {
 
 export async function ensureDataDirectory() {
   await StorageService.ensureDirectory(DATA_DIR);
+  await StorageService.ensureDirectory(SYSTEM_DIR);
 }
 
 /**

@@ -2,7 +2,7 @@ import * as fs from "fs/promises";
 import * as path from "path";
 import Database from "better-sqlite3";
 import { PlaytestSession } from "../types/index.js";
-import { SESSION_INDEX_DB, getSessionPath, DATA_DIR } from "../config/paths.js";
+import { SESSION_INDEX_DB, getSessionPath, DATA_DIR, SYSTEM_DIR } from "../config/paths.js";
 import crypto from "crypto";
 import * as StorageService from "./StorageService.js";
 
@@ -10,6 +10,7 @@ let db: Database.Database;
 
 export async function ensureSessionsDirectory() {
   await StorageService.ensureDirectory(DATA_DIR);
+  await StorageService.ensureDirectory(SYSTEM_DIR);
 }
 
 export async function initialize() {

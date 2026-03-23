@@ -1,5 +1,5 @@
 import * as fs from "fs/promises";
-import { DATA_DIR, getRulebookDir, getRulebookPath, getLegacyRulebookPath, sanitizeVersionTag, } from "../config/paths.js";
+import { DATA_DIR, SYSTEM_DIR, getRulebookDir, getRulebookPath, getLegacyRulebookPath, sanitizeVersionTag, } from "../config/paths.js";
 import * as StorageService from "./StorageService.js";
 // In-memory cache: key is "name" for latest or "name@versionTag" for snapshots.
 const rulebookCache = new Map();
@@ -22,6 +22,7 @@ export function invalidateVersionsCache(name) {
 }
 export async function ensureDataDirectory() {
     await StorageService.ensureDirectory(DATA_DIR);
+    await StorageService.ensureDirectory(SYSTEM_DIR);
 }
 /**
  * Auto-migrates a legacy flat file (e.g. game-data/heist.json)

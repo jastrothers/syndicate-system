@@ -6,8 +6,9 @@ const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, "../../../..");
 const DEFAULT_DATA_DIR = path.join(REPO_ROOT, "game-data");
 export const DATA_DIR = process.env.GAME_DATA_DIR || process.env.TEST_DATA_DIR || DEFAULT_DATA_DIR;
-export const SESSION_INDEX_DB = path.join(DATA_DIR, "session_index.db");
-export const REFERENCE_INDEX_DB = path.join(DATA_DIR, "reference_index.db");
+export const SYSTEM_DIR = path.join(DATA_DIR, "_system");
+export const SESSION_INDEX_DB = path.join(SYSTEM_DIR, "session_index.db");
+export const REFERENCE_INDEX_DB = path.join(SYSTEM_DIR, "reference_index.db");
 export function sanitizeFileName(name) {
     // Allow only alphanumeric, dashes, and underscores
     return name.replace(/[^a-zA-Z0-9_-]/g, "");
@@ -59,8 +60,7 @@ export function getRulebookMdPath(name, versionTag) {
     return path.join(dir, `${fileName}.md`);
 }
 export function getPlaytestLogPath(name) {
-    const dir = getRulebookDir(name);
-    return path.join(dir, `playtest_logs.md`);
+    return path.join(getGameDir(name), "logs", "playtest_logs.md");
 }
 /**
  * Returns the directory for a specific game's sessions.
@@ -107,12 +107,11 @@ export function sanitizeVersionTag(tag) {
  * Returns the path for the global designer profile.
  */
 export function getDesignerProfilePath() {
-    return path.join(DATA_DIR, "designer_profile.json");
+    return path.join(SYSTEM_DIR, "designer_profile.json");
 }
 /**
  * Returns the path for a game's decision log.
  */
 export function getDecisionLogPath(gameName) {
-    const gameDir = getGameDir(gameName);
-    return path.join(gameDir, "decision_log.json");
+    return path.join(getGameDir(gameName), "logs", "decision_log.json");
 }

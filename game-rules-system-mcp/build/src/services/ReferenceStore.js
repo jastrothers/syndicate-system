@@ -2,11 +2,12 @@ import * as fs from "fs/promises";
 import Database from "better-sqlite3";
 import matter from "gray-matter";
 import * as path from "path";
-import { DATA_DIR, REFERENCE_INDEX_DB, getReferenceFilePath } from "../config/paths.js";
+import { DATA_DIR, SYSTEM_DIR, REFERENCE_INDEX_DB, getReferenceFilePath } from "../config/paths.js";
 let db;
 export async function initialize() {
     try {
         await fs.mkdir(DATA_DIR, { recursive: true });
+        await fs.mkdir(SYSTEM_DIR, { recursive: true });
     }
     catch (error) {
         console.error("Failed to create data directory:", error);
