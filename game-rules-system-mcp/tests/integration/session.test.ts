@@ -108,8 +108,9 @@ test("Playtesting Session Integration Tests", async (t) => {
       name: "get_action_history",
       arguments: { sessionId: currentSessionId }
     });
-    const ledger = JSON.parse((ledgerResult.content[0] as any).text);
-    
+    const ledgerData = JSON.parse((ledgerResult.content[0] as any).text);
+    const ledger = ledgerData.items ?? ledgerData;
+
     const actions = ledger.map((l: any) => l.actionType);
     assert.ok(actions.includes("shuffle_deck"));
     assert.ok(actions.includes("draw_from_deck"));

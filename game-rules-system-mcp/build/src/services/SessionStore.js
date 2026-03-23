@@ -1,3 +1,4 @@
+import * as fs from "fs/promises";
 import Database from "better-sqlite3";
 import { SESSION_INDEX_DB, getSessionPath, DATA_DIR } from "../config/paths.js";
 import crypto from "crypto";
@@ -74,9 +75,15 @@ export async function saveSession(sessionId, session) {
     const sessionFile = getSessionPath(sessionId, session.rulebookName, session.rulebookVersion);
     session.lastUpdatedAt = new Date().toISOString();
     await StorageService.saveJson(sessionFile, session);
-    // Update index
+    // Update index — if this fails, compensate by removing the file we just wrote
     if (db) {
-        insertIntoIndex(session, sessionFile);
+        try {
+            insertIntoIndex(session, sessionFile);
+        }
+        catch (indexError) {
+            await fs.unlink(sessionFile).catch(() => { });
+            throw new Error(`Session save failed: could not update index. ${indexError instanceof Error ? indexError.message : String(indexError)}`);
+        }
     }
 }
 export async function listSessions(rulebookName, rulebookVersion) {

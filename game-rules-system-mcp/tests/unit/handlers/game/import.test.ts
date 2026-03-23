@@ -1,12 +1,26 @@
 import test from "node:test";
 import assert from "node:assert";
+import * as fs from "fs/promises";
 import { importGameTool } from "../../../../src/handlers/game/import.js";
 import * as ReferenceStore from "../../../../src/services/ReferenceStore.js";
 import { getRulebook } from "../../../../src/services/RulebookStore.js";
+import { getGameDir } from "../../../../src/config/paths.js";
 
 test("importGameTool", async (t) => {
   // Initialize services before running tests
   await ReferenceStore.initialize();
+
+  // Clean up any leftover state from previous runs
+  t.before(async () => {
+    const gameDir = getGameDir("TestGameImport");
+    await fs.rm(gameDir, { recursive: true, force: true }).catch(() => {});
+  });
+
+  t.after(async () => {
+    const gameDir = getGameDir("TestGameImport");
+    await fs.rm(gameDir, { recursive: true, force: true }).catch(() => {});
+    ReferenceStore.closeDb();
+  });
 
   await t.test("should successfully import a game, save rulebook, and save all references", async () => {
     const args = {
@@ -37,7 +51,4 @@ test("importGameTool", async (t) => {
     assert.strictEqual(refs.length, 4);
   });
 
-  t.after(() => {
-    ReferenceStore.closeDb();
-  });
 });

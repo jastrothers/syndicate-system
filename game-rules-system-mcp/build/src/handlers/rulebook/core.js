@@ -1,6 +1,20 @@
 import { z } from "zod";
 import { getRulebook, saveRulebook, getDraft, saveDraft, promoteDraft } from "../../services/RulebookStore.js";
 import { extractStructure } from "../../services/MarkdownFormatter.js";
+/**
+ * Flattens a sections tree into a map of dot-notation path → {title, content}.
+ */
+function flattenSections(sections, prefix = "") {
+    const result = {};
+    for (const [key, section] of Object.entries(sections)) {
+        const path = prefix ? `${prefix}.${key}` : key;
+        result[path] = { title: section.title, content: section.content };
+        if (section.subsections && Object.keys(section.subsections).length > 0) {
+            Object.assign(result, flattenSections(section.subsections, path));
+        }
+    }
+    return result;
+}
 export const compareRulebooksTool = {
     name: "compare_rulebooks",
     description: "Compares two rulebooks and returns the differences in their structures and content. Can compare different games or different versions of the same game.",
@@ -13,8 +27,33 @@ export const compareRulebooksTool = {
     handler: async (args) => {
         const base = await getRulebook(args.baseRulebook, args.baseVersion);
         const target = await getRulebook(args.targetRulebook, args.targetVersion);
-        const baseStructure = extractStructure(base.sections);
-        const targetStructure = extractStructure(target.sections);
+        const baseSections = flattenSections(base.sections);
+        const targetSections = flattenSections(target.sections);
+        const allPaths = new Set([...Object.keys(baseSections), ...Object.keys(targetSections)]);
+        const added = [];
+        const removed = [];
+        const modified = [];
+        const unchanged = [];
+        for (const p of allPaths) {
+            const inBase = p in baseSections;
+            const inTarget = p in targetSections;
+            if (!inBase) {
+                added.push(p);
+            }
+            else if (!inTarget) {
+                removed.push(p);
+            }
+            else {
+                const b = baseSections[p];
+                const t = targetSections[p];
+                if (b.title !== t.title || b.content !== t.content) {
+                    modified.push({ path: p, baseTitle: b.title, targetTitle: t.title, contentChanged: b.content !== t.content });
+                }
+                else {
+                    unchanged.push(p);
+                }
+            }
+        }
         const comparison = {
             baseRulebook: {
                 name: args.baseRulebook,
@@ -28,11 +67,14 @@ export const compareRulebooksTool = {
                 versionTag: args.targetVersion || "latest",
                 lastUpdated: target.metadata.lastUpdated,
             },
-            differences: {
-                note: "Detailed section-by-section diff requires parsing and matching sections, currently providing structural comparison.",
-                baseStructure,
-                targetStructure,
+            summary: {
+                totalSections: allPaths.size,
+                added: added.length,
+                removed: removed.length,
+                modified: modified.length,
+                unchanged: unchanged.length,
             },
+            differences: { added, removed, modified },
         };
         return {
             content: [{ type: "text", text: JSON.stringify(comparison, null, 2) }],

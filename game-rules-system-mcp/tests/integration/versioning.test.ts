@@ -110,8 +110,10 @@ test("Versioning Integration Tests", async (t) => {
     const comparison = JSON.parse((result.content[0] as any).text);
     assert.strictEqual(comparison.baseRulebook.versionTag, "1.0.0");
     assert.strictEqual(comparison.targetRulebook.versionTag, "1.1.0");
-    // Target should have the gameplay section that base lacks
-    assert.ok(comparison.differences.targetStructure.gameplay, "Target v1.1.0 should have 'gameplay'");
-    assert.ok(!comparison.differences.baseStructure.gameplay, "Base v1.0.0 should not have 'gameplay'");
+    // Target v1.1.0 has a 'gameplay' section that base v1.0.0 lacks — it should appear in the added list
+    assert.ok(comparison.summary.added > 0 || comparison.summary.modified > 0, "There should be added or modified sections between versions");
+    // The content diff should surface the gameplay section as added in target
+    const addedOrModified = [...comparison.differences.added, ...comparison.differences.modified.map((m: any) => m.path)];
+    assert.ok(addedOrModified.some((p: string) => p.includes("gameplay")), "gameplay section should appear in added/modified differences");
   });
 });

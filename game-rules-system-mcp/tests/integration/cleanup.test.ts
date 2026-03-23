@@ -19,7 +19,7 @@ test("Cleanup Integration Tests", async (t) => {
 
     const deleteResult: any = await client.callTool({
       name: "delete_playtest_session",
-      arguments: { sessionId },
+      arguments: { sessionId, confirm: true },
     });
     assert.strictEqual(deleteResult.isError, undefined);
     const deleteData = JSON.parse((deleteResult.content[0] as any).text);
@@ -54,7 +54,7 @@ test("Cleanup Integration Tests", async (t) => {
 
     const deleteResult: any = await client.callTool({
       name: "delete_design_session",
-      arguments: { gameName: "cleanup-design-game", sessionId },
+      arguments: { gameName: "cleanup-design-game", sessionId, confirm: true },
     });
     assert.strictEqual(deleteResult.isError, undefined);
 

@@ -30,9 +30,15 @@ export function registerHandlers(server) {
             return await tool.handler(parsedArgs);
         }
         catch (error) {
+            const type = error?.name === "ZodError" ? "validation"
+                : (error?.code === "ENOENT" || error?.code === "EACCES" || error?.code === "EBUSY") ? "io"
+                    : "logic";
+            const message = error?.name === "ZodError"
+                ? (error.errors ?? []).map((e) => `${e.path.join(".")}: ${e.message}`).join("; ")
+                : (error?.message || String(error));
             return {
                 isError: true,
-                content: [{ type: "text", text: String(error?.stack || error?.message || error) }]
+                content: [{ type: "text", text: JSON.stringify({ type, message }) }]
             };
         }
     });

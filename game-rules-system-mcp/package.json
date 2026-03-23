@@ -8,7 +8,7 @@
     "build": "tsc",
     "start": "node build/src/index.js",
     "dev": "tsc --watch",
-    "test": "npm run build && node --test --test-concurrency=1 \"build/tests/**/*.test.js\" \"build/tests/**/*.js\""
+    "test": "npm run build && node --test --test-concurrency=1 \"build/tests/**/*.test.js\""
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.1",

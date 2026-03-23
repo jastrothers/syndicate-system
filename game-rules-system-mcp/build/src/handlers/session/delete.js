@@ -6,6 +6,7 @@ export const deleteSessionTool = {
     description: "Permanently deletes a playtest session file and removes it from the session index.",
     schema: z.object({
         sessionId: z.string().describe("The ID of the session to delete."),
+        confirm: z.literal(true).describe("Must be explicitly set to true to confirm permanent deletion."),
     }),
     handler: async (args) => {
         const filePath = SessionStore.deleteSession(args.sessionId);

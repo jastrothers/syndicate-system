@@ -31,8 +31,21 @@ export async function processDecision(gameName, sessionId, stepId, decision, rat
         await ProfileService.updateAffinities(impactedMechanisms, -0.2); // Reject has higher weight
     }
 }
-export function synthesizeNovaResponse(step) {
+export function synthesizeNovaResponse(step, profile) {
     const trace = step.trace;
+    let designerContext;
+    if (profile && Object.keys(profile.affinities).length > 0) {
+        designerContext = {
+            liked: Object.entries(profile.affinities)
+                .filter(([, w]) => w >= 0.3)
+                .sort(([, a], [, b]) => b - a)
+                .map(([m]) => m),
+            disliked: Object.entries(profile.affinities)
+                .filter(([, w]) => w <= -0.3)
+                .sort(([, a], [, b]) => a - b)
+                .map(([m]) => m),
+        };
+    }
     return {
         conclusion: step.summary,
         reasoning: trace ?
@@ -57,6 +70,7 @@ export function synthesizeNovaResponse(step) {
                 description: "Keep the mechanism but tweak the numbers to resolve the specific issue.",
                 action: "ADJUST_PARAMS"
             }
-        ]
+        ],
+        ...(designerContext ? { designerContext } : {}),
     };
 }

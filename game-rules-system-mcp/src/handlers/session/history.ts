@@ -30,14 +30,21 @@ export const recordActionTool: ToolDefinition = {
 
 export const getActionHistoryTool: ToolDefinition = {
   name: "get_action_history",
-  description: "Retrieves the historical sequence of actions recorded in a session's ledger.",
+  description: "Retrieves the historical sequence of actions recorded in a session's ledger. Use limit and offset to page through long histories.",
   schema: z.object({
     sessionId: z.string().describe("The ID of the playtest session."),
+    limit: z.number().int().positive().optional().describe("Maximum number of entries to return."),
+    offset: z.number().int().nonnegative().optional().default(0).describe("Number of entries to skip before returning results. Default: 0."),
   }),
   handler: async (args) => {
     const session = await getSession(args.sessionId);
+    const total = session.ledger.length;
+    const offset = args.offset ?? 0;
+    const items = args.limit !== undefined
+      ? session.ledger.slice(offset, offset + args.limit)
+      : session.ledger.slice(offset);
     return {
-      content: [{ type: "text", text: JSON.stringify(session.ledger, null, 2) }],
+      content: [{ type: "text", text: JSON.stringify({ total, offset, count: items.length, items }, null, 2) }],
     };
   },
 };

@@ -37,12 +37,18 @@ describe("deleteDesignSessionTool", () => {
     it("has a handler function", () => {
         assert.equal(typeof deleteDesignSessionTool.handler, "function");
     });
-    it("schema requires gameName and sessionId", () => {
+    it("schema requires gameName, sessionId, and confirm: true", () => {
         const valid = deleteDesignSessionTool.schema.safeParse({
             gameName: "heist",
             sessionId: "abc-123",
+            confirm: true,
         });
         assert.ok(valid.success);
+        const missingConfirm = deleteDesignSessionTool.schema.safeParse({
+            gameName: "heist",
+            sessionId: "abc-123",
+        });
+        assert.ok(!missingConfirm.success, "Missing confirm should fail");
     });
     it("schema rejects missing gameName", () => {
         const result = deleteDesignSessionTool.schema.safeParse({ sessionId: "abc-123" });

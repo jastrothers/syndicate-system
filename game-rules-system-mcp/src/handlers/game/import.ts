@@ -1,6 +1,6 @@
 import { z } from "zod";
 import * as ReferenceStore from "../../services/ReferenceStore.js";
-import { saveRulebook } from "../../services/RulebookStore.js";
+import { saveRulebook, listRulebooks } from "../../services/RulebookStore.js";
 import { ToolDefinition } from "../types.js";
 
 function generateManifestReference(game: string, version: string, decks: any[]) {
@@ -58,7 +58,15 @@ export const importGameTool: ToolDefinition = {
         ).describe("A list of all references and components belonging to this game."),
     }),
     handler: async (args) => {
-        // 1. Initialize Rulebook via Raw Markdown (we simulate an empty skeleton then inject raw content into a top-level node for basic compatibility. For full sectionizing, it requires a parser we skip here to keep it simple).
+        // 1. Conflict check — refuse to overwrite an existing game
+        const existingGames = await listRulebooks();
+        if (existingGames.includes(args.game)) {
+            throw new Error(
+                `Game '${args.game}' already exists. Delete it first with delete_game or choose a different name.`
+            );
+        }
+
+        // 2. Initialize Rulebook via Raw Markdown (we simulate an empty skeleton then inject raw content into a top-level node for basic compatibility. For full sectionizing, it requires a parser we skip here to keep it simple).
         const rulebookSkeleton = {
             metadata: {
                 title: args.game,
@@ -77,7 +85,7 @@ export const importGameTool: ToolDefinition = {
         // If rulebook format differs, or existing version handling applies, rely on saveRulebook. Base case:
         await saveRulebook(args.game, rulebookSkeleton as any);
 
-        // 2. Iterate references
+        // 3. Iterate references
         const decks = [];
 
         for (const ref of args.references) {
@@ -87,11 +95,11 @@ export const importGameTool: ToolDefinition = {
             }
         }
 
-        // 3. Dynamic Manifest Generation
+        // 4. Dynamic Manifest Generation
         const manifest = generateManifestReference(args.game, args.version, decks);
         await ReferenceStore.saveReference(manifest.name, manifest.game, manifest.version, manifest.type, manifest.tags, manifest.content);
 
-        // 4. Dynamic setup macro script
+        // 5. Dynamic setup macro script
         const macro = generateMacroReference(args.game, args.version);
         await ReferenceStore.saveReference(macro.name, macro.game, macro.version, macro.type, macro.tags, macro.content);
 
