@@ -1,5 +1,11 @@
 import * as path from "path";
-export const DATA_DIR = process.env.TEST_DATA_DIR || path.join(process.cwd(), "game-data");
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+// build/src/config/ -> ../../.. -> game-rules-system-mcp/ -> .. -> syndicate-system/
+const REPO_ROOT = path.resolve(__dirname, "../../../..");
+const DEFAULT_DATA_DIR = path.join(REPO_ROOT, "game-data");
+export const DATA_DIR = process.env.GAME_DATA_DIR || process.env.TEST_DATA_DIR || DEFAULT_DATA_DIR;
 export const SESSION_INDEX_DB = path.join(DATA_DIR, "session_index.db");
 export const REFERENCE_INDEX_DB = path.join(DATA_DIR, "reference_index.db");
 export function sanitizeFileName(name) {
