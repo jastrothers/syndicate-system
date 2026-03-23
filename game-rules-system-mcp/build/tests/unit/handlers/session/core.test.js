@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { createSessionTool, getGameStateTool, updateGameStateTool, logPlaytestNoteTool, } from "../../../../src/handlers/session/core.js";
+import { createSessionTool, getGameStateTool, updateGameStateTool, logPlaytestNoteTool, listSessionsTool, } from "../../../../src/handlers/session/core.js";
 // ── create_session ────────────────────────────────────────────────────────────
 describe("createSessionTool", () => {
     it("has the correct tool name", () => {
@@ -60,5 +60,26 @@ describe("logPlaytestNoteTool", () => {
         const result = logPlaytestNoteTool.schema.safeParse({ sessionId: "s1", note: "Test note." });
         assert.ok(result.success);
         assert.equal(result.data.category, "General");
+    });
+});
+// ── list_sessions ────────────────────────────────────────────────────────────
+describe("listSessionsTool", () => {
+    it("has the correct tool name", () => {
+        assert.equal(listSessionsTool.name, "list_sessions");
+    });
+    it("schema accepts empty object (no filters)", () => {
+        const result = listSessionsTool.schema.safeParse({});
+        assert.ok(result.success);
+    });
+    it("schema accepts optional rulebookName filter", () => {
+        const result = listSessionsTool.schema.safeParse({ rulebookName: "heist" });
+        assert.ok(result.success);
+    });
+    it("schema accepts optional rulebookName and rulebookVersion filters", () => {
+        const result = listSessionsTool.schema.safeParse({
+            rulebookName: "heist",
+            rulebookVersion: "1.0.0",
+        });
+        assert.ok(result.success);
     });
 });

@@ -4,7 +4,7 @@ import { getSession, saveSession } from "../../services/SessionStore.js";
 import { ToolDefinition } from "../types.js";
 
 import { getReference } from "../../services/ReferenceStore.js";
-import { shuffleArray } from "../../services/DeckService.js";
+import { shuffleArray, expandCardTemplates } from "../../services/DeckService.js";
 
 // Helper function to process decks internally inside macro to avoid circular handler imports
 async function instantiateDeckFromReference(session: any, deckId: string, referenceName: string, game?: string, version?: string, shuffle: boolean = true) {
@@ -19,17 +19,7 @@ async function instantiateDeckFromReference(session: any, deckId: string, refere
     throw new Error(`Failed to parse reference '${referenceName}' content as JSON card array.`);
   }
 
-  const deck: unknown[] = [];
-  for (const entry of cards) {
-    const count = entry.count || 1;
-    for (let i = 0; i < count; i++) {
-        deck.push(
-            typeof entry.card === "object" && entry.card !== null
-            ? { id: crypto.randomUUID(), ...entry.card }
-            : entry.card
-        );
-    }
-  }
+  const deck = expandCardTemplates(cards);
 
   if (shuffle) shuffleArray(deck);
   session.state[deckId] = deck;
@@ -115,15 +105,17 @@ export const setupGameFromManifestTool: ToolDefinition = {
 
     await saveSession(args.sessionId, session);
 
+    const decksCreated = manifest.decks?.filter((d: any) => d.deckId && d.referenceName).map((d: any) => d.deckId) || [];
+    const stateKeysUpdated = manifest.state ? Object.keys(manifest.state) : [];
     return {
-      content: [{ type: "text", text: "Successfully setup game from manifest." }],
+      content: [{ type: "text", text: JSON.stringify({ decksCreated, stateKeysUpdated }, null, 2) }],
     };
   }
 };
 
 export const executeMacroActionTool: ToolDefinition = {
   name: "execute_macro_action",
-  description: "Executes a Javascript snippet from a reference inside a sandbox with write-access to the game state. Useful for executing complex turn logic.",
+  description: "Executes a Javascript snippet from a reference inside a sandbox with write-access to the game state. Useful for executing complex turn logic. Sandbox globals: `state` (mutable game state), `ledger` (action log array), `inputs` (the inputs param). Helper API: `api.draw(deckId, handId, count)` → drawn cards array, `api.move(entityId, sourceId, targetId)` → boolean, `api.shuffle(deckId)` → void, `api.log(msg)` → console log. Timeout: 2 seconds.",
   schema: z.object({
     sessionId: z.string().describe("The ID of the playtest session."),
     macroScriptReferenceName: z.string().describe("The name of the reference containing the Javascript macro code."),

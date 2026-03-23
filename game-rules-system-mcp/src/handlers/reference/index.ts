@@ -34,7 +34,11 @@ export const getReferenceTool: ToolDefinition = {
   handler: async (args) => {
     const ref = await ReferenceStore.getReference(args.name, args.game, args.version);
     if (!ref) {
-      throw new Error(`Reference '${args.name}' not found.`);
+      const hint = args.game ? ` for game '${args.game}'` : "";
+      const versionHint = args.version ? ` version '${args.version}'` : "";
+      throw new Error(
+        `Reference '${args.name}' not found${hint}${versionHint}. Try list_references to see available references, or check game/version filters.`
+      );
     }
     return {
       content: [{ type: "text", text: JSON.stringify(ref, null, 2) }],

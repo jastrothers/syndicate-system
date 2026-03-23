@@ -4,7 +4,7 @@
  */
 import { z } from "zod";
 import { getSession, saveSession } from "../../services/SessionStore.js";
-import { peekCards, searchArray, insertIntoArray, } from "../../services/DeckService.js";
+import { peekCards, searchArray, insertIntoArray, validateFilterClause, } from "../../services/DeckService.js";
 export const peekAtDeckTool = {
     name: "peek_at_deck",
     description: "Look at top or bottom N cards of a deck array without moving them. Returns the peeked cards. Useful for scry, reveal, and information-gathering mechanics.",
@@ -61,10 +61,7 @@ export const searchZoneTool = {
         if (!Array.isArray(zone)) {
             throw new Error(`State key '${args.zoneId}' is not an array.`);
         }
-        const numericOps = ["gt", "lt", "gte", "lte"];
-        if (numericOps.includes(args.filter.op) && typeof args.filter.value !== "number") {
-            throw new Error(`Filter operator '${args.filter.op}' requires a numeric value, got ${typeof args.filter.value}.`);
-        }
+        validateFilterClause(args.filter);
         const results = searchArray(zone, args.filter);
         return {
             content: [
@@ -108,7 +105,7 @@ export const insertIntoDeckTool = {
             content: [
                 {
                     type: "text",
-                    text: `Inserted ${args.cards.length} card(s) at ${args.position} of ${args.deckId}.`,
+                    text: JSON.stringify({ inserted: args.cards.length, deckSize: session.state[args.deckId].length, deckId: args.deckId, position: args.position }, null, 2),
                 },
             ],
         };

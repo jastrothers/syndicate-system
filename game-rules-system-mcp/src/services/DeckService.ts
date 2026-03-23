@@ -65,6 +65,41 @@ export function matchesFilter(item: unknown, filter: FilterClause): boolean {
 }
 
 /**
+ * Validates that a filter clause uses a numeric operator with a numeric value.
+ * Throws a descriptive error if the operator requires a number but value is not.
+ */
+export function validateFilterClause(filter: FilterClause): void {
+  const numericOps = ["gt", "lt", "gte", "lte"];
+  if (numericOps.includes(filter.op) && typeof filter.value !== "number") {
+    throw new Error(
+      `Filter operator '${filter.op}' requires a numeric value, got ${typeof filter.value}.`
+    );
+  }
+}
+
+/**
+ * Expands a card template array into a flat deck array.
+ * Each template entry has a `card` (object or scalar) and a `count`.
+ * Object cards receive a unique `id` field via crypto.randomUUID().
+ */
+export function expandCardTemplates(
+  cards: Array<{ card: unknown; count: number }>
+): unknown[] {
+  const deck: unknown[] = [];
+  for (const entry of cards) {
+    const count = entry.count || 1;
+    for (let i = 0; i < count; i++) {
+      deck.push(
+        typeof entry.card === "object" && entry.card !== null
+          ? { id: crypto.randomUUID(), ...(entry.card as Record<string, unknown>) }
+          : entry.card
+      );
+    }
+  }
+  return deck;
+}
+
+/**
  * Look at N cards from the top or bottom of a deck without mutating it.
  */
 export function peekCards<T>(

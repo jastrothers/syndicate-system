@@ -69,15 +69,15 @@ export const deleteRulebookVersionTool = {
     name: "delete_rulebook_version",
     description: "Permanently deletes a versioned rulebook snapshot (e.g. v1.0.0). Cannot delete the 'latest' working copy.",
     schema: z.object({
-        gameName: z.string().describe("The name of the game/rulebook."),
+        rulebookName: z.string().describe("The name of the rulebook."),
         versionTag: z.string().describe("The version tag to delete (e.g. '1.0.0'). Cannot be 'latest'."),
     }),
     handler: async (args) => {
         if (args.versionTag.toLowerCase() === "latest") {
             throw new Error("Cannot delete the 'latest' working copy. Use delete_game to remove all game data.");
         }
-        const jsonPath = getRulebookPath(args.gameName, { versionTag: args.versionTag });
-        const mdPath = getRulebookMdPath(args.gameName, args.versionTag);
+        const jsonPath = getRulebookPath(args.rulebookName, { versionTag: args.versionTag });
+        const mdPath = getRulebookMdPath(args.rulebookName, args.versionTag);
         let deletedFiles = [];
         try {
             await fs.unlink(jsonPath);
@@ -85,7 +85,7 @@ export const deleteRulebookVersionTool = {
         }
         catch (err) {
             if (err.code === "ENOENT") {
-                throw new Error(`Version '${args.versionTag}' of rulebook '${args.gameName}' not found.`);
+                throw new Error(`Version '${args.versionTag}' of rulebook '${args.rulebookName}' not found.`);
             }
             throw err;
         }
@@ -102,7 +102,7 @@ export const deleteRulebookVersionTool = {
                     type: "text",
                     text: JSON.stringify({
                         status: "success",
-                        message: `Version '${args.versionTag}' of rulebook '${args.gameName}' has been permanently deleted.`,
+                        message: `Version '${args.versionTag}' of rulebook '${args.rulebookName}' has been permanently deleted.`,
                         deletedFiles,
                     }, null, 2),
                 }],

@@ -8,6 +8,7 @@ import {
   peekCards,
   searchArray,
   insertIntoArray,
+  validateFilterClause,
   FilterClause,
 } from "../../services/DeckService.js";
 import { ToolDefinition } from "../types.js";
@@ -76,11 +77,7 @@ export const searchZoneTool: ToolDefinition = {
       throw new Error(`State key '${args.zoneId}' is not an array.`);
     }
 
-    const numericOps = ["gt", "lt", "gte", "lte"];
-    if (numericOps.includes(args.filter.op) && typeof args.filter.value !== "number") {
-      throw new Error(`Filter operator '${args.filter.op}' requires a numeric value, got ${typeof args.filter.value}.`);
-    }
-
+    validateFilterClause(args.filter as FilterClause);
     const results = searchArray(zone, args.filter as FilterClause);
 
     return {
@@ -135,7 +132,7 @@ export const insertIntoDeckTool: ToolDefinition = {
       content: [
         {
           type: "text",
-          text: `Inserted ${args.cards.length} card(s) at ${args.position} of ${args.deckId}.`,
+          text: JSON.stringify({ inserted: args.cards.length, deckSize: session.state[args.deckId].length, deckId: args.deckId, position: args.position }, null, 2),
         },
       ],
     };

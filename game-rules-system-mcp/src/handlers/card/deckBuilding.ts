@@ -5,11 +5,9 @@
  */
 import { z } from "zod";
 import { getSession, saveSession } from "../../services/SessionStore.js";
-import { shuffleArray, matchesFilter, FilterClause } from "../../services/DeckService.js";
+import { shuffleArray, matchesFilter, validateFilterClause, expandCardTemplates, FilterClause } from "../../services/DeckService.js";
 import { filterSchema } from "./deck.js";
 import { ToolDefinition } from "../types.js";
-
-import * as crypto from "crypto";
 
 export const createDeckFromTemplateTool: ToolDefinition = {
   name: "create_deck_from_template",
@@ -43,16 +41,7 @@ export const createDeckFromTemplateTool: ToolDefinition = {
   handler: async (args: any) => {
     const session = await getSession(args.sessionId);
 
-    const deck: unknown[] = [];
-    for (const entry of args.cards) {
-      for (let i = 0; i < entry.count; i++) {
-        deck.push(
-          typeof entry.card === "object" && entry.card !== null
-            ? { id: crypto.randomUUID(), ...entry.card }
-            : entry.card
-        );
-      }
-    }
+    const deck = expandCardTemplates(args.cards);
 
     if (args.shuffle) {
       shuffleArray(deck);
@@ -77,7 +66,7 @@ export const createDeckFromTemplateTool: ToolDefinition = {
       content: [
         {
           type: "text",
-          text: `Created deck '${args.deckId}' with ${deck.length} cards (${args.cards.length} unique types).${args.shuffle ? " Deck shuffled." : ""}`,
+          text: JSON.stringify({ deckId: args.deckId, totalCards: deck.length, uniqueTypes: args.cards.length, shuffled: args.shuffle }, null, 2),
         },
       ],
     };
@@ -105,10 +94,7 @@ export const countZoneTool: ToolDefinition = {
 
     let count: number;
     if (args.filter) {
-      const numericOps = ["gt", "lt", "gte", "lte"];
-      if (numericOps.includes(args.filter.op) && typeof args.filter.value !== "number") {
-        throw new Error(`Filter operator '${args.filter.op}' requires a numeric value, got ${typeof args.filter.value}.`);
-      }
+      validateFilterClause(args.filter as FilterClause);
       count = zone.filter((item) =>
         matchesFilter(item, args.filter as FilterClause)
       ).length;
@@ -229,17 +215,7 @@ export const createDeckFromReferenceTool: ToolDefinition = {
       throw new Error(`Failed to parse reference '${args.referenceName}' content as JSON card array.`);
     }
 
-    const deck: unknown[] = [];
-    for (const entry of cards) {
-      const count = entry.count || 1;
-      for (let i = 0; i < count; i++) {
-        deck.push(
-          typeof entry.card === "object" && entry.card !== null
-            ? { id: crypto.randomUUID(), ...entry.card }
-            : entry.card
-        );
-      }
-    }
+    const deck = expandCardTemplates(cards);
 
     if (args.shuffle) {
       shuffleArray(deck);
@@ -265,7 +241,7 @@ export const createDeckFromReferenceTool: ToolDefinition = {
       content: [
         {
           type: "text",
-          text: `Created deck '${args.deckId}' from reference '${args.referenceName}' with ${deck.length} cards (${cards.length} unique types).${args.shuffle ? " Deck shuffled." : ""}`,
+          text: JSON.stringify({ deckId: args.deckId, referenceName: args.referenceName, totalCards: deck.length, uniqueTypes: cards.length, shuffled: args.shuffle }, null, 2),
         },
       ],
     };
