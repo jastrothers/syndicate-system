@@ -24,4 +24,7 @@ export const api = {
   getDesignResources: (name) => get(`/rulebooks/${name}/designs`),
   getDesignResource: (name, id) => get(`/rulebooks/${name}/designs/${id}`),
   validate: () => get('/validate'),
+  getDesignerProfile: () => get('/designer-profile'),
+  getDesignSessions: () => get('/design-sessions'),
+  getDesignSession: (game, id) => get(`/design-sessions/${game}/${id}`),
 };

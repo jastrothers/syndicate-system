@@ -583,5 +583,73 @@ function generateMarkdown(sections, level = 1) {
   return md;
 }
 
+// ── Designer Profile ─────────────────────────────────────────────
+app.get('/api/designer-profile', async (_req, res) => {
+  try {
+    const p = path.join(GAME_DATA, 'designer_profile.json');
+    if (!await exists(p)) return res.status(404).json({ error: 'Designer profile not found' });
+    res.json(JSON.parse(await fs.readFile(p, 'utf-8')));
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── Design Sessions ───────────────────────────────────────────────
+app.get('/api/design-sessions', async (_req, res) => {
+  try {
+    const gameEntries = (await fs.readdir(GAME_DATA, { withFileTypes: true })).filter(e => e.isDirectory());
+    const sessions = [];
+    for (const gameEntry of gameEntries) {
+      const designDir = path.join(GAME_DATA, gameEntry.name, 'design');
+      if (!await exists(designDir)) continue;
+      const files = (await fs.readdir(designDir)).filter(f => f.endsWith('.json'));
+      for (const file of files) {
+        try {
+          const data = JSON.parse(await fs.readFile(path.join(designDir, file), 'utf-8'));
+          sessions.push({
+            game: gameEntry.name,
+            sessionId: data.sessionId,
+            gameName: data.gameName || gameEntry.name,
+            theme: data.theme || '',
+            status: data.status || 'unknown',
+            stepCount: (data.steps || []).length,
+            createdAt: data.createdAt,
+            lastUpdatedAt: data.lastUpdatedAt
+          });
+        } catch {}
+      }
+    }
+    sessions.sort((a, b) => new Date(b.lastUpdatedAt).getTime() - new Date(a.lastUpdatedAt).getTime());
+    res.json(sessions);
+  } catch { res.json([]); }
+});
+
+app.get('/api/design-sessions/:game/:id', async (req, res) => {
+  try {
+    const filePath = path.join(GAME_DATA, req.params.game, 'design', `${req.params.id}.json`);
+    if (!await exists(filePath)) return res.status(404).json({ error: 'Design session not found' });
+    const data = JSON.parse(await fs.readFile(filePath, 'utf-8'));
+    const decisionLogPath = path.join(GAME_DATA, req.params.game, 'decision_log.json');
+    if (await exists(decisionLogPath)) {
+      try { data._decisionLog = JSON.parse(await fs.readFile(decisionLogPath, 'utf-8')); } catch {}
+    }
+    // Attach .md artifacts from same design/ directory
+    const designDir = path.join(GAME_DATA, req.params.game, 'design');
+    const allFiles = await fs.readdir(designDir).catch(() => []);
+    data._artifacts = [];
+    for (const file of allFiles.filter(f => f.endsWith('.md'))) {
+      try {
+        const raw = await fs.readFile(path.join(designDir, file), 'utf-8');
+        const { data: fm, content } = matter(raw);
+        data._artifacts.push({
+          filename: file,
+          title: fm.title || file.replace(/\.md$/, '').replace(/-/g, ' '),
+          type: fm.type || 'artifact',
+          content: content.trim()
+        });
+      } catch {}
+    }
+    res.json(data);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 const PORT = 3001;
 app.listen(PORT, () => console.log(`Game Viewer API running on http://localhost:${PORT}`));

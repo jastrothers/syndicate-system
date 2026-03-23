@@ -103,16 +103,63 @@ async function renderSessionDetail(container, sessionId) {
 }
 
 function renderState(container, state) {
+  const primitives = [];
+  const zones = [];
+  Object.entries(state).forEach(([key, val]) => {
+    if (Array.isArray(val) || (val !== null && typeof val === 'object')) zones.push([key, val]);
+    else primitives.push([key, val]);
+  });
+
+  const primHtml = primitives.length === 0 ? '' : `
+    <div style="margin-bottom:var(--sp-md);">
+      <div style="font-size:var(--text-xs);color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:var(--sp-sm);">Values</div>
+      <table class="data-table">
+        <tbody>
+          ${primitives.map(([k, v]) => `
+            <tr>
+              <td class="mono" style="width:40%;color:var(--text-secondary)">${escapeHtml(k)}</td>
+              <td class="mono">${escapeHtml(String(v))}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+
+  const zoneHtml = zones.length === 0 ? '' : `
+    <div>
+      <div style="font-size:var(--text-xs);color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:var(--sp-sm);">Zones &amp; Collections</div>
+      ${zones.map(([key, val], i) => {
+        const isArray = Array.isArray(val);
+        const count = isArray ? val.length : Object.keys(val).length;
+        return `
+          <div style="margin-bottom:var(--sp-sm);">
+            <div style="display:flex;align-items:center;gap:var(--sp-sm);padding:var(--sp-sm) 0;cursor:pointer;border-bottom:1px solid var(--glass-border);" onclick="toggleStateZone(${i},this)">
+              <span style="font-size:var(--text-xs);color:var(--text-muted);width:12px;">▶</span>
+              <span class="mono" style="font-size:var(--text-sm);color:var(--text-secondary);">${escapeHtml(key)}</span>
+              <span class="badge badge-neutral">${isArray ? `Array(${count})` : `Object(${count})`}</span>
+            </div>
+            <div id="state-zone-${i}" style="display:none;padding-left:var(--sp-lg);margin-top:var(--sp-xs);">
+              <div class="detail-panel"><div class="detail-body" style="padding:var(--sp-sm);"><pre class="json-viewer">${renderJson(val)}</pre></div></div>
+            </div>
+          </div>`;
+      }).join('')}
+    </div>`;
+
   container.innerHTML = `
     <div class="detail-panel slide-in">
       <div class="detail-header">
         <span class="card-title">Current Game State</span>
         <span class="badge badge-info">${Object.keys(state).length} keys</span>
       </div>
-      <div class="detail-body">
-        <pre class="json-viewer">${renderJson(state)}</pre>
-      </div>
+      <div class="detail-body">${primHtml}${zoneHtml || (!primHtml ? `<pre class="json-viewer">${renderJson(state)}</pre>` : '')}</div>
     </div>`;
+
+  window.toggleStateZone = (i, row) => {
+    const el = document.getElementById(`state-zone-${i}`);
+    const arrow = row.querySelector('span:first-child');
+    const open = el.style.display !== 'none';
+    el.style.display = open ? 'none' : '';
+    arrow.textContent = open ? '▶' : '▼';
+  };
 }
 
 function getActionDotClass(actionType) {
@@ -145,10 +192,19 @@ function renderLedger(container, ledger) {
     return;
   }
 
+  const actionTypes = [...new Set(ledger.map(e => e.actionType))];
+
   container.innerHTML = `
+    <div style="display:flex;gap:var(--sp-xs);flex-wrap:wrap;margin-bottom:var(--sp-md);">
+      <button class="tab-btn active" data-ledger-filter="all" onclick="filterLedger('all',this)">All <span class="badge badge-neutral" style="margin-left:4px">${ledger.length}</span></button>
+      ${actionTypes.map(t => {
+        const count = ledger.filter(e => e.actionType === t).length;
+        return `<button class="tab-btn" data-ledger-filter="${escapeHtml(t)}" onclick="filterLedger('${escapeHtml(t)}',this)">${escapeHtml(t.replace(/_/g,' '))} <span class="badge badge-neutral" style="margin-left:4px">${count}</span></button>`;
+      }).join('')}
+    </div>
     <ul class="timeline stagger">
       ${ledger.map(entry => `
-        <li class="timeline-item">
+        <li class="timeline-item" data-action="${escapeHtml(entry.actionType)}">
           <div class="timeline-dot ${getActionDotClass(entry.actionType)}">${getActionEmoji(entry.actionType)}</div>
           <div class="timeline-content">
             <div class="timeline-action">${escapeHtml(entry.actionType.replace(/_/g, ' '))}</div>
@@ -163,6 +219,14 @@ function renderLedger(container, ledger) {
         </li>
       `).join('')}
     </ul>`;
+
+  window.filterLedger = (type, btn) => {
+    container.querySelectorAll('[data-ledger-filter]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    container.querySelectorAll('.timeline-item[data-action]').forEach(item => {
+      item.style.display = (type === 'all' || item.dataset.action === type) ? '' : 'none';
+    });
+  };
 }
 
 function renderStats(container, session) {

@@ -165,18 +165,59 @@ async function renderDesignTab(container, gameName, designs) {
   });
 }
 
+function extractHeadings(md) {
+  const headings = [];
+  const re = /^(#{1,3})\s+(.+)$/gm;
+  let m;
+  while ((m = re.exec(md)) !== null) {
+    headings.push({ level: m[1].length, text: m[2].trim() });
+  }
+  return headings;
+}
+
 function renderMarkdownTab(container, content) {
   if (!content) {
     container.innerHTML = emptyStateHtml('No Content', 'No markdown content available for this rulebook.');
     return;
   }
 
-  container.innerHTML = `
-    <div class="detail-panel stagger">
-      <div class="detail-body markdown-body">
-        ${marked.parse(content)}
-      </div>
-    </div>`;
+  const headings = extractHeadings(content);
+  const showToc = headings.length >= 3;
+
+  if (showToc) {
+    container.innerHTML = `
+      <div style="display:flex;gap:var(--sp-xl);align-items:flex-start;">
+        <nav style="width:190px;flex-shrink:0;position:sticky;top:var(--sp-lg);max-height:80vh;overflow-y:auto;padding-right:var(--sp-sm);">
+          <div style="font-size:var(--text-xs);color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:var(--sp-sm);font-weight:600;">Contents</div>
+          ${headings.map((h, i) => `
+            <div style="padding:3px 0 3px ${(h.level - 1) * 12}px;">
+              <a class="toc-link" data-idx="${i}" href="javascript:void(0)"
+                 style="font-size:var(--text-xs);color:var(--text-secondary);line-height:1.4;display:block;transition:color var(--duration) var(--ease);"
+                 onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-secondary)'"
+              >${escapeHtml(h.text)}</a>
+            </div>
+          `).join('')}
+        </nav>
+        <div class="detail-panel stagger" style="flex:1;min-width:0;">
+          <div class="detail-body markdown-body" id="md-content">${marked.parse(content)}</div>
+        </div>
+      </div>`;
+
+    const mdEl = container.querySelector('#md-content');
+    const hdEls = mdEl ? Array.from(mdEl.querySelectorAll('h1,h2,h3')) : [];
+    hdEls.forEach((el, i) => { el.id = `md-h-${i}`; });
+    container.querySelectorAll('.toc-link').forEach(link => {
+      link.addEventListener('click', () => {
+        const idx = parseInt(link.dataset.idx, 10);
+        hdEls[idx]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  } else {
+    container.innerHTML = `
+      <div class="detail-panel stagger">
+        <div class="detail-body markdown-body">${marked.parse(content)}</div>
+      </div>`;
+  }
 }
 
 function renderTree(container, sections, depth = 0) {
@@ -186,7 +227,15 @@ function renderTree(container, sections, depth = 0) {
   }
 
   const html = buildTreeHtml(sections, depth);
-  container.innerHTML = `<ul class="tree stagger">${html}</ul>`;
+  container.innerHTML = `
+    <div style="display:flex;gap:var(--sp-sm);margin-bottom:var(--sp-md);align-items:center;">
+      <input type="text" id="tree-search" placeholder="Search sections…"
+        style="flex:1;background:var(--bg-active);border:1px solid var(--glass-border);border-radius:var(--radius-md);padding:var(--sp-xs) var(--sp-md);color:var(--text-primary);font-size:var(--text-sm);font-family:var(--font-sans);outline:none;"
+        oninput="filterTree(this.value)">
+      <button class="tab-btn" onclick="expandAllTree()">Expand All</button>
+      <button class="tab-btn" onclick="collapseAllTree()">Collapse All</button>
+    </div>
+    <ul class="tree stagger">${html}</ul>`;
 
   // Toggle handlers
   container.querySelectorAll('.tree-label').forEach(label => {
@@ -196,6 +245,23 @@ function renderTree(container, sections, depth = 0) {
       if (content) content.classList.toggle('visible');
     });
   });
+
+  window.filterTree = (query) => {
+    const q = query.toLowerCase().trim();
+    container.querySelectorAll('.tree-item').forEach(item => {
+      const text = item.querySelector('.tree-label span:last-child')?.textContent.toLowerCase() || '';
+      const key = item.querySelector('.tree-label .badge')?.textContent.toLowerCase() || '';
+      item.style.display = (!q || text.includes(q) || key.includes(q)) ? '' : 'none';
+    });
+  };
+  window.expandAllTree = () => {
+    container.querySelectorAll('.tree-content').forEach(el => el.classList.add('visible'));
+    container.querySelectorAll('.tree-label').forEach(el => el.classList.add('open'));
+  };
+  window.collapseAllTree = () => {
+    container.querySelectorAll('.tree-content').forEach(el => el.classList.remove('visible'));
+    container.querySelectorAll('.tree-label').forEach(el => el.classList.remove('open'));
+  };
 }
 
 function buildTreeHtml(sections, depth) {

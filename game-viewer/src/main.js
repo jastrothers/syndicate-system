@@ -6,6 +6,8 @@ import { renderReferences } from './pages/references.js';
 import { renderPlaytestLogs } from './pages/playtest-logs.js';
 import { renderSyndicate } from './pages/syndicate.js';
 import { renderValidation } from './pages/validation.js';
+import { renderDesignSessions } from './pages/design-sessions.js';
+import { renderDesignerProfile } from './pages/designer-profile.js';
 
 const app = document.getElementById('app');
 const navLinks = document.querySelectorAll('.nav-link');
@@ -18,6 +20,8 @@ const routes = {
   '/playtest-logs': renderPlaytestLogs,
   '/syndicate': renderSyndicate,
   '/validation': renderValidation,
+  '/design': renderDesignSessions,
+  '/profile': renderDesignerProfile,
 };
 
 function getRoute() {
