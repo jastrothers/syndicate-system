@@ -54,15 +54,34 @@ export interface NovaResponse {
     description: string;
     action: string;
   }[];
+  /** Designer affinity context derived from the profile — helps AI weigh suggestions. */
+  designerContext?: {
+    liked: string[];   // mechanisms with affinity >= 0.3
+    disliked: string[];// mechanisms with affinity <= -0.3
+  };
 }
 
-export function synthesizeNovaResponse(step: DesignStep): NovaResponse {
+export function synthesizeNovaResponse(step: DesignStep, profile?: DesignerProfile): NovaResponse {
   const trace = step.trace;
-  
+
+  let designerContext: NovaResponse["designerContext"] | undefined;
+  if (profile && Object.keys(profile.affinities).length > 0) {
+    designerContext = {
+      liked: Object.entries(profile.affinities)
+        .filter(([, w]) => w >= 0.3)
+        .sort(([, a], [, b]) => b - a)
+        .map(([m]) => m),
+      disliked: Object.entries(profile.affinities)
+        .filter(([, w]) => w <= -0.3)
+        .sort(([, a], [, b]) => a - b)
+        .map(([m]) => m),
+    };
+  }
+
   return {
     conclusion: step.summary,
-    reasoning: trace ? 
-      `**Observation:** ${trace.observation}\n**Data:** ${JSON.stringify(trace.data)}\n**Mechanism:** ${trace.mechanism}\n**Impact:** ${trace.impact}` : 
+    reasoning: trace ?
+      `**Observation:** ${trace.observation}\n**Data:** ${JSON.stringify(trace.data)}\n**Mechanism:** ${trace.mechanism}\n**Impact:** ${trace.impact}` :
       step.output,
     options: [
       {
@@ -83,6 +102,7 @@ export function synthesizeNovaResponse(step: DesignStep): NovaResponse {
         description: "Keep the mechanism but tweak the numbers to resolve the specific issue.",
         action: "ADJUST_PARAMS"
       }
-    ]
+    ],
+    ...(designerContext ? { designerContext } : {}),
   };
 }

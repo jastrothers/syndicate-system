@@ -472,7 +472,8 @@ test("Card Mechanics Integration Tests", async (t) => {
       name: "get_action_history",
       arguments: { sessionId: cardSessionId },
     });
-    const ledger = JSON.parse((ledgerRes.content[0] as any).text);
+    const ledgerData = JSON.parse((ledgerRes.content[0] as any).text);
+    const ledger = ledgerData.items ?? ledgerData;
     const revealActions = ledger.filter((a: any) => a.actionType === "reveal_cards");
     assert.ok(revealActions.length > 0);
   });

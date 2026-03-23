@@ -3,6 +3,19 @@
  * No session I/O; all functions operate on plain arrays.
  */
 /**
+ * Mulberry32 seeded PRNG — deterministic, fast, good distribution.
+ * Returns a function that produces values in [0, 1).
+ */
+function createPrng(seed) {
+    let s = seed | 0;
+    return () => {
+        s += 0x6d2b79f5;
+        let t = Math.imul(s ^ (s >>> 15), 1 | s);
+        t = t + Math.imul(t ^ (t >>> 7), 61 | t) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+}
+/**
  * Returns true if `item` satisfies the given filter clause.
  */
 export function matchesFilter(item, filter) {
@@ -83,10 +96,12 @@ export function insertIntoArray(arr, items, position) {
 }
 /**
  * Fisher-Yates shuffle. Mutates the array in place.
+ * Pass an integer `seed` for deterministic/reproducible shuffles.
  */
-export function shuffleArray(arr) {
+export function shuffleArray(arr, seed) {
+    const random = seed !== undefined ? createPrng(seed) : () => Math.random();
     for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
+        const j = Math.floor(random() * (i + 1));
         [arr[i], arr[j]] = [arr[j], arr[i]];
     }
     return arr;

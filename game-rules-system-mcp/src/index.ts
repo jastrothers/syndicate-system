@@ -37,9 +37,17 @@ export function registerHandlers(server: Server) {
         const parsedArgs = (tool.schema as any).parse(request.params.arguments || {});
         return await tool.handler(parsedArgs);
       } catch (error: any) {
+        const type =
+          error?.name === "ZodError" ? "validation"
+          : (error?.code === "ENOENT" || error?.code === "EACCES" || error?.code === "EBUSY") ? "io"
+          : "logic";
+        const message =
+          error?.name === "ZodError"
+            ? (error.errors ?? []).map((e: any) => `${e.path.join(".")}: ${e.message}`).join("; ")
+            : (error?.message || String(error));
         return {
           isError: true,
-          content: [{ type: "text", text: String(error?.stack || error?.message || error) }]
+          content: [{ type: "text", text: JSON.stringify({ type, message }) }]
         };
       }
     }

@@ -11,9 +11,14 @@ describe("deleteSessionTool", () => {
     assert.equal(typeof deleteSessionTool.handler, "function");
   });
 
-  it("schema accepts a valid sessionId", () => {
-    const result = deleteSessionTool.schema.safeParse({ sessionId: "abc-123-def" });
+  it("schema accepts a valid sessionId with confirm: true", () => {
+    const result = deleteSessionTool.schema.safeParse({ sessionId: "abc-123-def", confirm: true });
     assert.ok(result.success);
+  });
+
+  it("schema rejects missing confirm flag", () => {
+    const result = deleteSessionTool.schema.safeParse({ sessionId: "abc-123-def" });
+    assert.ok(!result.success, "Missing confirm should fail");
   });
 
   it("schema rejects missing sessionId", () => {

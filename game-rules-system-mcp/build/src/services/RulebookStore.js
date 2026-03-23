@@ -1,6 +1,19 @@
 import * as fs from "fs/promises";
 import { DATA_DIR, getRulebookDir, getRulebookPath, getLegacyRulebookPath, sanitizeVersionTag, } from "../config/paths.js";
 import * as StorageService from "./StorageService.js";
+// In-memory cache: key is "name" for latest or "name@versionTag" for snapshots.
+const rulebookCache = new Map();
+// Tracks which rulebook names have already been migration-checked this process lifetime.
+const migratedNames = new Set();
+function cacheKey(name, versionTag) {
+    return versionTag ? `${name}@${versionTag}` : name;
+}
+function invalidateCache(name) {
+    for (const k of rulebookCache.keys()) {
+        if (k === name || k.startsWith(`${name}@`))
+            rulebookCache.delete(k);
+    }
+}
 export async function ensureDataDirectory() {
     await StorageService.ensureDirectory(DATA_DIR);
 }
@@ -34,8 +47,12 @@ export async function migrateIfNeeded(name) {
     await fs.unlink(legacyPath);
 }
 export async function getRulebook(name, versionTag) {
-    // Try auto-migration first (only for latest/unversioned access)
-    if (!versionTag) {
+    const key = cacheKey(name, versionTag);
+    if (rulebookCache.has(key))
+        return rulebookCache.get(key);
+    // Try auto-migration once per name per process lifetime (only for latest)
+    if (!versionTag && !migratedNames.has(name)) {
+        migratedNames.add(name);
         await migrateIfNeeded(name);
     }
     const rulebookFile = getRulebookPath(name, { versionTag });
@@ -49,7 +66,9 @@ export async function getRulebook(name, versionTag) {
         components: [],
     };
     try {
-        return await StorageService.readJson(rulebookFile, defaultValue);
+        const rulebook = await StorageService.readJson(rulebookFile, defaultValue);
+        rulebookCache.set(key, rulebook);
+        return rulebook;
     }
     catch (error) {
         if (error instanceof Error && error.code === "ENOENT") {
@@ -71,6 +90,8 @@ export async function saveDraft(name, rulebook) {
     const filePath = getRulebookPath(name, { isDraft: true });
     rulebook.metadata.lastUpdated = new Date().toISOString();
     await StorageService.saveJson(filePath, rulebook);
+    // Drafts don't affect the versioned cache, but invalidate latest since draft and latest share a name context
+    invalidateCache(name);
 }
 export async function promoteDraft(name) {
     const draftPath = getRulebookPath(name, { isDraft: true });
@@ -79,6 +100,7 @@ export async function promoteDraft(name) {
         const draftContent = await fs.readFile(draftPath, "utf-8");
         await fs.writeFile(latestPath, draftContent, "utf-8");
         await fs.unlink(draftPath);
+        invalidateCache(name);
     }
     catch (error) {
         throw new Error(`Failed to promote draft for '${name}': ${error instanceof Error ? error.message : String(error)}`);
@@ -88,6 +110,7 @@ export async function saveRulebook(name, rulebook) {
     const rulebookFile = getRulebookPath(name); // Always saves to latest
     rulebook.metadata.lastUpdated = new Date().toISOString();
     await StorageService.saveJson(rulebookFile, rulebook);
+    invalidateCache(name);
 }
 /**
  * Lists all rulebook names (game IDs) by scanning game directories.

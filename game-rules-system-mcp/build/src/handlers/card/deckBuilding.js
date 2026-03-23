@@ -88,6 +88,10 @@ export const countZoneTool = {
         }
         let count;
         if (args.filter) {
+            const numericOps = ["gt", "lt", "gte", "lte"];
+            if (numericOps.includes(args.filter.op) && typeof args.filter.value !== "number") {
+                throw new Error(`Filter operator '${args.filter.op}' requires a numeric value, got ${typeof args.filter.value}.`);
+            }
             count = zone.filter((item) => matchesFilter(item, args.filter)).length;
         }
         else {

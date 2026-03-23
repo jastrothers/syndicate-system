@@ -54,7 +54,8 @@ export const novaTools = [
       if (!step) {
         throw new Error(`Step ${args.stepId} not found in session.`);
       }
-      const response = NovaService.synthesizeNovaResponse(step);
+      const profile = await ProfileService.getProfile();
+      const response = NovaService.synthesizeNovaResponse(step, profile);
       return {
         content: [{ type: "text", text: JSON.stringify(response, null, 2) }]
       };

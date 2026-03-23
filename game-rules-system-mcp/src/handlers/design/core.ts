@@ -45,15 +45,37 @@ export const addDesignStepTool: ToolDefinition = {
 
 export const getDesignSessionTool: ToolDefinition = {
   name: "get_design_session",
-  description: "Retrieves the full history of a design session.",
+  description: "Retrieves the history of a design session. By default returns only step summaries to conserve context. Set includeFull: true to include complete step output.",
   schema: z.object({
     gameName: z.string().describe("The name of the game."),
     sessionId: z.string().describe("The design session ID."),
+    includeFull: z.boolean().optional().default(false).describe("If true, includes the full output for each step. Default: false (summaries only)."),
+    limit: z.number().int().positive().optional().describe("Maximum number of steps to return."),
+    offset: z.number().int().nonnegative().optional().default(0).describe("Number of steps to skip. Default: 0."),
   }),
   handler: async (args: any) => {
     const session = await getDesignSession(args.gameName, args.sessionId);
+    const total = session.steps.length;
+    const offset = args.offset ?? 0;
+    const sliced = args.limit !== undefined
+      ? session.steps.slice(offset, offset + args.limit)
+      : session.steps.slice(offset);
+    const steps = args.includeFull
+      ? sliced
+      : sliced.map(({ output: _output, ...rest }) => rest);
     return {
-      content: [{ type: "text", text: JSON.stringify(session, null, 2) }],
+      content: [{ type: "text", text: JSON.stringify({
+        sessionId: session.sessionId,
+        gameName: session.gameName,
+        theme: session.theme,
+        status: session.status,
+        createdAt: session.createdAt,
+        lastUpdatedAt: session.lastUpdatedAt,
+        totalSteps: total,
+        offset,
+        count: steps.length,
+        steps,
+      }, null, 2) }],
     };
   },
 };
@@ -78,6 +100,7 @@ export const deleteDesignSessionTool: ToolDefinition = {
   schema: z.object({
     gameName: z.string().describe("The name of the game the design session belongs to."),
     sessionId: z.string().describe("The design session ID to delete."),
+    confirm: z.literal(true).describe("Must be explicitly set to true to confirm permanent deletion."),
   }),
   handler: async (args: any) => {
     const filePath = getDesignSessionPath(args.gameName, args.sessionId);

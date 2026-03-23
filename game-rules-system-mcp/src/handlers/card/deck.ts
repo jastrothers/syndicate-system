@@ -76,6 +76,11 @@ export const searchZoneTool: ToolDefinition = {
       throw new Error(`State key '${args.zoneId}' is not an array.`);
     }
 
+    const numericOps = ["gt", "lt", "gte", "lte"];
+    if (numericOps.includes(args.filter.op) && typeof args.filter.value !== "number") {
+      throw new Error(`Filter operator '${args.filter.op}' requires a numeric value, got ${typeof args.filter.value}.`);
+    }
+
     const results = searchArray(zone, args.filter as FilterClause);
 
     return {

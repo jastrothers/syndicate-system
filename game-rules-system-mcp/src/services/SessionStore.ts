@@ -96,9 +96,16 @@ export async function saveSession(sessionId: string, session: PlaytestSession): 
 
   await StorageService.saveJson(sessionFile, session);
 
-  // Update index
+  // Update index — if this fails, compensate by removing the file we just wrote
   if (db) {
-    insertIntoIndex(session, sessionFile);
+    try {
+      insertIntoIndex(session, sessionFile);
+    } catch (indexError) {
+      await fs.unlink(sessionFile).catch(() => {});
+      throw new Error(
+        `Session save failed: could not update index. ${indexError instanceof Error ? indexError.message : String(indexError)}`
+      );
+    }
   }
 }
 
