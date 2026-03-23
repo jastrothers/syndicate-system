@@ -1,6 +1,7 @@
 import { z } from "zod";
 import * as fs from "fs/promises";
 import * as SessionStore from "../../services/SessionStore.js";
+import { jsonResponse } from "../response.js";
 export const deleteSessionTool = {
     name: "delete_playtest_session",
     description: "Permanently deletes a playtest session file and removes it from the session index.",
@@ -21,15 +22,10 @@ export const deleteSessionTool = {
                 throw err;
             // File already gone — index entry was stale, still a success
         }
-        return {
-            content: [{
-                    type: "text",
-                    text: JSON.stringify({
-                        status: "success",
-                        message: `Session '${args.sessionId}' has been permanently deleted.`,
-                        deletedFile: filePath,
-                    }, null, 2),
-                }],
-        };
+        return jsonResponse({
+            status: "success",
+            message: `Session '${args.sessionId}' has been permanently deleted.`,
+            deletedFile: filePath,
+        });
     },
 };

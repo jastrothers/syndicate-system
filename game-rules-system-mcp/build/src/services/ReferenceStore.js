@@ -115,9 +115,22 @@ export async function getReference(name, game, version) {
 }
 export async function queryReferences(game, version, type, tags) {
     const resolvedVersion = version || "latest";
-    let query = "SELECT id, name, game, version, type, tags, lastUpdated, deleted FROM references_index";
+    // Push filters into SQL WHERE clause for efficiency
+    const conditions = [];
     const params = [];
-    const results = db.prepare(query).all();
+    if (game) {
+        conditions.push("(game = ? OR game = 'general')");
+        params.push(game);
+    }
+    conditions.push("(version = ? OR version = 'latest')");
+    params.push(resolvedVersion);
+    if (type) {
+        conditions.push("type = ?");
+        params.push(type);
+    }
+    const whereClause = conditions.length > 0 ? ` WHERE ${conditions.join(" AND ")}` : "";
+    const query = `SELECT id, name, game, version, type, tags, lastUpdated, deleted FROM references_index${whereClause}`;
+    const results = db.prepare(query).all(...params);
     // Layer merging using the new Fallback Strategy
     const resolvedMap = new Map();
     for (const r of results) {
@@ -161,13 +174,10 @@ export async function queryReferences(game, version, type, tags) {
             resolvedMap.set(keyMap, r);
         }
     }
-    // Filter out any entries overridden by tombstones, then apply manual filters
+    // Filter out any entries overridden by tombstones, then apply remaining filters
     let finalResults = Array.from(resolvedMap.values())
         .filter(r => r.deleted === 0)
         .map(r => ({ ...r, tags: JSON.parse(r.tags || "[]") }));
-    if (type) {
-        finalResults = finalResults.filter(r => r.type === type);
-    }
     if (tags && tags.length > 0) {
         finalResults = finalResults.filter(r => tags.every(tag => r.tags.includes(tag)));
     }

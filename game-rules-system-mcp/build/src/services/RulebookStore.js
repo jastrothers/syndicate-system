@@ -3,6 +3,8 @@ import { DATA_DIR, getRulebookDir, getRulebookPath, getLegacyRulebookPath, sanit
 import * as StorageService from "./StorageService.js";
 // In-memory cache: key is "name" for latest or "name@versionTag" for snapshots.
 const rulebookCache = new Map();
+// Cache for version listings per rulebook name
+const versionsCache = new Map();
 // Tracks which rulebook names have already been migration-checked this process lifetime.
 const migratedNames = new Set();
 function cacheKey(name, versionTag) {
@@ -13,6 +15,10 @@ function invalidateCache(name) {
         if (k === name || k.startsWith(`${name}@`))
             rulebookCache.delete(k);
     }
+    versionsCache.delete(name);
+}
+export function invalidateVersionsCache(name) {
+    versionsCache.delete(name);
 }
 export async function ensureDataDirectory() {
     await StorageService.ensureDirectory(DATA_DIR);
@@ -144,6 +150,8 @@ export async function listRulebooks() {
  * Returns version info for each snapshot (excludes "latest" from the list).
  */
 export async function listVersions(name) {
+    if (versionsCache.has(name))
+        return versionsCache.get(name);
     const dir = getRulebookDir(name);
     let files;
     try {
@@ -177,6 +185,7 @@ export async function listVersions(name) {
     }
     // Sort by lastUpdated descending
     versions.sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime());
+    versionsCache.set(name, versions);
     return versions;
 }
 /**

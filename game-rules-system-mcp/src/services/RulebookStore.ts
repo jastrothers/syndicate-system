@@ -11,6 +11,8 @@ import * as StorageService from "./StorageService.js";
 
 // In-memory cache: key is "name" for latest or "name@versionTag" for snapshots.
 const rulebookCache = new Map<string, Rulebook>();
+// Cache for version listings per rulebook name
+const versionsCache = new Map<string, VersionInfo[]>();
 // Tracks which rulebook names have already been migration-checked this process lifetime.
 const migratedNames = new Set<string>();
 
@@ -22,6 +24,11 @@ function invalidateCache(name: string): void {
   for (const k of rulebookCache.keys()) {
     if (k === name || k.startsWith(`${name}@`)) rulebookCache.delete(k);
   }
+  versionsCache.delete(name);
+}
+
+export function invalidateVersionsCache(name: string): void {
+  versionsCache.delete(name);
 }
 
 export async function ensureDataDirectory() {
@@ -162,6 +169,8 @@ export async function listRulebooks(): Promise<string[]> {
  * Returns version info for each snapshot (excludes "latest" from the list).
  */
 export async function listVersions(name: string): Promise<VersionInfo[]> {
+  if (versionsCache.has(name)) return versionsCache.get(name)!;
+
   const dir = getRulebookDir(name);
   let files: string[];
   try {
@@ -197,6 +206,7 @@ export async function listVersions(name: string): Promise<VersionInfo[]> {
 
   // Sort by lastUpdated descending
   versions.sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime());
+  versionsCache.set(name, versions);
   return versions;
 }
 

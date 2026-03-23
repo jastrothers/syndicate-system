@@ -1,8 +1,9 @@
 import { z } from "zod";
 import * as fs from "fs/promises";
-import { getRulebook, listRulebooks, listVersions, createVersion } from "../../services/RulebookStore.js";
+import { getRulebook, listRulebooks, listVersions, createVersion, invalidateVersionsCache } from "../../services/RulebookStore.js";
 import { getRulebookPath, getRulebookMdPath } from "../../config/paths.js";
 import { ToolDefinition } from "../types.js";
+import { jsonResponse } from "../response.js";
 
 export const listRulebooksTool: ToolDefinition = {
   name: "list_rulebooks",
@@ -20,9 +21,7 @@ export const listRulebooksTool: ToolDefinition = {
       } catch { /* no latest */ }
       result[name] = { latest: latestInfo, versions: versions.map((v) => v.versionTag) };
     }
-    return {
-      content: [{ type: "text", text: JSON.stringify({ rulebooks: result }, null, 2) }],
-    };
+    return jsonResponse({ rulebooks: result });
   },
 };
 
@@ -42,12 +41,7 @@ export const listVersionsTool: ToolDefinition = {
       latest = { title: rb.metadata.title, version: rb.metadata.version, lastUpdated: rb.metadata.lastUpdated };
     } catch { /* no latest */ }
 
-    return {
-      content: [{
-        type: "text",
-        text: JSON.stringify({ rulebookName: args.rulebookName, latest, versions }, null, 2),
-      }],
-    };
+    return jsonResponse({ rulebookName: args.rulebookName, latest, versions });
   },
 };
 
@@ -61,12 +55,7 @@ export const createVersionTool: ToolDefinition = {
   }),
   handler: async (args) => {
     const versionInfo = await createVersion(args.rulebookName, args.versionTag, args.description);
-    return {
-      content: [{
-        type: "text",
-        text: JSON.stringify({ message: `Successfully created version '${versionInfo.versionTag}' for rulebook '${args.rulebookName}'.`, version: versionInfo }, null, 2),
-      }],
-    };
+    return jsonResponse({ message: `Successfully created version '${versionInfo.versionTag}' for rulebook '${args.rulebookName}'.`, version: versionInfo });
   },
 };
 
@@ -104,16 +93,12 @@ export const deleteRulebookVersionTool: ToolDefinition = {
       if (err.code !== "ENOENT") throw err;
     }
 
-    return {
-      content: [{
-        type: "text",
-        text: JSON.stringify({
-          status: "success",
-          message: `Version '${args.versionTag}' of rulebook '${args.rulebookName}' has been permanently deleted.`,
-          deletedFiles,
-        }, null, 2),
-      }],
-    };
+    invalidateVersionsCache(args.rulebookName);
+    return jsonResponse({
+      status: "success",
+      message: `Version '${args.versionTag}' of rulebook '${args.rulebookName}' has been permanently deleted.`,
+      deletedFiles,
+    });
   },
 };
 

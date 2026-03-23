@@ -2,6 +2,7 @@ import { z } from "zod";
 import * as NovaService from "../../services/NovaService.js";
 import * as ProfileService from "../../services/ProfileService.js";
 import * as DesignStore from "../../services/DesignStore.js";
+import { jsonResponse, textResponse } from "../response.js";
 
 export const novaTools = [
   {
@@ -24,9 +25,7 @@ export const novaTools = [
         args.rationale,
         args.impactedMechanisms
       );
-      return {
-        content: [{ type: "text", text: `Decision '${args.decision}' recorded and profile updated.` }]
-      };
+      return textResponse(`Decision '${args.decision}' recorded and profile updated.`);
     }
   },
   {
@@ -35,9 +34,7 @@ export const novaTools = [
     schema: z.object({}),
     handler: async () => {
       const profile = await ProfileService.getProfile();
-      return {
-        content: [{ type: "text", text: JSON.stringify(profile, null, 2) }]
-      };
+      return jsonResponse(profile);
     }
   },
   {
@@ -56,9 +53,7 @@ export const novaTools = [
       }
       const profile = await ProfileService.getProfile();
       const response = NovaService.synthesizeNovaResponse(step, profile);
-      return {
-        content: [{ type: "text", text: JSON.stringify(response, null, 2) }]
-      };
+      return jsonResponse(response);
     }
   }
 ];

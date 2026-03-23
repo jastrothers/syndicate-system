@@ -7,6 +7,7 @@ import { z } from "zod";
 import { getSession, saveSession } from "../../services/SessionStore.js";
 import { shuffleArray, matchesFilter, validateFilterClause, expandCardTemplates } from "../../services/DeckService.js";
 import { filterSchema } from "./deck.js";
+import { jsonResponse } from "../response.js";
 export const createDeckFromTemplateTool = {
     name: "create_deck_from_template",
     description: "Generate a populated deck array in game state from a list of card definitions with quantities. Useful for setting up starter decks, markets, and supply piles at the start of a game.",
@@ -52,14 +53,7 @@ export const createDeckFromTemplateTool = {
             },
         });
         await saveSession(args.sessionId, session);
-        return {
-            content: [
-                {
-                    type: "text",
-                    text: JSON.stringify({ deckId: args.deckId, totalCards: deck.length, uniqueTypes: args.cards.length, shuffled: args.shuffle }, null, 2),
-                },
-            ],
-        };
+        return jsonResponse({ deckId: args.deckId, totalCards: deck.length, uniqueTypes: args.cards.length, shuffled: args.shuffle });
     },
 };
 export const countZoneTool = {
@@ -86,14 +80,7 @@ export const countZoneTool = {
         else {
             count = zone.length;
         }
-        return {
-            content: [
-                {
-                    type: "text",
-                    text: JSON.stringify({ zoneId: args.zoneId, count, filtered: !!args.filter }, null, 2),
-                },
-            ],
-        };
+        return jsonResponse({ zoneId: args.zoneId, count, filtered: !!args.filter });
     },
 };
 export const revealCardsTool = {
@@ -137,14 +124,7 @@ export const revealCardsTool = {
             },
         });
         await saveSession(args.sessionId, session);
-        return {
-            content: [
-                {
-                    type: "text",
-                    text: JSON.stringify({ revealed: revealedCards.length, cards: revealedCards }, null, 2),
-                },
-            ],
-        };
+        return jsonResponse({ revealed: revealedCards.length, cards: revealedCards });
     },
 };
 import { getReference } from "../../services/ReferenceStore.js";
@@ -193,14 +173,7 @@ export const createDeckFromReferenceTool = {
             },
         });
         await saveSession(args.sessionId, session);
-        return {
-            content: [
-                {
-                    type: "text",
-                    text: JSON.stringify({ deckId: args.deckId, referenceName: args.referenceName, totalCards: deck.length, uniqueTypes: cards.length, shuffled: args.shuffle }, null, 2),
-                },
-            ],
-        };
+        return jsonResponse({ deckId: args.deckId, referenceName: args.referenceName, totalCards: deck.length, uniqueTypes: cards.length, shuffled: args.shuffle });
     },
 };
 export const deckBuildingTools = [

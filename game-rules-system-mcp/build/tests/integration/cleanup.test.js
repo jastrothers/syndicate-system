@@ -85,8 +85,8 @@ test("Cleanup Integration Tests", async (t) => {
             name: "list_references",
             arguments: { game: "ref-cleanup-game" },
         });
-        const refs = JSON.parse(listResult.content[0].text);
-        const found = refs.find((r) => r.name === "soft-delete-ref");
+        const refsData = JSON.parse(listResult.content[0].text);
+        const found = refsData.items.find((r) => r.name === "soft-delete-ref");
         assert.strictEqual(found, undefined, "Soft-deleted reference should not appear in list");
     });
     await t.test("delete_reference (hard): permanently removes file and index entry", async () => {
@@ -111,8 +111,8 @@ test("Cleanup Integration Tests", async (t) => {
             name: "list_references",
             arguments: { game: "ref-cleanup-game" },
         });
-        const refs = JSON.parse(listResult.content[0].text);
-        const found = refs.find((r) => r.name === "hard-delete-ref");
+        const refsData = JSON.parse(listResult.content[0].text);
+        const found = refsData.items.find((r) => r.name === "hard-delete-ref");
         assert.strictEqual(found, undefined, "Hard-deleted reference should not appear in list");
     });
     await t.test("delete_reference: errors when reference does not exist", async () => {
@@ -223,8 +223,8 @@ test("Cleanup Integration Tests", async (t) => {
             name: "list_references",
             arguments: { game: gameName },
         });
-        const refs = JSON.parse(refList.content[0].text);
-        assert.strictEqual(refs.length, 0, "References should be cleared after delete_game");
+        const refsData = JSON.parse(refList.content[0].text);
+        assert.strictEqual(refsData.count, 0, "References should be cleared after delete_game");
         // Rulebook should be gone from the listing
         const rbList = await client.callTool({
             name: "list_rulebooks",

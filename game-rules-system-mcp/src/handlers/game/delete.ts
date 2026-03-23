@@ -4,6 +4,7 @@ import * as ReferenceStore from "../../services/ReferenceStore.js";
 import * as SessionStore from "../../services/SessionStore.js";
 import { getGameDir, sanitizeFileName } from "../../config/paths.js";
 import { ToolDefinition } from "../types.js";
+import { jsonResponse } from "../response.js";
 
 export const deleteGameTool: ToolDefinition = {
   name: "delete_game",
@@ -49,16 +50,11 @@ export const deleteGameTool: ToolDefinition = {
     // 3. Delete the entire game directory tree
     await fs.rm(gameDir, { recursive: true, force: true });
 
-    return {
-      content: [{
-        type: "text",
-        text: JSON.stringify({
-          status: "success",
-          message: `Game '${args.gameName}' and all associated data have been permanently deleted.`,
-          deletedDirectory: gameDir,
-          sessionsRemovedFromIndex: sessionPaths.length,
-        }, null, 2),
-      }],
-    };
+    return jsonResponse({
+      status: "success",
+      message: `Game '${args.gameName}' and all associated data have been permanently deleted.`,
+      deletedDirectory: gameDir,
+      sessionsRemovedFromIndex: sessionPaths.length,
+    });
   },
 };

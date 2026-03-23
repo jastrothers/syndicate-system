@@ -2,6 +2,7 @@ import { z } from "zod";
 import { parseAndRoll } from "../../services/DiceService.js";
 import { getSession, saveSession } from "../../services/SessionStore.js";
 import { ToolDefinition } from "../types.js";
+import { jsonResponse } from "../response.js";
 
 export const rollDiceTool: ToolDefinition = {
   name: "roll_dice",
@@ -40,9 +41,7 @@ export const rollDiceTool: ToolDefinition = {
       await saveSession(args.sessionId, session);
     }
 
-    return {
-      content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
-    };
+    return jsonResponse(result);
   },
 };
 

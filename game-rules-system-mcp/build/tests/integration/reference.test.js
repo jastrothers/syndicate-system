@@ -39,9 +39,9 @@ test("Reference System Integration Tests", async (t) => {
             }
         });
         assert.strictEqual(result.isError, undefined);
-        const refs = JSON.parse(result.content[0].text);
-        assert.strictEqual(refs.length, 1);
-        assert.strictEqual(refs[0].name, "test_advantage");
+        const data = JSON.parse(result.content[0].text);
+        assert.strictEqual(data.count, 1);
+        assert.strictEqual(data.items[0].name, "test_advantage");
     });
     await t.test("Rebuild Index", async () => {
         const result = await client.callTool({

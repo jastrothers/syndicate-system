@@ -12,6 +12,7 @@ import {
   FilterClause,
 } from "../../services/DeckService.js";
 import { ToolDefinition } from "../types.js";
+import { jsonResponse } from "../response.js";
 
 export const peekAtDeckTool: ToolDefinition = {
   name: "peek_at_deck",
@@ -49,9 +50,7 @@ export const peekAtDeckTool: ToolDefinition = {
     });
     await saveSession(args.sessionId, session);
 
-    return {
-      content: [{ type: "text", text: JSON.stringify(peeked, null, 2) }],
-    };
+    return jsonResponse(peeked);
   },
 };
 
@@ -80,18 +79,7 @@ export const searchZoneTool: ToolDefinition = {
     validateFilterClause(args.filter as FilterClause);
     const results = searchArray(zone, args.filter as FilterClause);
 
-    return {
-      content: [
-        {
-          type: "text",
-          text: JSON.stringify(
-            { matches: results.length, results },
-            null,
-            2
-          ),
-        },
-      ],
-    };
+    return jsonResponse({ matches: results.length, results });
   },
 };
 
@@ -128,14 +116,7 @@ export const insertIntoDeckTool: ToolDefinition = {
     });
     await saveSession(args.sessionId, session);
 
-    return {
-      content: [
-        {
-          type: "text",
-          text: JSON.stringify({ inserted: args.cards.length, deckSize: session.state[args.deckId].length, deckId: args.deckId, position: args.position }, null, 2),
-        },
-      ],
-    };
+    return jsonResponse({ inserted: args.cards.length, deckSize: session.state[args.deckId].length, deckId: args.deckId, position: args.position });
   },
 };
 

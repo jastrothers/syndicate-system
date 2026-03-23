@@ -2,6 +2,7 @@ import { z } from "zod";
 import { getSession, saveSession } from "../../services/SessionStore.js";
 import { validateConstraint } from "../../services/ValidationService.js";
 import { getRulebook } from "../../services/RulebookStore.js";
+import { jsonResponse, textResponse } from "../response.js";
 export const recordActionTool = {
     name: "record_action",
     description: "Logs a programmatic mechanical outcome to the session's action ledger.",
@@ -20,29 +21,30 @@ export const recordActionTool = {
             data: args.data,
         });
         await saveSession(args.sessionId, session);
-        return {
-            content: [{ type: "text", text: `Action recorded successfully.` }],
-        };
+        return textResponse("Action recorded successfully.");
     },
 };
 export const getActionHistoryTool = {
     name: "get_action_history",
-    description: "Retrieves the historical sequence of actions recorded in a session's ledger. Use limit and offset to page through long histories.",
+    description: "Retrieves the historical sequence of actions recorded in a session's ledger. Use limit and offset to page through long histories. Use actionType to filter by action.",
     schema: z.object({
         sessionId: z.string().describe("The ID of the playtest session."),
+        actionType: z.string().optional().describe("Filter entries to only this action type."),
         limit: z.number().int().positive().optional().describe("Maximum number of entries to return."),
         offset: z.number().int().nonnegative().optional().default(0).describe("Number of entries to skip before returning results. Default: 0."),
     }),
     handler: async (args) => {
         const session = await getSession(args.sessionId);
-        const total = session.ledger.length;
+        let ledger = session.ledger;
+        if (args.actionType) {
+            ledger = ledger.filter((e) => e.actionType === args.actionType);
+        }
+        const total = ledger.length;
         const offset = args.offset ?? 0;
         const items = args.limit !== undefined
-            ? session.ledger.slice(offset, offset + args.limit)
-            : session.ledger.slice(offset);
-        return {
-            content: [{ type: "text", text: JSON.stringify({ total, offset, count: items.length, items }, null, 2) }],
-        };
+            ? ledger.slice(offset, offset + args.limit)
+            : ledger.slice(offset);
+        return jsonResponse({ total, offset, count: items.length, items });
     },
 };
 export const validateActionTool = {
@@ -69,9 +71,7 @@ export const validateActionTool = {
             actionData: args.actionData,
             constraints: current.constraints,
         });
-        return {
-            content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
-        };
+        return jsonResponse(result);
     },
 };
 export const sessionHistoryTools = [

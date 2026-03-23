@@ -2,6 +2,7 @@ import { z } from "zod";
 import * as ReferenceStore from "../../services/ReferenceStore.js";
 import { saveRulebook, listRulebooks } from "../../services/RulebookStore.js";
 import { ToolDefinition } from "../types.js";
+import { jsonResponse } from "../response.js";
 
 function generateManifestReference(game: string, version: string, decks: any[]) {
     const manifestName = `${game.toLowerCase()}_base_manifest`;
@@ -103,17 +104,12 @@ export const importGameTool: ToolDefinition = {
         const macro = generateMacroReference(args.game, args.version);
         await ReferenceStore.saveReference(macro.name, macro.game, macro.version, macro.type, macro.tags, macro.content);
 
-        return {
-            content: [{
-                type: "text",
-                text: JSON.stringify({
-                    status: "success",
-                    message: `Game '${args.game}' imported successfully.`,
-                    manifestReference: manifest.name,
-                    macroReference: macro.name,
-                    totalReferencesSaved: args.references.length + 2
-                }, null, 2)
-            }],
-        };
+        return jsonResponse({
+            status: "success",
+            message: `Game '${args.game}' imported successfully.`,
+            manifestReference: manifest.name,
+            macroReference: macro.name,
+            totalReferencesSaved: args.references.length + 2
+        });
     },
 };

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { parseAndRoll } from "../../services/DiceService.js";
 import { getSession, saveSession } from "../../services/SessionStore.js";
+import { jsonResponse } from "../response.js";
 export const rollDiceTool = {
     name: "roll_dice",
     description: "Rolls dice using standard notation (e.g. '2d6', '1d20+5'). Supports deterministic rolls via an optional seed. When a sessionId is provided, the roll is logged to the session ledger.",
@@ -35,9 +36,7 @@ export const rollDiceTool = {
             });
             await saveSession(args.sessionId, session);
         }
-        return {
-            content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
-        };
+        return jsonResponse(result);
     },
 };
 export const diceTools = [rollDiceTool];

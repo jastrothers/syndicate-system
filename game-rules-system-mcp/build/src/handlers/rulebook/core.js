@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { getRulebook, saveRulebook, getDraft, saveDraft, promoteDraft } from "../../services/RulebookStore.js";
 import { extractStructure } from "../../services/MarkdownFormatter.js";
+import { jsonResponse, textResponse } from "../response.js";
 /**
  * Flattens a sections tree into a map of dot-notation path → {title, content}.
  */
@@ -76,9 +77,7 @@ export const compareRulebooksTool = {
             },
             differences: { added, removed, modified },
         };
-        return {
-            content: [{ type: "text", text: JSON.stringify(comparison, null, 2) }],
-        };
+        return jsonResponse(comparison);
     },
 };
 export const getRulebookStructureTool = {
@@ -91,9 +90,7 @@ export const getRulebookStructureTool = {
     handler: async (args) => {
         const rulebook = await getRulebook(args.rulebookName, args.rulebookVersion);
         const structure = extractStructure(rulebook.sections);
-        return {
-            content: [{ type: "text", text: JSON.stringify({ metadata: rulebook.metadata, structure }, null, 2) }],
-        };
+        return jsonResponse({ metadata: rulebook.metadata, structure });
     },
 };
 export const readRuleSectionTool = {
@@ -115,55 +112,73 @@ export const readRuleSectionTool = {
             }
             current = part === parts[parts.length - 1] ? current[part] : current[part].subsections;
         }
-        return {
-            content: [{ type: "text", text: JSON.stringify(current, null, 2) }],
-        };
+        return jsonResponse(current);
     },
 };
+function applyRuleUpdate(sections, update) {
+    const parts = update.path.split(".");
+    let currentMap = sections;
+    for (let i = 0; i < parts.length - 1; i++) {
+        const part = parts[i];
+        if (!currentMap[part]) {
+            currentMap[part] = { title: part, subsections: {} };
+        }
+        if (!currentMap[part].subsections) {
+            currentMap[part].subsections = {};
+        }
+        currentMap = currentMap[part].subsections;
+    }
+    const target = parts[parts.length - 1];
+    const existing = currentMap[target] || {};
+    currentMap[target] = {
+        ...existing,
+        title: update.title,
+        ...(update.content !== undefined ? { content: update.content } : {}),
+        ...(update.examples !== undefined ? { examples: update.examples } : {}),
+    };
+}
 export const updateRuleTool = {
     name: "update_rule",
-    description: "Adds or modifies a specific rule section. Creates intermediate sections if they don't exist.",
+    description: "Adds or modifies rule sections. Creates intermediate sections if they don't exist. Supports batch mode via updates array to apply multiple changes in one save.",
     schema: z.object({
         rulebookName: z.string().optional().default("rulebook").describe("The name of the rulebook to update. Defaults to 'rulebook'."),
-        path: z.string().describe("Dot-notation path to update (e.g., 'combat.resolution')"),
-        title: z.string().describe("Title of the section"),
+        path: z.string().optional().describe("Dot-notation path to update (e.g., 'combat.resolution'). Required unless using batch updates."),
+        title: z.string().optional().describe("Title of the section. Required unless using batch updates."),
         content: z.string().optional().describe("Main rule text"),
         examples: z.array(z.string()).optional().describe("List of example strings"),
         isDraft: z.boolean().optional().default(false).describe("Whether to update the draft rulebook instead of the latest."),
+        updates: z.array(z.object({
+            path: z.string(),
+            title: z.string(),
+            content: z.string().optional(),
+            examples: z.array(z.string()).optional(),
+        })).optional().describe("Batch mode: provide multiple rule updates applied in one save. When provided, path/title are ignored."),
     }),
     handler: async (args) => {
         const rulebook = args.isDraft
             ? (await getDraft(args.rulebookName) || await getRulebook(args.rulebookName))
             : await getRulebook(args.rulebookName);
-        const parts = args.path.split(".");
-        let currentMap = rulebook.sections;
-        for (let i = 0; i < parts.length - 1; i++) {
-            const part = parts[i];
-            if (!currentMap[part]) {
-                currentMap[part] = { title: part, subsections: {} };
+        if (args.updates && args.updates.length > 0) {
+            for (const update of args.updates) {
+                applyRuleUpdate(rulebook.sections, update);
             }
-            if (!currentMap[part].subsections) {
-                currentMap[part].subsections = {};
-            }
-            currentMap = currentMap[part].subsections;
         }
-        const target = parts[parts.length - 1];
-        const existing = currentMap[target] || {};
-        currentMap[target] = {
-            ...existing,
-            title: args.title,
-            ...(args.content !== undefined ? { content: args.content } : {}),
-            ...(args.examples !== undefined ? { examples: args.examples } : {}),
-        };
+        else if (args.path && args.title) {
+            applyRuleUpdate(rulebook.sections, { path: args.path, title: args.title, content: args.content, examples: args.examples });
+        }
+        else {
+            throw new Error("Either provide path+title for a single update, or an updates array for batch mode.");
+        }
         if (args.isDraft) {
             await saveDraft(args.rulebookName, rulebook);
         }
         else {
             await saveRulebook(args.rulebookName, rulebook);
         }
-        return {
-            content: [{ type: "text", text: `Successfully updated rule section: ${args.path} in rulebook: ${args.rulebookName}${args.isDraft ? " (DRAFT)" : ""}` }],
-        };
+        const updatedPaths = args.updates
+            ? args.updates.map((u) => u.path)
+            : [args.path];
+        return jsonResponse({ updatedPaths, rulebookName: args.rulebookName, isDraft: args.isDraft }, "Next: compile_markdown_rulebook to sync the markdown file");
     },
 };
 export const getDraftTool = {
@@ -175,9 +190,7 @@ export const getDraftTool = {
     handler: async (args) => {
         const draft = await getDraft(args.rulebookName);
         const rulebook = draft || await getRulebook(args.rulebookName);
-        return {
-            content: [{ type: "text", text: JSON.stringify(rulebook, null, 2) }],
-        };
+        return jsonResponse(rulebook);
     },
 };
 export const saveDraftTool = {
@@ -189,9 +202,7 @@ export const saveDraftTool = {
     }),
     handler: async (args) => {
         await saveDraft(args.rulebookName, args.rulebook);
-        return {
-            content: [{ type: "text", text: `Successfully saved draft for rulebook: ${args.rulebookName}` }],
-        };
+        return textResponse(`Successfully saved draft for rulebook: ${args.rulebookName}`);
     },
 };
 export const promoteDraftTool = {
@@ -202,9 +213,7 @@ export const promoteDraftTool = {
     }),
     handler: async (args) => {
         await promoteDraft(args.rulebookName);
-        return {
-            content: [{ type: "text", text: `Successfully promoted draft to latest for rulebook: ${args.rulebookName}` }],
-        };
+        return textResponse(`Successfully promoted draft to latest for rulebook: ${args.rulebookName}`);
     },
 };
 export const deleteRuleTool = {
@@ -231,9 +240,7 @@ export const deleteRuleTool = {
         }
         delete currentMap[target];
         await saveRulebook(args.rulebookName, rulebook);
-        return {
-            content: [{ type: "text", text: `Successfully deleted rule section: ${args.path} from rulebook: ${args.rulebookName}` }],
-        };
+        return textResponse(`Successfully deleted rule section: ${args.path} from rulebook: ${args.rulebookName}`);
     },
 };
 export const rulebookCoreTools = [

@@ -2,6 +2,7 @@ import { z } from "zod";
 import * as vm from "node:vm";
 import { getSession, saveSession } from "../../services/SessionStore.js";
 import { ToolDefinition } from "../types.js";
+import { jsonResponse } from "../response.js";
 
 import { getReference } from "../../services/ReferenceStore.js";
 import { shuffleArray, expandCardTemplates } from "../../services/DeckService.js";
@@ -51,9 +52,7 @@ export const evaluateGameStateTool: ToolDefinition = {
       const result = vm.runInContext(args.expression, context, {
         timeout: 1000, 
       });
-      return {
-        content: [{ type: "text", text: JSON.stringify({ result }, null, 2) }],
-      };
+      return jsonResponse({ result });
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : String(e);
       throw new Error(`Failed to evaluate expression: ${errorMessage}`);
@@ -107,31 +106,36 @@ export const setupGameFromManifestTool: ToolDefinition = {
 
     const decksCreated = manifest.decks?.filter((d: any) => d.deckId && d.referenceName).map((d: any) => d.deckId) || [];
     const stateKeysUpdated = manifest.state ? Object.keys(manifest.state) : [];
-    return {
-      content: [{ type: "text", text: JSON.stringify({ decksCreated, stateKeysUpdated }, null, 2) }],
-    };
+    return jsonResponse({ decksCreated, stateKeysUpdated });
   }
 };
 
 export const executeMacroActionTool: ToolDefinition = {
   name: "execute_macro_action",
-  description: "Executes a Javascript snippet from a reference inside a sandbox with write-access to the game state. Useful for executing complex turn logic. Sandbox globals: `state` (mutable game state), `ledger` (action log array), `inputs` (the inputs param). Helper API: `api.draw(deckId, handId, count)` → drawn cards array, `api.move(entityId, sourceId, targetId)` → boolean, `api.shuffle(deckId)` → void, `api.log(msg)` → console log. Timeout: 2 seconds.",
+  description: "Executes a Javascript snippet inside a sandbox with write-access to the game state. Prefer this over sequential draw/shuffle/move calls for multi-step operations. Provide inlineScript for one-off logic, or macroScriptReferenceName to load from a saved reference. Sandbox globals: `state` (mutable game state), `ledger` (action log array), `inputs` (the inputs param). Helper API: `api.draw(deckId, handId, count)` → drawn cards array, `api.move(entityId, sourceId, targetId)` → boolean, `api.shuffle(deckId)` → void, `api.log(msg)` → console log. Timeout: 2 seconds.",
   schema: z.object({
     sessionId: z.string().describe("The ID of the playtest session."),
-    macroScriptReferenceName: z.string().describe("The name of the reference containing the Javascript macro code."),
+    macroScriptReferenceName: z.string().optional().describe("The name of the reference containing the Javascript macro code. Required if inlineScript is not provided."),
+    inlineScript: z.string().optional().describe("Inline JavaScript to execute instead of loading from a reference. Use for one-off multi-step operations."),
     game: z.string().optional().describe("Optional game context constraint."),
     version: z.string().optional().describe("Optional version context constraint."),
     inputs: z.record(z.string(), z.unknown()).optional().describe("Optional JSON record of inputs to pass into the script as `inputs`."),
   }),
   handler: async (args) => {
     const session = await getSession(args.sessionId);
-    const ref = await getReference(args.macroScriptReferenceName, args.game, args.version);
-    
-    if (!ref) {
-      throw new Error(`Reference '${args.macroScriptReferenceName}' not found.`);
-    }
 
-    const scriptCode = ref.content;
+    let scriptCode: string;
+    if (args.inlineScript) {
+      scriptCode = args.inlineScript;
+    } else if (args.macroScriptReferenceName) {
+      const ref = await getReference(args.macroScriptReferenceName, args.game, args.version);
+      if (!ref) {
+        throw new Error(`Reference '${args.macroScriptReferenceName}' not found.`);
+      }
+      scriptCode = ref.content;
+    } else {
+      throw new Error("Either macroScriptReferenceName or inlineScript must be provided.");
+    }
 
     let modified = false;
     const context = vm.createContext({
@@ -183,16 +187,14 @@ export const executeMacroActionTool: ToolDefinition = {
            timestamp: new Date().toISOString(),
            actionType: "execute_macro_action",
            actor: "System",
-           data: { script: args.macroScriptReferenceName, inputs: args.inputs, result },
+           data: { script: args.macroScriptReferenceName || "inline", inputs: args.inputs, result },
          });
       }
 
       // Always save the session as macros usually mutate state directly
       await saveSession(args.sessionId, session);
 
-      return {
-        content: [{ type: "text", text: JSON.stringify({ result, modifiedState: true }, null, 2) }],
-      };
+      return jsonResponse({ result, modifiedState: modified });
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : String(e);
       throw new Error(`Failed to execute macro script: ${errorMessage}`);

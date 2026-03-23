@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { getSession, saveSession } from "../../services/SessionStore.js";
 import { shuffleArray } from "../../services/DeckService.js";
+import { jsonResponse } from "../response.js";
 export const drawFromDeckTool = {
     name: "draw_from_deck",
     description: "Moves a set number of entities from a named deck array in the state into a target hand array.",
@@ -26,9 +27,7 @@ export const drawFromDeckTool = {
             data: { deckId: args.deckId, handId: args.targetHandId, count: args.count, drawn },
         });
         await saveSession(args.sessionId, session);
-        return {
-            content: [{ type: "text", text: JSON.stringify({ drawn, deckRemaining: session.state[args.deckId].length, handSize: session.state[args.targetHandId].length }, null, 2) }],
-        };
+        return jsonResponse({ drawn, deckRemaining: session.state[args.deckId].length, handSize: session.state[args.targetHandId].length });
     },
 };
 export const shuffleDeckTool = {
@@ -50,9 +49,7 @@ export const shuffleDeckTool = {
             data: { deckId: args.deckId },
         });
         await saveSession(args.sessionId, session);
-        return {
-            content: [{ type: "text", text: JSON.stringify({ deckId: args.deckId, size: session.state[args.deckId].length }, null, 2) }],
-        };
+        return jsonResponse({ deckId: args.deckId, size: session.state[args.deckId].length });
     },
 };
 export const moveEntityTool = {
@@ -89,9 +86,7 @@ export const moveEntityTool = {
             data: { entityId: args.entityId, sourceId: args.sourceId, targetId: args.targetId, item: movedItem },
         });
         await saveSession(args.sessionId, session);
-        return {
-            content: [{ type: "text", text: JSON.stringify({ movedItem, sourceRemaining: srcArray.length, targetSize: targetArray.length }, null, 2) }],
-        };
+        return jsonResponse({ movedItem, sourceRemaining: srcArray.length, targetSize: targetArray.length });
     },
 };
 export const sessionEntitiesTools = [

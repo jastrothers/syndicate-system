@@ -51,15 +51,17 @@ describe("updateRuleTool", () => {
     it("has the correct tool name", () => {
         assert.equal(updateRuleTool.name, "update_rule");
     });
-    it("schema requires path and title", () => {
+    it("schema accepts path and title for single update", () => {
         const valid = updateRuleTool.schema.safeParse({
             path: "setup.board",
             title: "Board Setup",
             content: "Place the board in the middle of the table.",
         });
         assert.ok(valid.success);
-        const invalid = updateRuleTool.schema.safeParse({ path: "setup.board" });
-        assert.ok(!invalid.success, "Missing title should fail");
+    });
+    it("schema accepts path without title (optional for batch mode)", () => {
+        const result = updateRuleTool.schema.safeParse({ path: "setup.board" });
+        assert.ok(result.success, "Title is optional to support batch mode");
     });
 });
 // ── delete_rule ───────────────────────────────────────────────────────────────

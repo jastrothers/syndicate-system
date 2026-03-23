@@ -2,6 +2,7 @@ import { z } from "zod";
 import * as fs from "fs/promises";
 import { createDesignSession, addDesignStep, getDesignSession, listDesignSessions } from "../../services/DesignStore.js";
 import { getDesignSessionPath } from "../../config/paths.js";
+import { jsonResponse, textResponse } from "../response.js";
 export const createDesignSessionTool = {
     name: "create_design_session",
     description: "Initializes a new board game design session in the MCP.",
@@ -11,9 +12,7 @@ export const createDesignSessionTool = {
     }),
     handler: async (args) => {
         const session = await createDesignSession(args.gameName, args.theme);
-        return {
-            content: [{ type: "text", text: JSON.stringify(session, null, 2) }],
-        };
+        return jsonResponse(session);
     },
 };
 export const addDesignStepTool = {
@@ -34,9 +33,7 @@ export const addDesignStepTool = {
             output: args.output,
             summary: args.summary,
         });
-        return {
-            content: [{ type: "text", text: `Successfully logged step ${args.stepNumber} to design session: ${args.sessionId}` }],
-        };
+        return textResponse(`Successfully logged step ${args.stepNumber} to design session: ${args.sessionId}`);
     },
 };
 export const getDesignSessionTool = {
@@ -59,20 +56,18 @@ export const getDesignSessionTool = {
         const steps = args.includeFull
             ? sliced
             : sliced.map(({ output: _output, ...rest }) => rest);
-        return {
-            content: [{ type: "text", text: JSON.stringify({
-                        sessionId: session.sessionId,
-                        gameName: session.gameName,
-                        theme: session.theme,
-                        status: session.status,
-                        createdAt: session.createdAt,
-                        lastUpdatedAt: session.lastUpdatedAt,
-                        totalSteps: total,
-                        offset,
-                        count: steps.length,
-                        steps,
-                    }, null, 2) }],
-        };
+        return jsonResponse({
+            sessionId: session.sessionId,
+            gameName: session.gameName,
+            theme: session.theme,
+            status: session.status,
+            createdAt: session.createdAt,
+            lastUpdatedAt: session.lastUpdatedAt,
+            totalSteps: total,
+            offset,
+            count: steps.length,
+            steps,
+        });
     },
 };
 export const listDesignSessionsTool = {
@@ -83,9 +78,7 @@ export const listDesignSessionsTool = {
     }),
     handler: async (args) => {
         const sessions = await listDesignSessions(args.gameName);
-        return {
-            content: [{ type: "text", text: JSON.stringify(sessions, null, 2) }],
-        };
+        return jsonResponse(sessions);
     },
 };
 export const deleteDesignSessionTool = {
@@ -107,9 +100,7 @@ export const deleteDesignSessionTool = {
             }
             throw err;
         }
-        return {
-            content: [{ type: "text", text: `Design session '${args.sessionId}' for game '${args.gameName}' has been permanently deleted.` }],
-        };
+        return textResponse(`Design session '${args.sessionId}' for game '${args.gameName}' has been permanently deleted.`);
     },
 };
 export const designCoreTools = [

@@ -8,6 +8,7 @@ import { getSession, saveSession } from "../../services/SessionStore.js";
 import { shuffleArray, matchesFilter, validateFilterClause, expandCardTemplates, FilterClause } from "../../services/DeckService.js";
 import { filterSchema } from "./deck.js";
 import { ToolDefinition } from "../types.js";
+import { jsonResponse } from "../response.js";
 
 export const createDeckFromTemplateTool: ToolDefinition = {
   name: "create_deck_from_template",
@@ -62,14 +63,7 @@ export const createDeckFromTemplateTool: ToolDefinition = {
     });
     await saveSession(args.sessionId, session);
 
-    return {
-      content: [
-        {
-          type: "text",
-          text: JSON.stringify({ deckId: args.deckId, totalCards: deck.length, uniqueTypes: args.cards.length, shuffled: args.shuffle }, null, 2),
-        },
-      ],
-    };
+    return jsonResponse({ deckId: args.deckId, totalCards: deck.length, uniqueTypes: args.cards.length, shuffled: args.shuffle });
   },
 };
 
@@ -102,18 +96,7 @@ export const countZoneTool: ToolDefinition = {
       count = zone.length;
     }
 
-    return {
-      content: [
-        {
-          type: "text",
-          text: JSON.stringify(
-            { zoneId: args.zoneId, count, filtered: !!args.filter },
-            null,
-            2
-          ),
-        },
-      ],
-    };
+    return jsonResponse({ zoneId: args.zoneId, count, filtered: !!args.filter });
   },
 };
 
@@ -168,18 +151,7 @@ export const revealCardsTool: ToolDefinition = {
     });
     await saveSession(args.sessionId, session);
 
-    return {
-      content: [
-        {
-          type: "text",
-          text: JSON.stringify(
-            { revealed: revealedCards.length, cards: revealedCards },
-            null,
-            2
-          ),
-        },
-      ],
-    };
+    return jsonResponse({ revealed: revealedCards.length, cards: revealedCards });
   },
 };
 
@@ -237,14 +209,7 @@ export const createDeckFromReferenceTool: ToolDefinition = {
     });
     await saveSession(args.sessionId, session);
 
-    return {
-      content: [
-        {
-          type: "text",
-          text: JSON.stringify({ deckId: args.deckId, referenceName: args.referenceName, totalCards: deck.length, uniqueTypes: cards.length, shuffled: args.shuffle }, null, 2),
-        },
-      ],
-    };
+    return jsonResponse({ deckId: args.deckId, referenceName: args.referenceName, totalCards: deck.length, uniqueTypes: cards.length, shuffled: args.shuffle });
   },
 };
 

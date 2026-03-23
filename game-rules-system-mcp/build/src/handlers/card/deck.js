@@ -5,6 +5,7 @@
 import { z } from "zod";
 import { getSession, saveSession } from "../../services/SessionStore.js";
 import { peekCards, searchArray, insertIntoArray, validateFilterClause, } from "../../services/DeckService.js";
+import { jsonResponse } from "../response.js";
 export const peekAtDeckTool = {
     name: "peek_at_deck",
     description: "Look at top or bottom N cards of a deck array without moving them. Returns the peeked cards. Useful for scry, reveal, and information-gathering mechanics.",
@@ -37,9 +38,7 @@ export const peekAtDeckTool = {
             },
         });
         await saveSession(args.sessionId, session);
-        return {
-            content: [{ type: "text", text: JSON.stringify(peeked, null, 2) }],
-        };
+        return jsonResponse(peeked);
     },
 };
 export const filterSchema = z.object({
@@ -63,14 +62,7 @@ export const searchZoneTool = {
         }
         validateFilterClause(args.filter);
         const results = searchArray(zone, args.filter);
-        return {
-            content: [
-                {
-                    type: "text",
-                    text: JSON.stringify({ matches: results.length, results }, null, 2),
-                },
-            ],
-        };
+        return jsonResponse({ matches: results.length, results });
     },
 };
 export const insertIntoDeckTool = {
@@ -101,14 +93,7 @@ export const insertIntoDeckTool = {
             },
         });
         await saveSession(args.sessionId, session);
-        return {
-            content: [
-                {
-                    type: "text",
-                    text: JSON.stringify({ inserted: args.cards.length, deckSize: session.state[args.deckId].length, deckId: args.deckId, position: args.position }, null, 2),
-                },
-            ],
-        };
+        return jsonResponse({ inserted: args.cards.length, deckSize: session.state[args.deckId].length, deckId: args.deckId, position: args.position });
     },
 };
 export const deckTools = [

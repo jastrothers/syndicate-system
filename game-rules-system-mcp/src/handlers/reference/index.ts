@@ -3,23 +3,45 @@ import * as fs from "fs/promises";
 import * as ReferenceStore from "../../services/ReferenceStore.js";
 import { getReferenceFilePath } from "../../config/paths.js";
 import { ToolDefinition } from "../types.js";
+import { jsonResponse, textResponse } from "../response.js";
 
 export const saveReferenceTool: ToolDefinition = {
   name: "save_reference",
-  description: "Saves a reusable game reference module (e.g. standard rule, character archetype, deck) as a Markdown file and indexes it.",
+  description: "Saves reusable game reference modules as Markdown files and indexes them. Supports batch mode via batch array to save multiple references in one call.",
   schema: z.object({
-    name: z.string().describe("The unique name of the reference."),
+    name: z.string().optional().describe("The unique name of the reference. Required unless using batch mode."),
     game: z.string().optional().describe("Optional name of the game this reference belongs to."),
     version: z.string().optional().describe("Optional version of the game this reference is tied to."),
     type: z.string().optional().default("general").describe("The category/type of the reference (e.g., 'rule', 'template', 'deck')."),
     tags: z.array(z.string()).optional().default([]).describe("List of searchable tags."),
-    content: z.string().describe("The content of the reference in Markdown or JSON string."),
+    content: z.string().optional().describe("The content of the reference in Markdown or JSON string. Required unless using batch mode."),
+    batch: z.array(z.object({
+      name: z.string(),
+      game: z.string().optional(),
+      version: z.string().optional(),
+      type: z.string().optional().default("general"),
+      tags: z.array(z.string()).optional().default([]),
+      content: z.string(),
+    })).optional().describe("Batch mode: save multiple references in one call."),
   }),
   handler: async (args) => {
+    if (args.batch && args.batch.length > 0) {
+      const names: string[] = [];
+      for (const ref of args.batch) {
+        await ReferenceStore.saveReference(
+          ref.name, ref.game || args.game, ref.version || args.version,
+          ref.type, ref.tags, ref.content
+        );
+        names.push(ref.name);
+      }
+      return jsonResponse({ saved: names.length, names });
+    }
+
+    if (!args.name || !args.content) {
+      throw new Error("Either provide name+content for a single save, or a batch array.");
+    }
     await ReferenceStore.saveReference(args.name, args.game, args.version, args.type, args.tags, args.content);
-    return {
-      content: [{ type: "text", text: `Successfully saved reference: ${args.name}` }],
-    };
+    return textResponse(`Successfully saved reference: ${args.name}`);
   },
 };
 
@@ -40,26 +62,29 @@ export const getReferenceTool: ToolDefinition = {
         `Reference '${args.name}' not found${hint}${versionHint}. Try list_references to see available references, or check game/version filters.`
       );
     }
-    return {
-      content: [{ type: "text", text: JSON.stringify(ref, null, 2) }],
-    };
+    return jsonResponse(ref);
   },
 };
 
 export const listReferencesTool: ToolDefinition = {
   name: "list_references",
-  description: "Queries the reference index by type and/or tags to find matching reusable modules.",
+  description: "Queries the reference index by type and/or tags. Returns metadata only (no content). Use get_reference for full content. Supports pagination.",
   schema: z.object({
     game: z.string().optional().describe("Filter by a specific game name."),
     version: z.string().optional().describe("Filter by a specific game version."),
     type: z.string().optional().describe("Filter by a specific reference type."),
     tags: z.array(z.string()).optional().describe("Filter by an array of necessary tags."),
+    limit: z.number().int().positive().optional().describe("Maximum number of results to return."),
+    offset: z.number().int().nonnegative().optional().default(0).describe("Number of results to skip. Default: 0."),
   }),
   handler: async (args) => {
-    const refs = await ReferenceStore.queryReferences(args.game, args.version, args.type, args.tags);
-    return {
-      content: [{ type: "text", text: JSON.stringify(refs, null, 2) }],
-    };
+    const allRefs = await ReferenceStore.queryReferences(args.game, args.version, args.type, args.tags);
+    const total = allRefs.length;
+    const offset = args.offset ?? 0;
+    const items = args.limit !== undefined
+      ? allRefs.slice(offset, offset + args.limit)
+      : allRefs.slice(offset);
+    return jsonResponse({ total, offset, count: items.length, items });
   },
 };
 
@@ -69,9 +94,7 @@ export const rebuildReferenceIndexTool: ToolDefinition = {
   schema: z.object({}),
   handler: async () => {
     await ReferenceStore.rebuildIndex();
-    return {
-      content: [{ type: "text", text: "Successfully rebuilt the reference index from the file system." }],
-    };
+    return textResponse("Successfully rebuilt the reference index from the file system.");
   },
 };
 
@@ -92,9 +115,7 @@ export const deleteReferenceTool: ToolDefinition = {
         throw new Error(`Reference '${args.name}' not found for game '${args.game}'.`);
       }
       await ReferenceStore.saveReference(args.name, args.game, args.version, existing.type, existing.tags, existing.content, true);
-      return {
-        content: [{ type: "text", text: `Reference '${args.name}' has been soft-deleted (tombstoned) for game '${args.game}'.` }],
-      };
+      return textResponse(`Reference '${args.name}' has been soft-deleted (tombstoned) for game '${args.game}'.`);
     }
 
     // Hard-delete: remove file and DB row
@@ -113,16 +134,11 @@ export const deleteReferenceTool: ToolDefinition = {
     // Remove from SQLite index
     await ReferenceStore.rebuildIndex();
 
-    return {
-      content: [{
-        type: "text",
-        text: JSON.stringify({
-          status: "success",
-          message: `Reference '${args.name}' has been permanently deleted for game '${args.game}' (version: ${resolvedVersion}).`,
-          deletedFile: filePath,
-        }, null, 2),
-      }],
-    };
+    return jsonResponse({
+      status: "success",
+      message: `Reference '${args.name}' has been permanently deleted for game '${args.game}' (version: ${resolvedVersion}).`,
+      deletedFile: filePath,
+    });
   },
 };
 

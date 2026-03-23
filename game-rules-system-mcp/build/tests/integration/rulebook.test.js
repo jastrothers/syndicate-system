@@ -24,7 +24,8 @@ test("General & Rulebook Integration Tests", async (t) => {
         });
         assert.strictEqual(result.isError, undefined, result.content?.[0]?.text);
         assert.strictEqual(result.content[0].type, "text");
-        assert.ok(result.content[0].text.includes("Successfully updated rule section"));
+        const data = JSON.parse(result.content[0].text);
+        assert.ok(data.updatedPaths.includes("test_section.subsection"));
     });
     await t.test("Read rule section", async () => {
         const result = await client.callTool({
@@ -90,7 +91,8 @@ test("General & Rulebook Integration Tests", async (t) => {
             },
         });
         assert.strictEqual(result.isError, undefined);
-        assert.ok(result.content[0].text.includes("in rulebook: heist"));
+        const data = JSON.parse(result.content[0].text);
+        assert.strictEqual(data.rulebookName, "heist");
     });
     await t.test("Multi-Rulebook: List rulebooks", async () => {
         const result = await client.callTool({

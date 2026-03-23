@@ -1,9 +1,0 @@
-{
-  "affinities": {
-    "worker_placement": 0.39402000000000004,
-    "auction": -0.398
-  },
-  "complexityTolerance": 3,
-  "thematicPreferences": [],
-  "lastUpdated": "2026-03-11T11:55:24.806Z"
-}

@@ -45,9 +45,9 @@ describe("saveReferenceTool", () => {
         assert.ok(result.success);
         assert.deepEqual(result.data.tags, []);
     });
-    it("schema rejects input missing content", () => {
+    it("schema accepts missing content (optional for batch mode)", () => {
         const result = saveReferenceTool.schema.safeParse({ name: "ref" });
-        assert.ok(!result.success, "Missing content should fail");
+        assert.ok(result.success, "Content is optional to support batch mode");
     });
 });
 // ── get_reference ─────────────────────────────────────────────────────────────

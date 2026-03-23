@@ -2,6 +2,7 @@ import { z } from "zod";
 import { getSession, saveSession } from "../../services/SessionStore.js";
 import { shuffleArray } from "../../services/DeckService.js";
 import { ToolDefinition } from "../types.js";
+import { jsonResponse } from "../response.js";
 
 
 export const drawFromDeckTool: ToolDefinition = {
@@ -30,9 +31,7 @@ export const drawFromDeckTool: ToolDefinition = {
     });
     await saveSession(args.sessionId, session);
 
-    return {
-      content: [{ type: "text", text: JSON.stringify({ drawn, deckRemaining: session.state[args.deckId].length, handSize: session.state[args.targetHandId].length }, null, 2) }],
-    };
+    return jsonResponse({ drawn, deckRemaining: session.state[args.deckId].length, handSize: session.state[args.targetHandId].length });
   },
 };
 
@@ -57,9 +56,7 @@ export const shuffleDeckTool: ToolDefinition = {
     });
     await saveSession(args.sessionId, session);
 
-    return {
-      content: [{ type: "text", text: JSON.stringify({ deckId: args.deckId, size: session.state[args.deckId].length }, null, 2) }],
-    };
+    return jsonResponse({ deckId: args.deckId, size: session.state[args.deckId].length });
   },
 };
 
@@ -104,9 +101,7 @@ export const moveEntityTool: ToolDefinition = {
     });
     await saveSession(args.sessionId, session);
 
-    return {
-      content: [{ type: "text", text: JSON.stringify({ movedItem, sourceRemaining: srcArray.length, targetSize: targetArray.length }, null, 2) }],
-    };
+    return jsonResponse({ movedItem, sourceRemaining: srcArray.length, targetSize: targetArray.length });
   },
 };
 

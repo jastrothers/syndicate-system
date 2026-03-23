@@ -99,17 +99,17 @@ test("E2E Simulated Agent: Rule Ingestion", async (t) => {
             name: "list_references",
             arguments: { type: "spell" }
         });
-        const spells = JSON.parse(spellQuery.content[0].text);
-        assert.strictEqual(spells.length, 2, "Agent should have saved exactly 2 spells");
-        assert.ok(spells.some((s) => s.name === "spell_fireball"));
+        const spellsData = JSON.parse(spellQuery.content[0].text);
+        assert.strictEqual(spellsData.count, 2, "Agent should have saved exactly 2 spells");
+        assert.ok(spellsData.items.some((s) => s.name === "spell_fireball"));
         // Find all references tagged 'combat'
         const combatQuery = await client.callTool({
             name: "list_references",
             arguments: { tags: ["combat"] }
         });
-        const combatMods = JSON.parse(combatQuery.content[0].text);
-        assert.strictEqual(combatMods.length, 1, "Agent should have saved 1 module tagged combat");
-        assert.strictEqual(combatMods[0].name, "combat_actions");
+        const combatData = JSON.parse(combatQuery.content[0].text);
+        assert.strictEqual(combatData.count, 1, "Agent should have saved 1 module tagged combat");
+        assert.strictEqual(combatData.items[0].name, "combat_actions");
         // Fetch the specific 'movement_core' and verify full markdown text
         const getMovement = await client.callTool({
             name: "get_reference",
