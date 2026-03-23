@@ -173,7 +173,6 @@ export async function queryReferences(game?: string, version?: string, type?: st
         shouldKeep = true;
      } else {
         const rTarget = (game && r.game === game) || (!game && r.game !== 'general');
-        const _cTarget = (game && current.game === game) || (!game && current.game !== 'general');
 
         const isNewerExact = rTarget && r.version === resolvedVersion;
         const isCurrentGeneral = current.game === 'general';

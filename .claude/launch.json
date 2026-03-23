@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Game Viewer",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["game-viewer/node_modules/vite/bin/vite.js", "--port", "3000", "--config", "game-viewer/vite.config.js"],
+      "port": 3000
+    },
+    {
+      "name": "Game Viewer API",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["game-viewer/server.js"],
+      "port": 3001
+    }
+  ]
+}

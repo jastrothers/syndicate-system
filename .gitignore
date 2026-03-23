@@ -1,3 +1,5 @@
 node_modules/
 game-rules-system-mcp/build/
 game-data/_test_*/
+.vite/
+*.log

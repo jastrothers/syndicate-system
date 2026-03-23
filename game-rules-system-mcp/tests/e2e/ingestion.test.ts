@@ -10,24 +10,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const serverPath = path.join(__dirname, "..", "..", "src", "index.js");
 const TEST_DATA_DIR = path.join(os.tmpdir(), `test-mcp-e2e-${Date.now()}`);
 
-// Mock raw text that an AI agent might transcribe from a PDF
-const _RAW_RULES_TEXT = `
-# TinyDungeon System
-
-## Movement
-Characters can move up to 30 feet per turn on a grid (6 squares). Difficult terrain costs double movement.
-
-## Combat Actions
-On a turn, a character can take ONE major action and ONE minor action.
-- Major: Attack, Cast Spell, Dash (move another 30 ft)
-- Minor: Draw weapon, Drink potion
-
-## The Magic System
-Spells cost Mana. You regain Mana by resting. 
-- Fireball (3 Mana): Deals 2d6 damage in an area.
-- Heal (2 Mana): Restores 1d8 health to target.
-`;
-
 test("E2E Simulated Agent: Rule Ingestion", async (t) => {
   // 1. Setup Client
   const transport = new StdioClientTransport({

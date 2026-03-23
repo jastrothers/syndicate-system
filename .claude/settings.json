@@ -10,7 +10,10 @@
       "Bash(grep -E \"\\\\.ts$\")",
       "Bash(find c:UsersJuliangitsyndicate-systemgame-viewer -not -path */node_modules/* -type d)",
       "Bash(xargs wc:*)",
-      "Bash(grep -v \"^$\")"
+      "Bash(grep -v \"^$\")",
+      "Bash(find /c/Users/Julian/git/syndicate-system/game-rules-system-mcp/tests -type f -name *.ts)",
+      "Bash(grep -B2 -A2 \"err.code !== \"\"ENOENT\"\"\" \"/c/Users/Julian/git/syndicate-system/game-rules-system-mcp/src/handlers/\"*/*.ts)",
+      "Bash(node --test build/tests/unit/)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Julian\\git\\syndicate-system"
