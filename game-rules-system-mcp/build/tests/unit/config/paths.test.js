@@ -36,7 +36,7 @@ describe("getRulebookPath", () => {
         assert.ok(p.endsWith("latest.json"), `Expected 'latest.json', got: ${p}`);
     });
     it("returns a versioned path when a version tag is provided", () => {
-        const p = getRulebookPath("heist", "1.0.0");
+        const p = getRulebookPath("heist", { versionTag: "1.0.0" });
         assert.ok(p.endsWith("v1.0.0.json"), `Expected 'v1.0.0.json', got: ${p}`);
     });
 });

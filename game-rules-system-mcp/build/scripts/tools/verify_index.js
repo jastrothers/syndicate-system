@@ -1,4 +1,4 @@
-import { initialize, closeDb } from "./src/services/ReferenceStore.js";
+import { initialize, closeDb } from "../../src/services/ReferenceStore.js";
 async function verify() {
     console.log("Initializing Reference Store...");
     await initialize(); // This also calls rebuildIndex

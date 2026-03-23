@@ -7,7 +7,7 @@ import * as path from "path";
 const tmpDir = path.join(os.tmpdir(), `ref-test-${Date.now()}`);
 process.env.TEST_DATA_DIR = tmpDir;
 // Must be imported AFTER env var is set (paths.ts reads env at module load)
-const { initialize, saveReference, getReference, queryReferences, rebuildIndex, closeDb } = await import("../../../src/services/ReferenceStore.js");
+const { initialize, saveReference, getReference, queryReferences, rebuildIndex, deleteReferencesByGame, closeDb } = await import("../../../src/services/ReferenceStore.js");
 describe("ReferenceStore Units", () => {
     before(async () => {
         await fs.mkdir(tmpDir, { recursive: true });
@@ -56,6 +56,22 @@ describe("ReferenceStore Units", () => {
     it("queryReferences with no args should return all references", async () => {
         const all = await queryReferences();
         assert.ok(all.length >= 3, "Should return all saved references");
+    });
+    it("deleteReferencesByGame should hard-delete all files and remove from index", async () => {
+        await saveReference("DeleteSword", "DeleteGame", undefined, "equipment", ["melee"], "A sword.");
+        await saveReference("DeleteShield", "DeleteGame", undefined, "equipment", ["defense"], "A shield.");
+        const before = await queryReferences("DeleteGame");
+        assert.ok(before.length >= 2, "Should have references before deletion");
+        await deleteReferencesByGame("DeleteGame");
+        const after = await queryReferences("DeleteGame");
+        assert.strictEqual(after.length, 0, "No references should remain after deletion");
+        // Files should be gone — getReference returns null
+        const sword = await getReference("DeleteSword", "DeleteGame");
+        assert.strictEqual(sword, null);
+    });
+    it("deleteReferencesByGame should handle a game with no references without throwing", async () => {
+        await deleteReferencesByGame("totally-unknown-game-xyz");
+        // No error = pass
     });
     it("rebuildIndex should re-scan and restore entries from disk", async () => {
         // Rebuild from disk — all saved files should be picked up again

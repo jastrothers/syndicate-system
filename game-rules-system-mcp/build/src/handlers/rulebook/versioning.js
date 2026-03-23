@@ -1,5 +1,7 @@
 import { z } from "zod";
+import * as fs from "fs/promises";
 import { getRulebook, listRulebooks, listVersions, createVersion } from "../../services/RulebookStore.js";
+import { getRulebookPath, getRulebookMdPath } from "../../config/paths.js";
 export const listRulebooksTool = {
     name: "list_rulebooks",
     description: "Returns a list of all existing rulebooks in the data directory, including their available versions.",
@@ -63,8 +65,53 @@ export const createVersionTool = {
         };
     },
 };
+export const deleteRulebookVersionTool = {
+    name: "delete_rulebook_version",
+    description: "Permanently deletes a versioned rulebook snapshot (e.g. v1.0.0). Cannot delete the 'latest' working copy.",
+    schema: z.object({
+        gameName: z.string().describe("The name of the game/rulebook."),
+        versionTag: z.string().describe("The version tag to delete (e.g. '1.0.0'). Cannot be 'latest'."),
+    }),
+    handler: async (args) => {
+        if (args.versionTag.toLowerCase() === "latest") {
+            throw new Error("Cannot delete the 'latest' working copy. Use delete_game to remove all game data.");
+        }
+        const jsonPath = getRulebookPath(args.gameName, { versionTag: args.versionTag });
+        const mdPath = getRulebookMdPath(args.gameName, args.versionTag);
+        let deletedFiles = [];
+        try {
+            await fs.unlink(jsonPath);
+            deletedFiles.push(jsonPath);
+        }
+        catch (err) {
+            if (err.code === "ENOENT") {
+                throw new Error(`Version '${args.versionTag}' of rulebook '${args.gameName}' not found.`);
+            }
+            throw err;
+        }
+        try {
+            await fs.unlink(mdPath);
+            deletedFiles.push(mdPath);
+        }
+        catch (err) {
+            if (err.code !== "ENOENT")
+                throw err;
+        }
+        return {
+            content: [{
+                    type: "text",
+                    text: JSON.stringify({
+                        status: "success",
+                        message: `Version '${args.versionTag}' of rulebook '${args.gameName}' has been permanently deleted.`,
+                        deletedFiles,
+                    }, null, 2),
+                }],
+        };
+    },
+};
 export const rulebookVersioningTools = [
     listRulebooksTool,
     listVersionsTool,
     createVersionTool,
+    deleteRulebookVersionTool,
 ];

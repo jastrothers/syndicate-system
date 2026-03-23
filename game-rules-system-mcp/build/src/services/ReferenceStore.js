@@ -173,6 +173,21 @@ export async function queryReferences(game, version, type, tags) {
     }
     return finalResults;
 }
+export async function deleteReferencesByGame(gameName) {
+    if (!db)
+        return;
+    const rows = db.prepare("SELECT filePath FROM references_index WHERE game = ?").all(gameName);
+    for (const row of rows) {
+        try {
+            await fs.unlink(row.filePath);
+        }
+        catch (err) {
+            if (err.code !== "ENOENT")
+                throw err;
+        }
+    }
+    db.prepare("DELETE FROM references_index WHERE game = ?").run(gameName);
+}
 export function closeDb() {
     if (db) {
         db.close();

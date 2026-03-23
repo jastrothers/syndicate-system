@@ -196,6 +196,19 @@ export async function queryReferences(game?: string, version?: string, type?: st
   return finalResults;
 }
 
+export async function deleteReferencesByGame(gameName: string): Promise<void> {
+  if (!db) return;
+  const rows = db.prepare("SELECT filePath FROM references_index WHERE game = ?").all(gameName) as { filePath: string }[];
+  for (const row of rows) {
+    try {
+      await fs.unlink(row.filePath);
+    } catch (err: any) {
+      if (err.code !== "ENOENT") throw err;
+    }
+  }
+  db.prepare("DELETE FROM references_index WHERE game = ?").run(gameName);
+}
+
 export function closeDb(): void {
   if (db) {
     db.close();

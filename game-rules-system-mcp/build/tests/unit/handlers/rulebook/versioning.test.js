@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { listRulebooksTool, listVersionsTool, createVersionTool, } from "../../../../src/handlers/rulebook/versioning.js";
+import { listRulebooksTool, listVersionsTool, createVersionTool, deleteRulebookVersionTool, } from "../../../../src/handlers/rulebook/versioning.js";
 // ── list_rulebooks ────────────────────────────────────────────────────────────
 describe("listRulebooksTool", () => {
     it("has the correct tool name", () => {
@@ -44,5 +44,26 @@ describe("createVersionTool", () => {
             description: "Playtest 3 freeze",
         });
         assert.ok(result.success);
+    });
+});
+// ── delete_rulebook_version ────────────────────────────────────────────────────
+describe("deleteRulebookVersionTool", () => {
+    it("has the correct tool name", () => {
+        assert.equal(deleteRulebookVersionTool.name, "delete_rulebook_version");
+    });
+    it("schema requires gameName and versionTag", () => {
+        const valid = deleteRulebookVersionTool.schema.safeParse({
+            gameName: "heist",
+            versionTag: "1.0.0",
+        });
+        assert.ok(valid.success);
+    });
+    it("schema rejects missing gameName", () => {
+        const result = deleteRulebookVersionTool.schema.safeParse({ versionTag: "1.0.0" });
+        assert.ok(!result.success, "Missing gameName should fail");
+    });
+    it("schema rejects missing versionTag", () => {
+        const result = deleteRulebookVersionTool.schema.safeParse({ gameName: "heist" });
+        assert.ok(!result.success, "Missing versionTag should fail");
     });
 });

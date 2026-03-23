@@ -1,0 +1,34 @@
+import { z } from "zod";
+import * as fs from "fs/promises";
+import * as SessionStore from "../../services/SessionStore.js";
+export const deleteSessionTool = {
+    name: "delete_playtest_session",
+    description: "Permanently deletes a playtest session file and removes it from the session index.",
+    schema: z.object({
+        sessionId: z.string().describe("The ID of the session to delete."),
+    }),
+    handler: async (args) => {
+        const filePath = SessionStore.deleteSession(args.sessionId);
+        if (!filePath) {
+            throw new Error(`Session '${args.sessionId}' not found in index.`);
+        }
+        try {
+            await fs.unlink(filePath);
+        }
+        catch (err) {
+            if (err.code !== "ENOENT")
+                throw err;
+            // File already gone — index entry was stale, still a success
+        }
+        return {
+            content: [{
+                    type: "text",
+                    text: JSON.stringify({
+                        status: "success",
+                        message: `Session '${args.sessionId}' has been permanently deleted.`,
+                        deletedFile: filePath,
+                    }, null, 2),
+                }],
+        };
+    },
+};

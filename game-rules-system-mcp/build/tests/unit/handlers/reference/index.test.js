@@ -1,14 +1,15 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { saveReferenceTool, getReferenceTool, listReferencesTool, rebuildReferenceIndexTool, referenceTools, } from "../../../../src/handlers/reference/index.js";
+import { saveReferenceTool, getReferenceTool, listReferencesTool, rebuildReferenceIndexTool, deleteReferenceTool, referenceTools, } from "../../../../src/handlers/reference/index.js";
 // ── Tool registration ─────────────────────────────────────────────────────────
 describe("referenceTools registration", () => {
-    it("exports four tools", () => {
-        assert.equal(referenceTools.length, 4);
+    it("exports five tools", () => {
+        assert.equal(referenceTools.length, 5);
     });
     it("contains the expected tool names", () => {
         const names = referenceTools.map((t) => t.name);
         assert.deepEqual(names.sort(), [
+            "delete_reference",
             "get_reference",
             "list_references",
             "rebuild_reference_index",
@@ -86,5 +87,33 @@ describe("rebuildReferenceIndexTool", () => {
     it("schema accepts empty input", () => {
         const result = rebuildReferenceIndexTool.schema.safeParse({});
         assert.ok(result.success);
+    });
+});
+// ── delete_reference ──────────────────────────────────────────────────────────
+describe("deleteReferenceTool", () => {
+    it("has the correct tool name", () => {
+        assert.equal(deleteReferenceTool.name, "delete_reference");
+    });
+    it("schema requires name and game", () => {
+        const valid = deleteReferenceTool.schema.safeParse({ name: "my-ref", game: "heist" });
+        assert.ok(valid.success);
+    });
+    it("schema rejects missing name", () => {
+        const result = deleteReferenceTool.schema.safeParse({ game: "heist" });
+        assert.ok(!result.success, "Missing name should fail");
+    });
+    it("schema rejects missing game", () => {
+        const result = deleteReferenceTool.schema.safeParse({ name: "my-ref" });
+        assert.ok(!result.success, "Missing game should fail");
+    });
+    it("schema defaults hard to false", () => {
+        const result = deleteReferenceTool.schema.safeParse({ name: "my-ref", game: "heist" });
+        assert.ok(result.success);
+        assert.equal(result.data.hard, false);
+    });
+    it("schema accepts hard: true", () => {
+        const result = deleteReferenceTool.schema.safeParse({ name: "my-ref", game: "heist", hard: true });
+        assert.ok(result.success);
+        assert.equal(result.data.hard, true);
     });
 });

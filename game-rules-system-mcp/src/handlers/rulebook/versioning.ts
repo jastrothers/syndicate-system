@@ -1,5 +1,7 @@
 import { z } from "zod";
+import * as fs from "fs/promises";
 import { getRulebook, listRulebooks, listVersions, createVersion } from "../../services/RulebookStore.js";
+import { getRulebookPath, getRulebookMdPath } from "../../config/paths.js";
 import { ToolDefinition } from "../types.js";
 
 export const listRulebooksTool: ToolDefinition = {
@@ -68,8 +70,56 @@ export const createVersionTool: ToolDefinition = {
   },
 };
 
+export const deleteRulebookVersionTool: ToolDefinition = {
+  name: "delete_rulebook_version",
+  description: "Permanently deletes a versioned rulebook snapshot (e.g. v1.0.0). Cannot delete the 'latest' working copy.",
+  schema: z.object({
+    gameName: z.string().describe("The name of the game/rulebook."),
+    versionTag: z.string().describe("The version tag to delete (e.g. '1.0.0'). Cannot be 'latest'."),
+  }),
+  handler: async (args) => {
+    if (args.versionTag.toLowerCase() === "latest") {
+      throw new Error("Cannot delete the 'latest' working copy. Use delete_game to remove all game data.");
+    }
+
+    const jsonPath = getRulebookPath(args.gameName, { versionTag: args.versionTag });
+    const mdPath = getRulebookMdPath(args.gameName, args.versionTag);
+
+    let deletedFiles: string[] = [];
+
+    try {
+      await fs.unlink(jsonPath);
+      deletedFiles.push(jsonPath);
+    } catch (err: any) {
+      if (err.code === "ENOENT") {
+        throw new Error(`Version '${args.versionTag}' of rulebook '${args.gameName}' not found.`);
+      }
+      throw err;
+    }
+
+    try {
+      await fs.unlink(mdPath);
+      deletedFiles.push(mdPath);
+    } catch (err: any) {
+      if (err.code !== "ENOENT") throw err;
+    }
+
+    return {
+      content: [{
+        type: "text",
+        text: JSON.stringify({
+          status: "success",
+          message: `Version '${args.versionTag}' of rulebook '${args.gameName}' has been permanently deleted.`,
+          deletedFiles,
+        }, null, 2),
+      }],
+    };
+  },
+};
+
 export const rulebookVersioningTools = [
   listRulebooksTool,
   listVersionsTool,
   createVersionTool,
+  deleteRulebookVersionTool,
 ];

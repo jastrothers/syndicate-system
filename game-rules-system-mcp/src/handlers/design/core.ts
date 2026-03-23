@@ -1,5 +1,7 @@
 import { z } from "zod";
+import * as fs from "fs/promises";
 import { createDesignSession, addDesignStep, getDesignSession, listDesignSessions } from "../../services/DesignStore.js";
+import { getDesignSessionPath } from "../../config/paths.js";
 import { ToolDefinition } from "../types.js";
 
 export const createDesignSessionTool: ToolDefinition = {
@@ -70,9 +72,33 @@ export const listDesignSessionsTool: ToolDefinition = {
   },
 };
 
+export const deleteDesignSessionTool: ToolDefinition = {
+  name: "delete_design_session",
+  description: "Permanently deletes a design session JSON file for a game.",
+  schema: z.object({
+    gameName: z.string().describe("The name of the game the design session belongs to."),
+    sessionId: z.string().describe("The design session ID to delete."),
+  }),
+  handler: async (args: any) => {
+    const filePath = getDesignSessionPath(args.gameName, args.sessionId);
+    try {
+      await fs.unlink(filePath);
+    } catch (err: any) {
+      if (err.code === "ENOENT") {
+        throw new Error(`Design session '${args.sessionId}' not found for game '${args.gameName}'.`);
+      }
+      throw err;
+    }
+    return {
+      content: [{ type: "text", text: `Design session '${args.sessionId}' for game '${args.gameName}' has been permanently deleted.` }],
+    };
+  },
+};
+
 export const designCoreTools = [
   createDesignSessionTool,
   addDesignStepTool,
   getDesignSessionTool,
   listDesignSessionsTool,
+  deleteDesignSessionTool,
 ];

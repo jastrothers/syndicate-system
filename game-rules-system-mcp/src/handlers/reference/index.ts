@@ -1,5 +1,7 @@
 import { z } from "zod";
+import * as fs from "fs/promises";
 import * as ReferenceStore from "../../services/ReferenceStore.js";
+import { getReferenceFilePath } from "../../config/paths.js";
 import { ToolDefinition } from "../types.js";
 
 export const saveReferenceTool: ToolDefinition = {
@@ -69,9 +71,61 @@ export const rebuildReferenceIndexTool: ToolDefinition = {
   },
 };
 
+export const deleteReferenceTool: ToolDefinition = {
+  name: "delete_reference",
+  description: "Deletes a reference. By default uses a tombstone (soft-delete, file kept but hidden). Pass hard: true to permanently delete the file and remove it from the index.",
+  schema: z.object({
+    name: z.string().describe("The name of the reference to delete."),
+    game: z.string().describe("The game the reference belongs to."),
+    version: z.string().optional().describe("The version of the reference (defaults to 'latest')."),
+    hard: z.boolean().optional().default(false).describe("If true, permanently deletes the file and index entry. If false (default), tombstones the reference."),
+  }),
+  handler: async (args) => {
+    if (!args.hard) {
+      // Soft-delete: tombstone via saveReference
+      const existing = await ReferenceStore.getReference(args.name, args.game, args.version);
+      if (!existing) {
+        throw new Error(`Reference '${args.name}' not found for game '${args.game}'.`);
+      }
+      await ReferenceStore.saveReference(args.name, args.game, args.version, existing.type, existing.tags, existing.content, true);
+      return {
+        content: [{ type: "text", text: `Reference '${args.name}' has been soft-deleted (tombstoned) for game '${args.game}'.` }],
+      };
+    }
+
+    // Hard-delete: remove file and DB row
+    const resolvedVersion = args.version || "latest";
+    const filePath = getReferenceFilePath(args.name, args.game, resolvedVersion);
+
+    try {
+      await fs.unlink(filePath);
+    } catch (err: any) {
+      if (err.code === "ENOENT") {
+        throw new Error(`Reference file not found: ${filePath}`);
+      }
+      throw err;
+    }
+
+    // Remove from SQLite index
+    await ReferenceStore.rebuildIndex();
+
+    return {
+      content: [{
+        type: "text",
+        text: JSON.stringify({
+          status: "success",
+          message: `Reference '${args.name}' has been permanently deleted for game '${args.game}' (version: ${resolvedVersion}).`,
+          deletedFile: filePath,
+        }, null, 2),
+      }],
+    };
+  },
+};
+
 export const referenceTools = [
   saveReferenceTool,
   getReferenceTool,
   listReferencesTool,
   rebuildReferenceIndexTool,
+  deleteReferenceTool,
 ];

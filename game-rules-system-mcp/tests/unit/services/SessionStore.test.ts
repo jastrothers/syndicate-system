@@ -3,7 +3,7 @@ import assert from "node:assert";
 import * as fs from "fs/promises";
 import * as path from "path";
 import { getSessionPath, SESSION_INDEX_DB, DATA_DIR } from "../../../src/config/paths.js";
-import { initialize, createSession, getSession, saveSession, listSessions, closeDb } from "../../../src/services/SessionStore.js";
+import { initialize, createSession, getSession, saveSession, listSessions, deleteSession, deleteSessionsByGame, closeDb } from "../../../src/services/SessionStore.js";
 import { PlaytestSession } from "../../../src/types/index.js";
 import * as StorageService from "../../../src/services/StorageService.js";
 
@@ -100,6 +100,45 @@ describe("SessionStore Units", () => {
     assert.deepStrictEqual(retrieved.state, { points: 10 });
     assert.strictEqual(retrieved.ledger.length, 1);
     assert.strictEqual(retrieved.ledger[0].actionType, "test_action");
+  });
+
+  it("deleteSession should remove from DB and return the file path", async () => {
+    const session = await createSession("delete-test-game");
+    createdSessions.push({ id: session.sessionId, game: "delete-test-game" });
+
+    const returned = deleteSession(session.sessionId);
+    assert.ok(returned, "Should return a file path");
+    assert.ok(returned!.includes(session.sessionId), "Returned path should contain the session ID");
+
+    // Verify gone from DB
+    const list = await listSessions("delete-test-game");
+    const found = list.find((s: any) => s.sessionId === session.sessionId);
+    assert.strictEqual(found, undefined);
+  });
+
+  it("deleteSession should return null for a non-existent session ID", () => {
+    const result = deleteSession("non-existent-session-id-xyz");
+    assert.strictEqual(result, null);
+  });
+
+  it("deleteSessionsByGame should remove all sessions for a game and return their paths", async () => {
+    const s1 = await createSession("bulk-delete-game");
+    const s2 = await createSession("bulk-delete-game");
+    createdSessions.push({ id: s1.sessionId, game: "bulk-delete-game" });
+    createdSessions.push({ id: s2.sessionId, game: "bulk-delete-game" });
+
+    const paths = deleteSessionsByGame("bulk-delete-game");
+    assert.strictEqual(paths.length, 2);
+    assert.ok(paths.every((p) => typeof p === "string" && p.length > 0));
+
+    // Verify none remain in DB
+    const list = await listSessions("bulk-delete-game");
+    assert.strictEqual(list.length, 0);
+  });
+
+  it("deleteSessionsByGame should return an empty array for an unknown game", () => {
+    const paths = deleteSessionsByGame("game-that-does-not-exist");
+    assert.deepStrictEqual(paths, []);
   });
 
   it("should migrate legacy flat sessions into nested folders and index them on initialize", async () => {

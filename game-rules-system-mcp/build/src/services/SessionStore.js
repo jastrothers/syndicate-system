@@ -105,6 +105,22 @@ export async function listSessions(rulebookName, rulebookVersion) {
     query += " ORDER BY lastUpdatedAt DESC";
     return db.prepare(query).all(...params);
 }
+export function deleteSession(sessionId) {
+    if (!db)
+        return null;
+    const row = db.prepare("SELECT filePath FROM sessions_index WHERE id = ?").get(sessionId);
+    if (!row)
+        return null;
+    db.prepare("DELETE FROM sessions_index WHERE id = ?").run(sessionId);
+    return row.filePath;
+}
+export function deleteSessionsByGame(gameName) {
+    if (!db)
+        return [];
+    const rows = db.prepare("SELECT filePath FROM sessions_index WHERE rulebookName = ?").all(gameName);
+    db.prepare("DELETE FROM sessions_index WHERE rulebookName = ?").run(gameName);
+    return rows.map(r => r.filePath);
+}
 export function closeDb() {
     if (db) {
         db.close();

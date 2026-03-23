@@ -133,6 +133,21 @@ export async function listSessions(rulebookName?: string, rulebookVersion?: stri
   return db.prepare(query).all(...params);
 }
 
+export function deleteSession(sessionId: string): string | null {
+  if (!db) return null;
+  const row = db.prepare("SELECT filePath FROM sessions_index WHERE id = ?").get(sessionId) as { filePath: string } | undefined;
+  if (!row) return null;
+  db.prepare("DELETE FROM sessions_index WHERE id = ?").run(sessionId);
+  return row.filePath;
+}
+
+export function deleteSessionsByGame(gameName: string): string[] {
+  if (!db) return [];
+  const rows = db.prepare("SELECT filePath FROM sessions_index WHERE rulebookName = ?").all(gameName) as { filePath: string }[];
+  db.prepare("DELETE FROM sessions_index WHERE rulebookName = ?").run(gameName);
+  return rows.map(r => r.filePath);
+}
+
 export function closeDb(): void {
   if (db) {
     db.close();
