@@ -13,22 +13,27 @@ A strategic deckbuilding game system split into two domains:
 
 ## Terminal Commands (Windows)
 
-This repo runs on Windows. Always use `cmd /c <command>` for one-off commands to ensure output is captured correctly. Do not use PowerShell unless required.
-
-```cmd
-cmd /c echo "example"
-cmd /c echo "step 1" && cmd /c echo "step 2"
-```
+This repo runs on Windows, but Claude Code's shell is **Bash** (not cmd). Use native bash syntax — do NOT use `cmd /c` wrappers, as they suppress output in this environment.
 
 Do not create temporary `.js`, `.py`, or `.bat` files in root/source directories. Use the `temp/` directory and clean up immediately.
+
+**CWD persists between Bash tool calls.** Use absolute Unix-style paths to avoid state issues:
+
+```bash
+# Correct: absolute path, native bash
+cd /c/Users/Julian/git/syndicate-system/game-rules-system-mcp && npm run build
+
+# Wrong: cmd /c suppresses all output
+cmd /c npm run build
+```
 
 ## Build & Test (game-rules-system-mcp)
 
 ```bash
-cd game-rules-system-mcp
+cd /c/Users/Julian/git/syndicate-system/game-rules-system-mcp
 npm install
 npm run build        # tsc → build/
-npm run dev          # watch mode
+npm run dev          # watch mode (use run_in_background: true)
 npm test             # Node.js built-in test runner (serial, no concurrency)
 npm run build && npm test  # build then test
 ```
@@ -37,7 +42,7 @@ Tests live in `tests/unit/`, `tests/integration/`, and `tests/e2e/`. There is no
 
 To run a specific test file, compile it and invoke Node directly:
 ```bash
-cmd /c node --test build/tests/unit/services/DeckService.test.js
+node --test build/tests/unit/services/DeckService.test.js
 ```
 
 ## Game Viewer
