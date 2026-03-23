@@ -27,7 +27,7 @@ export const drawFromDeckTool = {
         });
         await saveSession(args.sessionId, session);
         return {
-            content: [{ type: "text", text: `Drawn ${drawn.length} items.` }],
+            content: [{ type: "text", text: JSON.stringify({ drawn, deckRemaining: session.state[args.deckId].length, handSize: session.state[args.targetHandId].length }, null, 2) }],
         };
     },
 };
@@ -51,7 +51,7 @@ export const shuffleDeckTool = {
         });
         await saveSession(args.sessionId, session);
         return {
-            content: [{ type: "text", text: `Deck ${args.deckId} shuffled.` }],
+            content: [{ type: "text", text: JSON.stringify({ deckId: args.deckId, size: session.state[args.deckId].length }, null, 2) }],
         };
     },
 };
@@ -73,9 +73,12 @@ export const moveEntityTool = {
             session.state[args.targetId] = [];
         const srcArray = session.state[args.sourceId];
         const targetArray = session.state[args.targetId];
+        if (srcArray.length === 0) {
+            throw new Error(`Source zone '${args.sourceId}' is empty — cannot find entity '${args.entityId}'.`);
+        }
         const idx = srcArray.findIndex((item) => item === args.entityId || (item && (item.id === args.entityId || item.name === args.entityId)));
         if (idx === -1) {
-            throw new Error(`Entity ${args.entityId} not found in ${args.sourceId}`);
+            throw new Error(`Entity '${args.entityId}' not found in '${args.sourceId}' (${srcArray.length} items). Entity matching checks id, name, and scalar equality.`);
         }
         const [movedItem] = srcArray.splice(idx, 1);
         targetArray.push(movedItem);
@@ -87,7 +90,7 @@ export const moveEntityTool = {
         });
         await saveSession(args.sessionId, session);
         return {
-            content: [{ type: "text", text: `Moved entity successfully.` }],
+            content: [{ type: "text", text: JSON.stringify({ movedItem, sourceRemaining: srcArray.length, targetSize: targetArray.length }, null, 2) }],
         };
     },
 };

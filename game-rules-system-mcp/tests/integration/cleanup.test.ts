@@ -168,7 +168,7 @@ test("Cleanup Integration Tests", async (t) => {
 
     const deleteResult: any = await client.callTool({
       name: "delete_rulebook_version",
-      arguments: { gameName: "version-cleanup-game", versionTag: "0.1.0" },
+      arguments: { rulebookName: "version-cleanup-game", versionTag: "0.1.0" },
     });
     assert.strictEqual(deleteResult.isError, undefined);
     const data = JSON.parse((deleteResult.content[0] as any).text);
@@ -185,7 +185,7 @@ test("Cleanup Integration Tests", async (t) => {
   await t.test("delete_rulebook_version: rejects 'latest' as a version tag", async () => {
     const result: any = await client.callTool({
       name: "delete_rulebook_version",
-      arguments: { gameName: "version-cleanup-game", versionTag: "latest" },
+      arguments: { rulebookName: "version-cleanup-game", versionTag: "latest" },
     });
     assert.strictEqual(result.isError, true);
     assert.ok((result.content[0] as any).text.includes("latest"), "Error should mention 'latest'");
@@ -194,7 +194,7 @@ test("Cleanup Integration Tests", async (t) => {
   await t.test("delete_rulebook_version: errors when version snapshot does not exist", async () => {
     const result: any = await client.callTool({
       name: "delete_rulebook_version",
-      arguments: { gameName: "version-cleanup-game", versionTag: "99.99.99" },
+      arguments: { rulebookName: "version-cleanup-game", versionTag: "99.99.99" },
     });
     assert.strictEqual(result.isError, true);
   });

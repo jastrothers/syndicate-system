@@ -334,7 +334,8 @@ test("Card Mechanics Integration Tests", async (t) => {
             },
         });
         assert.strictEqual(result.isError, undefined);
-        assert.ok(result.content[0].text.includes("10 cards"));
+        const deckResult = JSON.parse(result.content[0].text);
+        assert.strictEqual(deckResult.totalCards, 10);
         const stateRes = await client.callTool({
             name: "get_game_state",
             arguments: { sessionId: cardSessionId },

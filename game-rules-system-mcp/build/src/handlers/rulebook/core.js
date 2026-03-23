@@ -110,7 +110,8 @@ export const readRuleSectionTool = {
         let current = rulebook.sections;
         for (const part of parts) {
             if (!current || !current[part]) {
-                throw new Error(`Section path '${args.path}' not found.`);
+                const availableKeys = current ? Object.keys(current) : [];
+                throw new Error(`Section path '${args.path}' not found at segment '${part}'. Available keys at this level: [${availableKeys.join(", ")}]`);
             }
             current = part === parts[parts.length - 1] ? current[part] : current[part].subsections;
         }

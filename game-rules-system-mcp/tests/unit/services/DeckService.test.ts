@@ -7,6 +7,8 @@ import {
   drawWithReshuffle,
   matchesFilter,
   shuffleArray,
+  validateFilterClause,
+  expandCardTemplates,
 } from "../../../src/services/DeckService.js";
 
 test("DeckService", async (t) => {
@@ -209,5 +211,56 @@ test("DeckService", async (t) => {
     assert.strictEqual(reshuffled, true);
     assert.strictEqual(discard.length, 0);
     assert.strictEqual(deck.length, 1, "One card should remain in deck after drawing 2 of 3");
+  });
+
+  // ==================== validateFilterClause ====================
+
+  await t.test("validateFilterClause: passes for eq with string value", () => {
+    assert.doesNotThrow(() => validateFilterClause({ key: "name", op: "eq", value: "Copper" }));
+  });
+
+  await t.test("validateFilterClause: passes for gt with numeric value", () => {
+    assert.doesNotThrow(() => validateFilterClause({ key: "cost", op: "gt", value: 3 }));
+  });
+
+  await t.test("validateFilterClause: throws for gt with string value", () => {
+    assert.throws(
+      () => validateFilterClause({ key: "cost", op: "gt", value: "three" }),
+      /requires a numeric value/
+    );
+  });
+
+  await t.test("validateFilterClause: throws for lte with boolean value", () => {
+    assert.throws(
+      () => validateFilterClause({ key: "hp", op: "lte", value: true }),
+      /requires a numeric value/
+    );
+  });
+
+  // ==================== expandCardTemplates ====================
+
+  await t.test("expandCardTemplates: expands cards with counts", () => {
+    const deck = expandCardTemplates([
+      { card: { name: "Copper" }, count: 3 },
+      { card: { name: "Silver" }, count: 2 },
+    ]);
+    assert.strictEqual(deck.length, 5);
+    assert.strictEqual((deck[0] as any).name, "Copper");
+    assert.strictEqual((deck[3] as any).name, "Silver");
+  });
+
+  await t.test("expandCardTemplates: assigns unique ids to object cards", () => {
+    const deck = expandCardTemplates([
+      { card: { name: "Copper" }, count: 2 },
+    ]);
+    assert.notStrictEqual((deck[0] as any).id, (deck[1] as any).id);
+  });
+
+  await t.test("expandCardTemplates: handles scalar cards", () => {
+    const deck = expandCardTemplates([
+      { card: "token" as any, count: 3 },
+    ]);
+    assert.strictEqual(deck.length, 3);
+    assert.strictEqual(deck[0], "token");
   });
 });

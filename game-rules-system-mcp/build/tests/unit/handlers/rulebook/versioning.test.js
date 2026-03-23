@@ -51,19 +51,19 @@ describe("deleteRulebookVersionTool", () => {
     it("has the correct tool name", () => {
         assert.equal(deleteRulebookVersionTool.name, "delete_rulebook_version");
     });
-    it("schema requires gameName and versionTag", () => {
+    it("schema requires rulebookName and versionTag", () => {
         const valid = deleteRulebookVersionTool.schema.safeParse({
-            gameName: "heist",
+            rulebookName: "heist",
             versionTag: "1.0.0",
         });
         assert.ok(valid.success);
     });
-    it("schema rejects missing gameName", () => {
+    it("schema rejects missing rulebookName", () => {
         const result = deleteRulebookVersionTool.schema.safeParse({ versionTag: "1.0.0" });
-        assert.ok(!result.success, "Missing gameName should fail");
+        assert.ok(!result.success, "Missing rulebookName should fail");
     });
     it("schema rejects missing versionTag", () => {
-        const result = deleteRulebookVersionTool.schema.safeParse({ gameName: "heist" });
+        const result = deleteRulebookVersionTool.schema.safeParse({ rulebookName: "heist" });
         assert.ok(!result.success, "Missing versionTag should fail");
     });
 });

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import * as fs from "fs/promises";
 import { getPlaytestLogPath } from "../../config/paths.js";
-import { ensureSessionsDirectory, createSession, getSession, saveSession } from "../../services/SessionStore.js";
+import { ensureSessionsDirectory, createSession, getSession, saveSession, listSessions } from "../../services/SessionStore.js";
 export const createSessionTool = {
     name: "create_session",
     description: "Initializes an empty playtest session linked to a specific rulebook.",
@@ -32,7 +32,7 @@ export const getGameStateTool = {
 };
 export const updateGameStateTool = {
     name: "update_game_state",
-    description: "Applies a JSON patch to the game state.",
+    description: "Applies a shallow merge to the game state (Object.assign semantics — top-level keys are overwritten, not deep-merged).",
     schema: z.object({
         sessionId: z.string().describe("The ID of the playtest session."),
         patch: z.record(z.string(), z.unknown()).describe("A JSON object representing the state updates to apply via shallow merge."),
@@ -42,7 +42,7 @@ export const updateGameStateTool = {
         session.state = { ...session.state, ...args.patch };
         await saveSession(args.sessionId, session);
         return {
-            content: [{ type: "text", text: `Game state updated successfully.` }],
+            content: [{ type: "text", text: JSON.stringify({ updatedKeys: Object.keys(args.patch), state: session.state }, null, 2) }],
         };
     },
 };
@@ -68,9 +68,24 @@ export const logPlaytestNoteTool = {
         };
     },
 };
+export const listSessionsTool = {
+    name: "list_sessions",
+    description: "Lists all playtest sessions, optionally filtered by rulebook name and version. Returns session metadata without full state.",
+    schema: z.object({
+        rulebookName: z.string().optional().describe("Filter sessions by rulebook name."),
+        rulebookVersion: z.string().optional().describe("Filter sessions by rulebook version."),
+    }),
+    handler: async (args) => {
+        const sessions = await listSessions(args.rulebookName, args.rulebookVersion);
+        return {
+            content: [{ type: "text", text: JSON.stringify(sessions, null, 2) }],
+        };
+    },
+};
 export const sessionCoreTools = [
     createSessionTool,
     getGameStateTool,
     updateGameStateTool,
     logPlaytestNoteTool,
+    listSessionsTool,
 ];
