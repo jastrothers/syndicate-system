@@ -1,4 +1,4 @@
-import { describe, it, before, after } from "node:test";
+import { describe, it, after } from "node:test";
 import assert from "node:assert";
 import * as fs from "fs/promises";
 import { getDesignerProfilePath } from "../../../src/config/paths.js";

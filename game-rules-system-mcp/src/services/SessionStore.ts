@@ -1,5 +1,4 @@
 import * as fs from "fs/promises";
-import * as path from "path";
 import Database from "better-sqlite3";
 import { PlaytestSession } from "../types/index.js";
 import { SESSION_INDEX_DB, getSessionPath, DATA_DIR, SYSTEM_DIR } from "../config/paths.js";

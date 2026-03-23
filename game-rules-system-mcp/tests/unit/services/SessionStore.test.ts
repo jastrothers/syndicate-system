@@ -10,18 +10,6 @@ import * as StorageService from "../../../src/services/StorageService.js";
 describe("SessionStore Units", () => {
   const createdSessions: { id: string, game: string, version?: string }[] = [];
 
-  // Define mockSession here as it's used in a test case that might be moved or refactored
-  const legacyId = "legacy-session-123";
-  const mockSession: PlaytestSession = {
-    sessionId: legacyId,
-    rulebookName: "legacy-game",
-    rulebookVersion: "v1.0",
-    state: { migrated: true },
-    ledger: [],
-    createdAt: new Date().toISOString(),
-    lastUpdatedAt: new Date().toISOString(),
-  };
-
   before(async () => {
     // Cleanup DB and force fresh initialization so migration isn't already run
     try {

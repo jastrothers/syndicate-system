@@ -7,10 +7,10 @@ import { z } from "zod";
 import { getSession, saveSession } from "../../services/SessionStore.js";
 import { shuffleArray, matchesFilter, validateFilterClause, expandCardTemplates, FilterClause } from "../../services/DeckService.js";
 import { filterSchema } from "./deck.js";
-import { ToolDefinition } from "../types.js";
+import { defineTool, ToolDefinition } from "../types.js";
 import { jsonResponse } from "../response.js";
 
-export const createDeckFromTemplateTool: ToolDefinition = {
+export const createDeckFromTemplateTool = defineTool({
   name: "create_deck_from_template",
   description:
     "Generate a populated deck array in game state from a list of card definitions with quantities. Useful for setting up starter decks, markets, and supply piles at the start of a game.",
@@ -39,7 +39,7 @@ export const createDeckFromTemplateTool: ToolDefinition = {
       .default(true)
       .describe("Whether to shuffle the deck after creation. Default: true."),
   }),
-  handler: async (args: any) => {
+  handler: async (args) => {
     const session = await getSession(args.sessionId);
 
     const deck = expandCardTemplates(args.cards);
@@ -65,10 +65,10 @@ export const createDeckFromTemplateTool: ToolDefinition = {
 
     return jsonResponse({ deckId: args.deckId, totalCards: deck.length, uniqueTypes: args.cards.length, shuffled: args.shuffle });
   },
-};
+});
 
 
-export const countZoneTool: ToolDefinition = {
+export const countZoneTool = defineTool({
   name: "count_zone",
   description:
     "Return the count of items in a state array, optionally filtered by criteria. Useful for checking pile sizes, hand counts, and conditional checks.",
@@ -79,7 +79,7 @@ export const countZoneTool: ToolDefinition = {
       .optional()
       .describe("Optional filter to count only matching items."),
   }),
-  handler: async (args: any) => {
+  handler: async (args) => {
     const session = await getSession(args.sessionId);
     const zone = session.state[args.zoneId];
     if (!Array.isArray(zone)) {
@@ -98,9 +98,9 @@ export const countZoneTool: ToolDefinition = {
 
     return jsonResponse({ zoneId: args.zoneId, count, filtered: !!args.filter });
   },
-};
+});
 
-export const revealCardsTool: ToolDefinition = {
+export const revealCardsTool = defineTool({
   name: "reveal_cards",
   description:
     "Expose specific cards from any zone to the ledger without moving them. Creates a timestamped reveal entry in the action history for auditability.",
@@ -117,7 +117,7 @@ export const revealCardsTool: ToolDefinition = {
       ),
     actor: z.string().describe("The player revealing cards."),
   }),
-  handler: async (args: any) => {
+  handler: async (args) => {
     const session = await getSession(args.sessionId);
     const zone = session.state[args.zoneId];
     if (!Array.isArray(zone)) {
@@ -153,11 +153,11 @@ export const revealCardsTool: ToolDefinition = {
 
     return jsonResponse({ revealed: revealedCards.length, cards: revealedCards });
   },
-};
+});
 
 import { getReference } from "../../services/ReferenceStore.js";
 
-export const createDeckFromReferenceTool: ToolDefinition = {
+export const createDeckFromReferenceTool = defineTool({
   name: "create_deck_from_reference",
   description:
     "Generate a populated deck array in game state by fetching a saved reference containing card templates. This backend parses the JSON array and avoids LLM context bloat.",
@@ -169,15 +169,15 @@ export const createDeckFromReferenceTool: ToolDefinition = {
     version: z.string().optional().describe("Optional version context constraint."),
     shuffle: z.boolean().optional().default(true).describe("Whether to shuffle the deck after creation. Default: true."),
   }),
-  handler: async (args: any) => {
+  handler: async (args) => {
     const session = await getSession(args.sessionId);
     const ref = await getReference(args.referenceName, args.game, args.version);
-    
+
     if (!ref) {
       throw new Error(`Reference '${args.referenceName}' not found.`);
     }
 
-    let cards: Array<{ card: any; count: number }>;
+    let cards: Array<{ card: unknown; count: number }>;
     try {
       cards = JSON.parse(ref.content);
       if (!Array.isArray(cards)) {
@@ -211,7 +211,7 @@ export const createDeckFromReferenceTool: ToolDefinition = {
 
     return jsonResponse({ deckId: args.deckId, referenceName: args.referenceName, totalCards: deck.length, uniqueTypes: cards.length, shuffled: args.shuffle });
   },
-};
+});
 
 export const deckBuildingTools: ToolDefinition[] = [
   createDeckFromTemplateTool,

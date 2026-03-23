@@ -63,8 +63,8 @@ export async function migrateIfNeeded(name: string): Promise<void> {
   }
 
   await StorageService.ensureDirectory(newDir);
-  const data = await fs.readFile(legacyPath, "utf-8");
-  await fs.writeFile(latestPath, data, "utf-8");
+  const data = JSON.parse(await fs.readFile(legacyPath, "utf-8"));
+  await StorageService.saveJson(latestPath, data);
   await fs.unlink(legacyPath);
 }
 
@@ -123,8 +123,8 @@ export async function promoteDraft(name: string): Promise<void> {
   const latestPath = getRulebookPath(name);
 
   try {
-    const draftContent = await fs.readFile(draftPath, "utf-8");
-    await fs.writeFile(latestPath, draftContent, "utf-8");
+    const draft = await StorageService.readJson<Rulebook>(draftPath);
+    await StorageService.saveJson(latestPath, draft);
     await fs.unlink(draftPath);
     invalidateCache(name);
   } catch (error) {
@@ -247,8 +247,8 @@ export async function createVersion(
   }
   rulebook.metadata.lastUpdated = new Date().toISOString();
 
-  // Write snapshot
-  await fs.writeFile(snapshotPath, JSON.stringify(rulebook, null, 2), "utf-8");
+  // Write snapshot (locked via StorageService)
+  await StorageService.saveJson(snapshotPath, rulebook);
 
   return {
     versionTag: safeTag,

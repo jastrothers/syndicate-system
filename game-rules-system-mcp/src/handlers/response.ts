@@ -3,8 +3,9 @@
  * Compact JSON (no pretty-print) to minimize token consumption by AI consumers.
  */
 
-type McpResponse = {
+export type McpResponse = {
   content: { type: "text"; text: string }[];
+  isError?: boolean;
 };
 
 export function jsonResponse(data: unknown, hint?: string): McpResponse {

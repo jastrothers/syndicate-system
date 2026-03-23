@@ -1,6 +1,5 @@
-import { DesignSession, DesignStep, DesignerProfile, DecisionLog, DecisionEntry } from "../types/index.js";
+import { DesignStep, DesignerProfile, DecisionLog, DecisionEntry } from "../types/index.js";
 import * as ProfileService from "./ProfileService.js";
-import * as DesignStore from "./DesignStore.js";
 import * as StorageService from "./StorageService.js";
 import { getDecisionLogPath } from "../config/paths.js";
 

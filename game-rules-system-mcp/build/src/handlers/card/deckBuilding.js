@@ -7,8 +7,9 @@ import { z } from "zod";
 import { getSession, saveSession } from "../../services/SessionStore.js";
 import { shuffleArray, matchesFilter, validateFilterClause, expandCardTemplates } from "../../services/DeckService.js";
 import { filterSchema } from "./deck.js";
+import { defineTool } from "../types.js";
 import { jsonResponse } from "../response.js";
-export const createDeckFromTemplateTool = {
+export const createDeckFromTemplateTool = defineTool({
     name: "create_deck_from_template",
     description: "Generate a populated deck array in game state from a list of card definitions with quantities. Useful for setting up starter decks, markets, and supply piles at the start of a game.",
     schema: z.object({
@@ -55,8 +56,8 @@ export const createDeckFromTemplateTool = {
         await saveSession(args.sessionId, session);
         return jsonResponse({ deckId: args.deckId, totalCards: deck.length, uniqueTypes: args.cards.length, shuffled: args.shuffle });
     },
-};
-export const countZoneTool = {
+});
+export const countZoneTool = defineTool({
     name: "count_zone",
     description: "Return the count of items in a state array, optionally filtered by criteria. Useful for checking pile sizes, hand counts, and conditional checks.",
     schema: z.object({
@@ -82,8 +83,8 @@ export const countZoneTool = {
         }
         return jsonResponse({ zoneId: args.zoneId, count, filtered: !!args.filter });
     },
-};
-export const revealCardsTool = {
+});
+export const revealCardsTool = defineTool({
     name: "reveal_cards",
     description: "Expose specific cards from any zone to the ledger without moving them. Creates a timestamped reveal entry in the action history for auditability.",
     schema: z.object({
@@ -126,9 +127,9 @@ export const revealCardsTool = {
         await saveSession(args.sessionId, session);
         return jsonResponse({ revealed: revealedCards.length, cards: revealedCards });
     },
-};
+});
 import { getReference } from "../../services/ReferenceStore.js";
-export const createDeckFromReferenceTool = {
+export const createDeckFromReferenceTool = defineTool({
     name: "create_deck_from_reference",
     description: "Generate a populated deck array in game state by fetching a saved reference containing card templates. This backend parses the JSON array and avoids LLM context bloat.",
     schema: z.object({
@@ -175,7 +176,7 @@ export const createDeckFromReferenceTool = {
         await saveSession(args.sessionId, session);
         return jsonResponse({ deckId: args.deckId, referenceName: args.referenceName, totalCards: deck.length, uniqueTypes: cards.length, shuffled: args.shuffle });
     },
-};
+});
 export const deckBuildingTools = [
     createDeckFromTemplateTool,
     createDeckFromReferenceTool,

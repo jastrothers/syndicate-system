@@ -50,4 +50,27 @@ describe("StorageService", () => {
     );
     assert.deepStrictEqual(read, defaultValue);
   });
+
+  it("should throw when reading malformed JSON without default", async () => {
+    const badFile = path.join(TEST_DIR, "bad.json");
+    await fs.writeFile(badFile, "{ this is not valid json }", "utf-8");
+    await assert.rejects(
+      StorageService.readJson(badFile),
+      (err: Error) => err instanceof SyntaxError || err.message.includes("JSON")
+    );
+  });
+
+  it("should create parent directories when saving to nested path", async () => {
+    const nestedFile = path.join(TEST_DIR, "a", "b", "c", "deep.json");
+    await StorageService.saveJson(nestedFile, { deep: true });
+    const read = await StorageService.readJson(nestedFile);
+    assert.deepStrictEqual(read, { deep: true });
+  });
+
+  it("should overwrite existing file content", async () => {
+    await StorageService.saveJson(TEST_FILE, { version: 1 });
+    await StorageService.saveJson(TEST_FILE, { version: 2 });
+    const read = await StorageService.readJson<{ version: number }>(TEST_FILE);
+    assert.strictEqual(read.version, 2);
+  });
 });

@@ -152,7 +152,7 @@ export async function queryReferences(game, version, type, tags) {
         }
         else {
             const rTarget = (game && r.game === game) || (!game && r.game !== 'general');
-            const cTarget = (game && current.game === game) || (!game && current.game !== 'general');
+            const _cTarget = (game && current.game === game) || (!game && current.game !== 'general');
             const isNewerExact = rTarget && r.version === resolvedVersion;
             const isCurrentGeneral = current.game === 'general';
             const isNewerGameLatest = rTarget && r.version === 'latest' && current.version !== resolvedVersion;

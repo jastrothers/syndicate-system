@@ -2,9 +2,6 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import {
   createDesignSessionTool,
-  addDesignStepTool,
-  getDesignSessionTool,
-  listDesignSessionsTool,
   deleteDesignSessionTool,
   designCoreTools,
 } from "../../../../src/handlers/design/core.js";

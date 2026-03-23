@@ -3,8 +3,9 @@ import * as NovaService from "../../services/NovaService.js";
 import * as ProfileService from "../../services/ProfileService.js";
 import * as DesignStore from "../../services/DesignStore.js";
 import { jsonResponse, textResponse } from "../response.js";
+import { defineTool } from "../types.js";
 export const novaTools = [
-    {
+    defineTool({
         name: "record_decision",
         description: "Records a designer's decision (accept/reject/defer) on a design step to fuel the learning loop.",
         schema: z.object({
@@ -19,8 +20,8 @@ export const novaTools = [
             await NovaService.processDecision(args.gameName, args.sessionId, args.stepId, args.decision, args.rationale, args.impactedMechanisms);
             return textResponse(`Decision '${args.decision}' recorded and profile updated.`);
         }
-    },
-    {
+    }),
+    defineTool({
         name: "get_designer_profile",
         description: "Retrieves the global designer taste profile.",
         schema: z.object({}),
@@ -28,8 +29,8 @@ export const novaTools = [
             const profile = await ProfileService.getProfile();
             return jsonResponse(profile);
         }
-    },
-    {
+    }),
+    defineTool({
         name: "synthesize_nova_advice",
         description: "Synthesizes a specialist agent's output into the Nova Trace-Explain-Reason format.",
         schema: z.object({
@@ -47,5 +48,5 @@ export const novaTools = [
             const response = NovaService.synthesizeNovaResponse(step, profile);
             return jsonResponse(response);
         }
-    }
+    })
 ];

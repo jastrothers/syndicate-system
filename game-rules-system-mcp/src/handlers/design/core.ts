@@ -1,24 +1,31 @@
 import { z } from "zod";
 import * as fs from "fs/promises";
 import { createDesignSession, addDesignStep, getDesignSession, listDesignSessions } from "../../services/DesignStore.js";
-import { getDesignSessionPath } from "../../config/paths.js";
-import { ToolDefinition } from "../types.js";
+import { getDesignSessionPath, sanitizeFileName } from "../../config/paths.js";
+import { defineTool } from "../types.js";
 import { jsonResponse, textResponse } from "../response.js";
 
-export const createDesignSessionTool: ToolDefinition = {
+function validateGameName(gameName: string): string {
+  const safe = sanitizeFileName(gameName);
+  if (!safe) throw new Error(`Invalid game name: '${gameName}'.`);
+  return safe;
+}
+
+export const createDesignSessionTool = defineTool({
   name: "create_design_session",
   description: "Initializes a new board game design session in the MCP.",
   schema: z.object({
     gameName: z.string().describe("The name of the game being designed."),
     theme: z.string().describe("The core theme or high-level concept."),
   }),
-  handler: async (args: any) => {
+  handler: async (args) => {
+    validateGameName(args.gameName);
     const session = await createDesignSession(args.gameName, args.theme);
     return jsonResponse(session);
   },
-};
+});
 
-export const addDesignStepTool: ToolDefinition = {
+export const addDesignStepTool = defineTool({
   name: "add_design_step",
   description: "Logs a step in the design process (e.g., MechanicsArchitect output).",
   schema: z.object({
@@ -29,8 +36,9 @@ export const addDesignStepTool: ToolDefinition = {
     output: z.string().describe("The full output/data from the step."),
     summary: z.string().describe("A concise summary of the step's result."),
   }),
-  handler: async (args: any) => {
-    const session = await addDesignStep(args.gameName, args.sessionId, {
+  handler: async (args) => {
+    validateGameName(args.gameName);
+    await addDesignStep(args.gameName, args.sessionId, {
       stepNumber: args.stepNumber,
       persona: args.persona,
       output: args.output,
@@ -38,9 +46,9 @@ export const addDesignStepTool: ToolDefinition = {
     });
     return textResponse(`Successfully logged step ${args.stepNumber} to design session: ${args.sessionId}`);
   },
-};
+});
 
-export const getDesignSessionTool: ToolDefinition = {
+export const getDesignSessionTool = defineTool({
   name: "get_design_session",
   description: "Retrieves the history of a design session. By default returns only step summaries to conserve context. Set includeFull: true to include complete step output.",
   schema: z.object({
@@ -50,7 +58,8 @@ export const getDesignSessionTool: ToolDefinition = {
     limit: z.number().int().positive().optional().describe("Maximum number of steps to return."),
     offset: z.number().int().nonnegative().optional().default(0).describe("Number of steps to skip. Default: 0."),
   }),
-  handler: async (args: any) => {
+  handler: async (args) => {
+    validateGameName(args.gameName);
     const session = await getDesignSession(args.gameName, args.sessionId);
     const total = session.steps.length;
     const offset = args.offset ?? 0;
@@ -73,21 +82,22 @@ export const getDesignSessionTool: ToolDefinition = {
       steps,
     });
   },
-};
+});
 
-export const listDesignSessionsTool: ToolDefinition = {
+export const listDesignSessionsTool = defineTool({
   name: "list_design_sessions",
   description: "Lists all design sessions for a specific game.",
   schema: z.object({
     gameName: z.string().describe("The name of the game."),
   }),
-  handler: async (args: any) => {
+  handler: async (args) => {
+    validateGameName(args.gameName);
     const sessions = await listDesignSessions(args.gameName);
     return jsonResponse(sessions);
   },
-};
+});
 
-export const deleteDesignSessionTool: ToolDefinition = {
+export const deleteDesignSessionTool = defineTool({
   name: "delete_design_session",
   description: "Permanently deletes a design session JSON file for a game.",
   schema: z.object({
@@ -95,7 +105,8 @@ export const deleteDesignSessionTool: ToolDefinition = {
     sessionId: z.string().describe("The design session ID to delete."),
     confirm: z.literal(true).describe("Must be explicitly set to true to confirm permanent deletion."),
   }),
-  handler: async (args: any) => {
+  handler: async (args) => {
+    validateGameName(args.gameName);
     const filePath = getDesignSessionPath(args.gameName, args.sessionId);
     try {
       await fs.unlink(filePath);
@@ -107,7 +118,7 @@ export const deleteDesignSessionTool: ToolDefinition = {
     }
     return textResponse(`Design session '${args.sessionId}' for game '${args.gameName}' has been permanently deleted.`);
   },
-};
+});
 
 export const designCoreTools = [
   createDesignSessionTool,

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import * as fs from "fs/promises";
+import * as path from "path";
 import { getPlaytestLogPath } from "../../config/paths.js";
 import { ensureSessionsDirectory, createSession, getSession, saveSession, listSessions } from "../../services/SessionStore.js";
 import { jsonResponse, textResponse } from "../response.js";
@@ -75,8 +76,6 @@ export const logPlaytestNoteTool = {
         const timestamp = new Date().toISOString();
         const logEntry = `### [${timestamp}] [${args.category}]\n${args.note}\n\n`;
         const logFile = getPlaytestLogPath(session.rulebookName);
-        // Fix ENOENT issue by ensuring path exists
-        const path = await import("path");
         await fs.mkdir(path.dirname(logFile), { recursive: true });
         await fs.appendFile(logFile, logEntry, "utf-8");
         return textResponse("Successfully appended note to playtest logs.");

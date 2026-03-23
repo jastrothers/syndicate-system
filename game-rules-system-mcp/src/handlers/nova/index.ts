@@ -3,9 +3,10 @@ import * as NovaService from "../../services/NovaService.js";
 import * as ProfileService from "../../services/ProfileService.js";
 import * as DesignStore from "../../services/DesignStore.js";
 import { jsonResponse, textResponse } from "../response.js";
+import { defineTool } from "../types.js";
 
 export const novaTools = [
-  {
+  defineTool({
     name: "record_decision",
     description: "Records a designer's decision (accept/reject/defer) on a design step to fuel the learning loop.",
     schema: z.object({
@@ -16,7 +17,7 @@ export const novaTools = [
       rationale: z.string(),
       impactedMechanisms: z.array(z.string()).describe("List of mechanism IDs targeted by this decision.")
     }),
-    handler: async (args: any) => {
+    handler: async (args) => {
       await NovaService.processDecision(
         args.gameName,
         args.sessionId,
@@ -27,8 +28,8 @@ export const novaTools = [
       );
       return textResponse(`Decision '${args.decision}' recorded and profile updated.`);
     }
-  },
-  {
+  }),
+  defineTool({
     name: "get_designer_profile",
     description: "Retrieves the global designer taste profile.",
     schema: z.object({}),
@@ -36,8 +37,8 @@ export const novaTools = [
       const profile = await ProfileService.getProfile();
       return jsonResponse(profile);
     }
-  },
-  {
+  }),
+  defineTool({
     name: "synthesize_nova_advice",
     description: "Synthesizes a specialist agent's output into the Nova Trace-Explain-Reason format.",
     schema: z.object({
@@ -45,7 +46,7 @@ export const novaTools = [
       sessionId: z.string(),
       stepId: z.number()
     }),
-    handler: async (args: any) => {
+    handler: async (args) => {
       const session = await DesignStore.getDesignSession(args.gameName, args.sessionId);
       const step = session.steps.find(s => s.stepNumber === args.stepId);
       if (!step) {
@@ -55,5 +56,5 @@ export const novaTools = [
       const response = NovaService.synthesizeNovaResponse(step, profile);
       return jsonResponse(response);
     }
-  }
+  })
 ];

@@ -2,7 +2,7 @@ import { describe, it, before, after } from "node:test";
 import assert from "node:assert";
 import * as fs from "fs/promises";
 import { getRulebookPath, getRulebookDir } from "../../../src/config/paths.js";
-import { ensureDataDirectory, getRulebook, saveRulebook, listRulebooks, listVersions, createVersion, migrateIfNeeded } from "../../../src/services/RulebookStore.js";
+import { ensureDataDirectory, getRulebook, saveRulebook, listRulebooks, listVersions, createVersion } from "../../../src/services/RulebookStore.js";
 import { Rulebook } from "../../../src/types/index.js";
 
 describe("RulebookStore Units", () => {
@@ -99,5 +99,28 @@ describe("RulebookStore Units", () => {
   it("listRulebooks should include the test rulebook", async () => {
     const names = await listRulebooks();
     assert.ok(names.includes(testRulebookName));
+  });
+
+  it("getRulebook should throw for corrupted JSON on disk", async () => {
+    const corruptedName = "corrupted-rb-" + Date.now();
+    const dir = getRulebookDir(corruptedName);
+    await fs.mkdir(dir, { recursive: true });
+    const filePath = getRulebookPath(corruptedName);
+    await fs.writeFile(filePath, "{ not valid json !!!", "utf-8");
+
+    await assert.rejects(
+      () => getRulebook(corruptedName),
+      (err: Error) => err.message.includes("Failed to parse")
+    );
+
+    // Cleanup
+    await fs.rm(dir, { recursive: true, force: true }).catch(() => {});
+  });
+
+  it("createVersion should reject empty version tag", async () => {
+    await assert.rejects(
+      () => createVersion(testRulebookName, "!!!"),
+      (err: Error) => err.message.includes("Invalid version tag")
+    );
   });
 });

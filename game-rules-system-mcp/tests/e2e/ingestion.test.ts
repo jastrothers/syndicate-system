@@ -11,7 +11,7 @@ const serverPath = path.join(__dirname, "..", "..", "src", "index.js");
 const TEST_DATA_DIR = path.join(os.tmpdir(), `test-mcp-e2e-${Date.now()}`);
 
 // Mock raw text that an AI agent might transcribe from a PDF
-const RAW_RULES_TEXT = `
+const _RAW_RULES_TEXT = `
 # TinyDungeon System
 
 ## Movement

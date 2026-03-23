@@ -2,7 +2,7 @@ import { z } from "zod";
 import { getRulebook, saveRulebook, getDraft, saveDraft, promoteDraft } from "../../services/RulebookStore.js";
 import { extractStructure } from "../../services/MarkdownFormatter.js";
 import { RuleSection } from "../../types/index.js";
-import { ToolDefinition } from "../types.js";
+import { defineTool, ToolDefinition } from "../types.js";
 import { jsonResponse, textResponse } from "../response.js";
 
 /**
@@ -23,7 +23,7 @@ function flattenSections(
   return result;
 }
 
-export const compareRulebooksTool: ToolDefinition = {
+export const compareRulebooksTool = defineTool({
   name: "compare_rulebooks",
   description: "Compares two rulebooks and returns the differences in their structures and content. Can compare different games or different versions of the same game.",
   schema: z.object({
@@ -32,7 +32,7 @@ export const compareRulebooksTool: ToolDefinition = {
     targetRulebook: z.string().describe("The name of the target rulebook to compare against"),
     targetVersion: z.string().optional().describe("Optional version tag of the target rulebook. Defaults to the current working copy."),
   }),
-  handler: async (args: any) => {
+  handler: async (args) => {
     const base = await getRulebook(args.baseRulebook, args.baseVersion);
     const target = await getRulebook(args.targetRulebook, args.targetVersion);
 
@@ -88,23 +88,23 @@ export const compareRulebooksTool: ToolDefinition = {
 
     return jsonResponse(comparison);
   },
-};
+});
 
-export const getRulebookStructureTool: ToolDefinition = {
+export const getRulebookStructureTool = defineTool({
   name: "get_rulebook_structure",
   description: "Returns the high-level outline and hierarchy of the rulebook without full text.",
   schema: z.object({
     rulebookName: z.string().optional().default("rulebook").describe("The name of the rulebook to read from. Defaults to 'rulebook'."),
     rulebookVersion: z.string().optional().describe("Optional version tag to read a specific snapshot instead of the current working copy."),
   }),
-  handler: async (args: any) => {
+  handler: async (args) => {
     const rulebook = await getRulebook(args.rulebookName, args.rulebookVersion);
     const structure = extractStructure(rulebook.sections);
     return jsonResponse({ metadata: rulebook.metadata, structure });
   },
-};
+});
 
-export const readRuleSectionTool: ToolDefinition = {
+export const readRuleSectionTool = defineTool({
   name: "read_rule_section",
   description: "Returns the complete data for a specific rule section using a dot-notation path (e.g., 'combat.resolution').",
   schema: z.object({
@@ -112,24 +112,25 @@ export const readRuleSectionTool: ToolDefinition = {
     rulebookVersion: z.string().optional().describe("Optional version tag to read a specific snapshot instead of the current working copy."),
     path: z.string().describe("Dot-notation path to the section (e.g., 'setup.board')"),
   }),
-  handler: async (args: any) => {
+  handler: async (args) => {
     const rulebook = await getRulebook(args.rulebookName, args.rulebookVersion);
     const parts = args.path.split(".");
-    let current: any = rulebook.sections;
+    let current: Record<string, RuleSection> | RuleSection = rulebook.sections;
 
     for (const part of parts) {
-      if (!current || !current[part]) {
-        const availableKeys = current ? Object.keys(current) : [];
+      const asMap = current as Record<string, RuleSection>;
+      if (!asMap || !asMap[part]) {
+        const availableKeys = asMap ? Object.keys(asMap) : [];
         throw new Error(
           `Section path '${args.path}' not found at segment '${part}'. Available keys at this level: [${availableKeys.join(", ")}]`
         );
       }
-      current = part === parts[parts.length - 1] ? current[part] : current[part].subsections;
+      current = part === parts[parts.length - 1] ? asMap[part] : (asMap[part].subsections as Record<string, RuleSection>);
     }
 
     return jsonResponse(current);
   },
-};
+});
 
 function applyRuleUpdate(sections: Record<string, RuleSection>, update: { path: string; title: string; content?: string; examples?: string[] }) {
   const parts = update.path.split(".");
@@ -157,7 +158,7 @@ function applyRuleUpdate(sections: Record<string, RuleSection>, update: { path: 
   };
 }
 
-export const updateRuleTool: ToolDefinition = {
+export const updateRuleTool = defineTool({
   name: "update_rule",
   description: "Adds or modifies rule sections. Creates intermediate sections if they don't exist. Supports batch mode via updates array to apply multiple changes in one save.",
   schema: z.object({
@@ -174,7 +175,7 @@ export const updateRuleTool: ToolDefinition = {
       examples: z.array(z.string()).optional(),
     })).optional().describe("Batch mode: provide multiple rule updates applied in one save. When provided, path/title are ignored."),
   }),
-  handler: async (args: any) => {
+  handler: async (args) => {
     const rulebook = args.isDraft
       ? (await getDraft(args.rulebookName) || await getRulebook(args.rulebookName))
       : await getRulebook(args.rulebookName);
@@ -196,61 +197,61 @@ export const updateRuleTool: ToolDefinition = {
     }
 
     const updatedPaths = args.updates
-      ? args.updates.map((u: any) => u.path)
+      ? args.updates.map((u) => u.path)
       : [args.path];
     return jsonResponse(
       { updatedPaths, rulebookName: args.rulebookName, isDraft: args.isDraft },
       "Next: compile_markdown_rulebook to sync the markdown file"
     );
   },
-};
+});
 
-export const getDraftTool: ToolDefinition = {
+export const getDraftTool = defineTool({
   name: "get_draft",
   description: "Returns the current draft rulebook for a game. Returns latest if no draft exists.",
   schema: z.object({
     rulebookName: z.string().describe("The name of the rulebook to get the draft for."),
   }),
-  handler: async (args: any) => {
+  handler: async (args) => {
     const draft = await getDraft(args.rulebookName);
     const rulebook = draft || await getRulebook(args.rulebookName);
     return jsonResponse(rulebook);
   },
-};
+});
 
-export const saveDraftTool: ToolDefinition = {
+export const saveDraftTool = defineTool({
   name: "save_draft",
   description: "Saves a rulebook as a draft without overwriting the latest version.",
   schema: z.object({
     rulebookName: z.string().describe("The name of the rulebook to save as a draft."),
     rulebook: z.any().describe("The complete rulebook object to save."),
   }),
-  handler: async (args: any) => {
+  handler: async (args) => {
     await saveDraft(args.rulebookName, args.rulebook);
     return textResponse(`Successfully saved draft for rulebook: ${args.rulebookName}`);
   },
-};
+});
 
-export const promoteDraftTool: ToolDefinition = {
+export const promoteDraftTool = defineTool({
   name: "promote_draft",
   description: "Promotes the current draft rulebook to the latest version, overwriting it.",
   schema: z.object({
     rulebookName: z.string().describe("The name of the rulebook to promote."),
   }),
-  handler: async (args: any) => {
+  handler: async (args) => {
     await promoteDraft(args.rulebookName);
     return textResponse(`Successfully promoted draft to latest for rulebook: ${args.rulebookName}`);
   },
-};
+});
 
-export const deleteRuleTool: ToolDefinition = {
+export const deleteRuleTool = defineTool({
   name: "delete_rule",
   description: "Removes a specific rule section and all its nested subsections.",
   schema: z.object({
     rulebookName: z.string().optional().default("rulebook").describe("The name of the rulebook to delete from. Defaults to 'rulebook'."),
     path: z.string().describe("Dot-notation path to delete (e.g., 'combat.resolution')"),
   }),
-  handler: async (args: any) => {
+  handler: async (args) => {
     const rulebook = await getRulebook(args.rulebookName);
     const parts = args.path.split(".");
     let currentMap = rulebook.sections;
@@ -273,9 +274,9 @@ export const deleteRuleTool: ToolDefinition = {
 
     return textResponse(`Successfully deleted rule section: ${args.path} from rulebook: ${args.rulebookName}`);
   },
-};
+});
 
-export const rulebookCoreTools = [
+export const rulebookCoreTools: ToolDefinition[] = [
   compareRulebooksTool,
   getRulebookStructureTool,
   readRuleSectionTool,

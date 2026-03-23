@@ -1,7 +1,6 @@
 import * as fs from "fs/promises";
 import * as path from "path";
 import { DATA_DIR } from "../config/paths.js";
-import { rebuildIndex } from "../services/ReferenceStore.js";
 import { initialize as initReference } from "../services/ReferenceStore.js";
 
 async function ensureDir(dir: string) {

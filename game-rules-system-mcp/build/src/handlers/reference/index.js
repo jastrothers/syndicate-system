@@ -1,7 +1,7 @@
 import { z } from "zod";
 import * as fs from "fs/promises";
 import * as ReferenceStore from "../../services/ReferenceStore.js";
-import { getReferenceFilePath } from "../../config/paths.js";
+import { getReferenceFilePath, sanitizeFileName } from "../../config/paths.js";
 import { jsonResponse, textResponse } from "../response.js";
 export const saveReferenceTool = {
     name: "save_reference",
@@ -33,6 +33,9 @@ export const saveReferenceTool = {
         }
         if (!args.name || !args.content) {
             throw new Error("Either provide name+content for a single save, or a batch array.");
+        }
+        if (!sanitizeFileName(args.name)) {
+            throw new Error(`Invalid reference name: '${args.name}'.`);
         }
         await ReferenceStore.saveReference(args.name, args.game, args.version, args.type, args.tags, args.content);
         return textResponse(`Successfully saved reference: ${args.name}`);

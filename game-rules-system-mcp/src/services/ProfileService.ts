@@ -1,7 +1,6 @@
 import { DesignerProfile } from "../types/index.js";
 import * as StorageService from "./StorageService.js";
 import { getDesignerProfilePath } from "../config/paths.js";
-import * as fs from "fs/promises";
 
 const DEFAULT_PROFILE: DesignerProfile = {
   affinities: {},

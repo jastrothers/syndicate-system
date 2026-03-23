@@ -11,6 +11,22 @@ export interface ToolDefinition<T extends z.ZodTypeAny = any> {
   }>;
 }
 
+/**
+ * Helper to define a tool with full type inference on handler args.
+ * Eliminates the need for `(args: any)` annotations.
+ */
+export function defineTool<T extends z.ZodTypeAny>(def: {
+  name: string;
+  description: string;
+  schema: T;
+  handler: (args: z.infer<T>) => Promise<{
+    content: { type: string; text: string }[];
+    isError?: boolean;
+  }>;
+}): ToolDefinition<T> {
+  return def;
+}
+
 // Helper to convert ToolDefinition into MCP SDK Tool
 import { zodToJsonSchema } from "zod-to-json-schema";
 

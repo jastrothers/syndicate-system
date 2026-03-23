@@ -11,10 +11,10 @@ import {
   validateFilterClause,
   FilterClause,
 } from "../../services/DeckService.js";
-import { ToolDefinition } from "../types.js";
+import { defineTool, ToolDefinition } from "../types.js";
 import { jsonResponse } from "../response.js";
 
-export const peekAtDeckTool: ToolDefinition = {
+export const peekAtDeckTool = defineTool({
   name: "peek_at_deck",
   description:
     "Look at top or bottom N cards of a deck array without moving them. Returns the peeked cards. Useful for scry, reveal, and information-gathering mechanics.",
@@ -28,7 +28,7 @@ export const peekAtDeckTool: ToolDefinition = {
       .default("top")
       .describe("Which end of the deck to peek from. Default: top."),
   }),
-  handler: async (args: any) => {
+  handler: async (args) => {
     const session = await getSession(args.sessionId);
     const deck = session.state[args.deckId];
     if (!Array.isArray(deck)) {
@@ -52,7 +52,7 @@ export const peekAtDeckTool: ToolDefinition = {
 
     return jsonResponse(peeked);
   },
-};
+});
 
 export const filterSchema = z.object({
   key: z.string().describe("The property name on card objects to filter by."),
@@ -60,7 +60,7 @@ export const filterSchema = z.object({
   value: z.union([z.string(), z.number(), z.boolean()]).describe("The value to compare against."),
 });
 
-export const searchZoneTool: ToolDefinition = {
+export const searchZoneTool = defineTool({
   name: "search_zone",
   description:
     "Query a state array for cards matching a filter. Returns matching items and their indices without moving any cards. Useful for tutoring, targeted selection, and information.",
@@ -69,7 +69,7 @@ export const searchZoneTool: ToolDefinition = {
     zoneId: z.string().describe("State property key of the array to search."),
     filter: filterSchema.describe("Filter criteria: { key, op, value }."),
   }),
-  handler: async (args: any) => {
+  handler: async (args) => {
     const session = await getSession(args.sessionId);
     const zone = session.state[args.zoneId];
     if (!Array.isArray(zone)) {
@@ -81,10 +81,10 @@ export const searchZoneTool: ToolDefinition = {
 
     return jsonResponse({ matches: results.length, results });
   },
-};
+});
 
 
-export const insertIntoDeckTool: ToolDefinition = {
+export const insertIntoDeckTool = defineTool({
   name: "insert_into_deck",
   description:
     'Place cards at a specific position in a deck array. Supports "top", "bottom", or a numeric index. Useful for scry resolution, return-to-deck effects, and setup.',
@@ -97,7 +97,7 @@ export const insertIntoDeckTool: ToolDefinition = {
       .describe('Where to insert: "top", "bottom", or a numeric index.'),
     actor: z.string().describe("The player performing the action."),
   }),
-  handler: async (args: any) => {
+  handler: async (args) => {
     const session = await getSession(args.sessionId);
     if (!Array.isArray(session.state[args.deckId]))
       session.state[args.deckId] = [];
@@ -118,7 +118,7 @@ export const insertIntoDeckTool: ToolDefinition = {
 
     return jsonResponse({ inserted: args.cards.length, deckSize: session.state[args.deckId].length, deckId: args.deckId, position: args.position });
   },
-};
+});
 
 export const deckTools: ToolDefinition[] = [
   peekAtDeckTool,

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import * as ReferenceStore from "../../services/ReferenceStore.js";
 import { saveRulebook, listRulebooks } from "../../services/RulebookStore.js";
+import { sanitizeFileName } from "../../config/paths.js";
 import { jsonResponse } from "../response.js";
 function generateManifestReference(game, version, decks) {
     const manifestName = `${game.toLowerCase()}_base_manifest`;
@@ -51,15 +52,19 @@ export const importGameTool = {
         })).describe("A list of all references and components belonging to this game."),
     }),
     handler: async (args) => {
-        // 1. Conflict check — refuse to overwrite an existing game
+        const safeName = sanitizeFileName(args.game);
+        if (!safeName) {
+            throw new Error(`Invalid game name: '${args.game}'.`);
+        }
+        // 1. Conflict check — compare against sanitized directory names
         const existingGames = await listRulebooks();
-        if (existingGames.includes(args.game)) {
-            throw new Error(`Game '${args.game}' already exists. Delete it first with delete_game or choose a different name.`);
+        if (existingGames.includes(safeName)) {
+            throw new Error(`Game '${safeName}' already exists. Delete it first with delete_game or choose a different name.`);
         }
         // 2. Initialize Rulebook via Raw Markdown (we simulate an empty skeleton then inject raw content into a top-level node for basic compatibility. For full sectionizing, it requires a parser we skip here to keep it simple).
         const rulebookSkeleton = {
             metadata: {
-                title: args.game,
+                title: safeName,
                 version: args.version,
                 lastUpdated: new Date().toISOString()
             },
@@ -72,24 +77,24 @@ export const importGameTool = {
             }
         };
         // If rulebook format differs, or existing version handling applies, rely on saveRulebook. Base case:
-        await saveRulebook(args.game, rulebookSkeleton);
+        await saveRulebook(safeName, rulebookSkeleton);
         // 3. Iterate references
         const decks = [];
         for (const ref of args.references) {
-            await ReferenceStore.saveReference(ref.name, args.game, args.version, ref.type, ref.tags, ref.content);
+            await ReferenceStore.saveReference(ref.name, safeName, args.version, ref.type, ref.tags, ref.content);
             if (ref.type === "deck") {
                 decks.push(ref);
             }
         }
         // 4. Dynamic Manifest Generation
-        const manifest = generateManifestReference(args.game, args.version, decks);
+        const manifest = generateManifestReference(safeName, args.version, decks);
         await ReferenceStore.saveReference(manifest.name, manifest.game, manifest.version, manifest.type, manifest.tags, manifest.content);
         // 5. Dynamic setup macro script
-        const macro = generateMacroReference(args.game, args.version);
+        const macro = generateMacroReference(safeName, args.version);
         await ReferenceStore.saveReference(macro.name, macro.game, macro.version, macro.type, macro.tags, macro.content);
         return jsonResponse({
             status: "success",
-            message: `Game '${args.game}' imported successfully.`,
+            message: `Game '${safeName}' imported successfully.`,
             manifestReference: manifest.name,
             macroReference: macro.name,
             totalReferencesSaved: args.references.length + 2

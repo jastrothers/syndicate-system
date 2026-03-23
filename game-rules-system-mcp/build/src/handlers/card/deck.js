@@ -5,8 +5,9 @@
 import { z } from "zod";
 import { getSession, saveSession } from "../../services/SessionStore.js";
 import { peekCards, searchArray, insertIntoArray, validateFilterClause, } from "../../services/DeckService.js";
+import { defineTool } from "../types.js";
 import { jsonResponse } from "../response.js";
-export const peekAtDeckTool = {
+export const peekAtDeckTool = defineTool({
     name: "peek_at_deck",
     description: "Look at top or bottom N cards of a deck array without moving them. Returns the peeked cards. Useful for scry, reveal, and information-gathering mechanics.",
     schema: z.object({
@@ -40,13 +41,13 @@ export const peekAtDeckTool = {
         await saveSession(args.sessionId, session);
         return jsonResponse(peeked);
     },
-};
+});
 export const filterSchema = z.object({
     key: z.string().describe("The property name on card objects to filter by."),
     op: z.enum(["eq", "ne", "gt", "lt", "gte", "lte", "contains"]).describe("Comparison operator."),
     value: z.union([z.string(), z.number(), z.boolean()]).describe("The value to compare against."),
 });
-export const searchZoneTool = {
+export const searchZoneTool = defineTool({
     name: "search_zone",
     description: "Query a state array for cards matching a filter. Returns matching items and their indices without moving any cards. Useful for tutoring, targeted selection, and information.",
     schema: z.object({
@@ -64,8 +65,8 @@ export const searchZoneTool = {
         const results = searchArray(zone, args.filter);
         return jsonResponse({ matches: results.length, results });
     },
-};
-export const insertIntoDeckTool = {
+});
+export const insertIntoDeckTool = defineTool({
     name: "insert_into_deck",
     description: 'Place cards at a specific position in a deck array. Supports "top", "bottom", or a numeric index. Useful for scry resolution, return-to-deck effects, and setup.',
     schema: z.object({
@@ -95,7 +96,7 @@ export const insertIntoDeckTool = {
         await saveSession(args.sessionId, session);
         return jsonResponse({ inserted: args.cards.length, deckSize: session.state[args.deckId].length, deckId: args.deckId, position: args.position });
     },
-};
+});
 export const deckTools = [
     peekAtDeckTool,
     searchZoneTool,

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { getRulebook, saveRulebook, getDraft, saveDraft, promoteDraft } from "../../services/RulebookStore.js";
 import { extractStructure } from "../../services/MarkdownFormatter.js";
+import { defineTool } from "../types.js";
 import { jsonResponse, textResponse } from "../response.js";
 /**
  * Flattens a sections tree into a map of dot-notation path → {title, content}.
@@ -16,7 +17,7 @@ function flattenSections(sections, prefix = "") {
     }
     return result;
 }
-export const compareRulebooksTool = {
+export const compareRulebooksTool = defineTool({
     name: "compare_rulebooks",
     description: "Compares two rulebooks and returns the differences in their structures and content. Can compare different games or different versions of the same game.",
     schema: z.object({
@@ -79,8 +80,8 @@ export const compareRulebooksTool = {
         };
         return jsonResponse(comparison);
     },
-};
-export const getRulebookStructureTool = {
+});
+export const getRulebookStructureTool = defineTool({
     name: "get_rulebook_structure",
     description: "Returns the high-level outline and hierarchy of the rulebook without full text.",
     schema: z.object({
@@ -92,8 +93,8 @@ export const getRulebookStructureTool = {
         const structure = extractStructure(rulebook.sections);
         return jsonResponse({ metadata: rulebook.metadata, structure });
     },
-};
-export const readRuleSectionTool = {
+});
+export const readRuleSectionTool = defineTool({
     name: "read_rule_section",
     description: "Returns the complete data for a specific rule section using a dot-notation path (e.g., 'combat.resolution').",
     schema: z.object({
@@ -106,15 +107,16 @@ export const readRuleSectionTool = {
         const parts = args.path.split(".");
         let current = rulebook.sections;
         for (const part of parts) {
-            if (!current || !current[part]) {
-                const availableKeys = current ? Object.keys(current) : [];
+            const asMap = current;
+            if (!asMap || !asMap[part]) {
+                const availableKeys = asMap ? Object.keys(asMap) : [];
                 throw new Error(`Section path '${args.path}' not found at segment '${part}'. Available keys at this level: [${availableKeys.join(", ")}]`);
             }
-            current = part === parts[parts.length - 1] ? current[part] : current[part].subsections;
+            current = part === parts[parts.length - 1] ? asMap[part] : asMap[part].subsections;
         }
         return jsonResponse(current);
     },
-};
+});
 function applyRuleUpdate(sections, update) {
     const parts = update.path.split(".");
     let currentMap = sections;
@@ -137,7 +139,7 @@ function applyRuleUpdate(sections, update) {
         ...(update.examples !== undefined ? { examples: update.examples } : {}),
     };
 }
-export const updateRuleTool = {
+export const updateRuleTool = defineTool({
     name: "update_rule",
     description: "Adds or modifies rule sections. Creates intermediate sections if they don't exist. Supports batch mode via updates array to apply multiple changes in one save.",
     schema: z.object({
@@ -180,8 +182,8 @@ export const updateRuleTool = {
             : [args.path];
         return jsonResponse({ updatedPaths, rulebookName: args.rulebookName, isDraft: args.isDraft }, "Next: compile_markdown_rulebook to sync the markdown file");
     },
-};
-export const getDraftTool = {
+});
+export const getDraftTool = defineTool({
     name: "get_draft",
     description: "Returns the current draft rulebook for a game. Returns latest if no draft exists.",
     schema: z.object({
@@ -192,8 +194,8 @@ export const getDraftTool = {
         const rulebook = draft || await getRulebook(args.rulebookName);
         return jsonResponse(rulebook);
     },
-};
-export const saveDraftTool = {
+});
+export const saveDraftTool = defineTool({
     name: "save_draft",
     description: "Saves a rulebook as a draft without overwriting the latest version.",
     schema: z.object({
@@ -204,8 +206,8 @@ export const saveDraftTool = {
         await saveDraft(args.rulebookName, args.rulebook);
         return textResponse(`Successfully saved draft for rulebook: ${args.rulebookName}`);
     },
-};
-export const promoteDraftTool = {
+});
+export const promoteDraftTool = defineTool({
     name: "promote_draft",
     description: "Promotes the current draft rulebook to the latest version, overwriting it.",
     schema: z.object({
@@ -215,8 +217,8 @@ export const promoteDraftTool = {
         await promoteDraft(args.rulebookName);
         return textResponse(`Successfully promoted draft to latest for rulebook: ${args.rulebookName}`);
     },
-};
-export const deleteRuleTool = {
+});
+export const deleteRuleTool = defineTool({
     name: "delete_rule",
     description: "Removes a specific rule section and all its nested subsections.",
     schema: z.object({
@@ -242,7 +244,7 @@ export const deleteRuleTool = {
         await saveRulebook(args.rulebookName, rulebook);
         return textResponse(`Successfully deleted rule section: ${args.path} from rulebook: ${args.rulebookName}`);
     },
-};
+});
 export const rulebookCoreTools = [
     compareRulebooksTool,
     getRulebookStructureTool,
