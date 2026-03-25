@@ -123,4 +123,48 @@ describe("RulebookStore Units", () => {
       (err: Error) => err.message.includes("Invalid version tag")
     );
   });
+
+  it("createVersion should write _versions.json manifest", async () => {
+    const manifestPath = getRulebookDir(testRulebookName) + "/_versions.json";
+    let manifest: Record<string, any>;
+    try {
+      manifest = JSON.parse(await fs.readFile(manifestPath, "utf-8"));
+    } catch {
+      assert.fail("_versions.json should exist after createVersion");
+      return;
+    }
+    assert.ok(manifest["1.0.0"], "Manifest should contain version 1.0.0");
+    assert.ok(manifest["1.1.0"], "Manifest should contain version 1.1.0");
+    assert.strictEqual(manifest["1.0.0"].title, "My Custom Game");
+  });
+
+  it("listVersions should work from manifest without reading individual version files", async () => {
+    // Invalidate the in-memory cache so listVersions re-reads from disk
+    const { invalidateVersionsCache } = await import("../../../src/services/RulebookStore.js");
+    invalidateVersionsCache(testRulebookName);
+
+    const versions = await listVersions(testRulebookName);
+    assert.strictEqual(versions.length, 2);
+    const tags = versions.map((v) => v.versionTag);
+    assert.ok(tags.includes("1.0.0"));
+    assert.ok(tags.includes("1.1.0"));
+  });
+
+  it("listVersions should fall back to file scan if _versions.json is missing", async () => {
+    const manifestPath = getRulebookDir(testRulebookName) + "/_versions.json";
+    const { invalidateVersionsCache } = await import("../../../src/services/RulebookStore.js");
+
+    // Delete the manifest
+    try { await fs.unlink(manifestPath); } catch {}
+    invalidateVersionsCache(testRulebookName);
+
+    // Should still work via fallback file scan
+    const versions = await listVersions(testRulebookName);
+    assert.strictEqual(versions.length, 2);
+
+    // Should have backfilled the manifest
+    const backfilled = JSON.parse(await fs.readFile(manifestPath, "utf-8"));
+    assert.ok(backfilled["1.0.0"]);
+    assert.ok(backfilled["1.1.0"]);
+  });
 });

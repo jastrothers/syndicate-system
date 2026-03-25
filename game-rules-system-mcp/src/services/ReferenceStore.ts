@@ -6,6 +6,8 @@ import { DATA_DIR, SYSTEM_DIR, REFERENCE_INDEX_DB, getReferenceFilePath } from "
 
 let db: Database.Database;
 
+const CURRENT_SCHEMA_VERSION = 2;
+
 export async function initialize() {
   try {
     await fs.mkdir(DATA_DIR, { recursive: true });
@@ -17,24 +19,34 @@ export async function initialize() {
 
   try {
     db = new Database(REFERENCE_INDEX_DB);
-    db.exec(`DROP TABLE IF EXISTS references_index`);
-    // Create new schema supporting multiple versioned instances of the same ID
-    db.exec(`
-      CREATE TABLE IF NOT EXISTS references_index (
-        id TEXT NOT NULL,
-        name TEXT NOT NULL,
-        game TEXT NOT NULL,
-        version TEXT NOT NULL,
-        type TEXT,
-        tags TEXT,
-        filePath TEXT NOT NULL,
-        lastUpdated TEXT,
-        deleted INTEGER DEFAULT 0,
-        UNIQUE(id, game, version)
-      )
-    `);
 
-    await rebuildIndex();
+    // Schema versioning via _meta table
+    db.exec(`CREATE TABLE IF NOT EXISTS _meta (key TEXT PRIMARY KEY, value TEXT)`);
+
+    const versionRow = db.prepare("SELECT value FROM _meta WHERE key = 'schema_version'").get() as { value: string } | undefined;
+    const existingVersion = versionRow ? parseInt(versionRow.value, 10) : 0;
+
+    const tableExists = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='references_index'").get();
+
+    if (!tableExists || existingVersion < CURRENT_SCHEMA_VERSION) {
+      db.exec(`DROP TABLE IF EXISTS references_index`);
+      db.exec(`
+        CREATE TABLE references_index (
+          id TEXT NOT NULL,
+          name TEXT NOT NULL,
+          game TEXT NOT NULL,
+          version TEXT NOT NULL,
+          type TEXT,
+          tags TEXT,
+          filePath TEXT NOT NULL,
+          lastUpdated TEXT,
+          deleted INTEGER DEFAULT 0,
+          UNIQUE(id, game, version)
+        )
+      `);
+      db.prepare("INSERT OR REPLACE INTO _meta (key, value) VALUES ('schema_version', ?)").run(String(CURRENT_SCHEMA_VERSION));
+      await rebuildIndex();
+    }
   } catch (error) {
     console.error("Failed to initialize reference database index:", error);
     process.exit(1);
@@ -65,42 +77,86 @@ export async function saveReference(name: string, game: string | undefined, vers
   stmt.run(name, name, resolvedGame, resolvedVersion, type, JSON.stringify(tags), filePath, now, deleted ? 1 : 0);
 }
 
-export async function getReference(name: string, game?: string, version?: string): Promise<{ name: string, game?: string, version?: string, type: string, tags: string[], content: string } | null> {
-  let row: { filePath: string, deleted: number } | undefined;
-  
-  if (game) {
-    const resolvedVersion = version || "latest";
-    // Try exact match first
-    let stmt = db.prepare("SELECT filePath, deleted FROM references_index WHERE (name = ? OR id = ?) AND game = ? AND version = ?");
-    row = stmt.get(name, name, game, resolvedVersion) as { filePath: string, deleted: number } | undefined;
+export interface BatchReferenceItem {
+  name: string;
+  game?: string;
+  version?: string;
+  type: string;
+  tags: string[];
+  content: string;
+}
 
-    // Fallback to 'latest' matching the game if exact version isn't found
-    if (!row && resolvedVersion !== "latest") {
-      stmt = db.prepare("SELECT filePath, deleted FROM references_index WHERE (name = ? OR id = ?) AND game = ? AND version = 'latest'");
-      row = stmt.get(name, name, game) as { filePath: string, deleted: number } | undefined;
-    }
-    
-    // Global Fallback: 'general/latest'
-    if (!row && game !== "general") {
-       stmt = db.prepare("SELECT filePath, deleted FROM references_index WHERE (name = ? OR id = ?) AND game = 'general' AND version = 'latest'");
-       row = stmt.get(name, name) as { filePath: string, deleted: number } | undefined;
-    }
-  } else {
-    // No game specified. Search globally for the best match.
-    const resolvedVersion = version || "latest";
-    
-    // 1. Try to find the exact version requested across any game
-    let stmt = db.prepare("SELECT filePath, deleted FROM references_index WHERE (name = ? OR id = ?) AND version = ? LIMIT 1");
-    row = stmt.get(name, name, resolvedVersion) as { filePath: string, deleted: number } | undefined;
-    
-    // 2. Fallback to latest across any game
-    if (!row && resolvedVersion !== "latest") {
-      stmt = db.prepare("SELECT filePath, deleted FROM references_index WHERE (name = ? OR id = ?) AND version = 'latest' LIMIT 1");
-      row = stmt.get(name, name) as { filePath: string, deleted: number } | undefined;
-    }
+export async function saveReferenceBatch(items: BatchReferenceItem[]): Promise<void> {
+  // Phase 1: Write all files to disk
+  const dbRows: Array<{ name: string; game: string; version: string; type: string; tags: string; filePath: string; now: string }> = [];
+
+  for (const item of items) {
+    const resolvedGame = item.game || "general";
+    const resolvedVersion = item.version || "latest";
+    const filePath = getReferenceFilePath(item.name, resolvedGame, resolvedVersion);
+    const now = new Date().toISOString();
+
+    await fs.mkdir(path.dirname(filePath), { recursive: true });
+
+    const metadata: any = { title: item.name, type: item.type, tags: item.tags, lastUpdated: now };
+    if (item.game !== undefined) metadata.game = resolvedGame;
+    if (item.version !== undefined) metadata.version = resolvedVersion;
+
+    const fileContent = matter.stringify(item.content, metadata);
+    await fs.writeFile(filePath, fileContent, "utf-8");
+
+    dbRows.push({ name: item.name, game: resolvedGame, version: resolvedVersion, type: item.type, tags: JSON.stringify(item.tags), filePath, now });
   }
 
-  // If we found a file but it's marked as deleted, respect the tombstone
+  // Phase 2: Single transaction for all DB inserts
+  const stmt = db.prepare(`
+    INSERT OR REPLACE INTO references_index (id, name, game, version, type, tags, filePath, lastUpdated, deleted)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)
+  `);
+
+  const insertAll = db.transaction((rows: typeof dbRows) => {
+    for (const r of rows) {
+      stmt.run(r.name, r.name, r.game, r.version, r.type, r.tags, r.filePath, r.now);
+    }
+  });
+
+  insertAll(dbRows);
+}
+
+export async function getReference(name: string, game?: string, version?: string): Promise<{ name: string, game?: string, version?: string, type: string, tags: string[], content: string } | null> {
+  const resolvedVersion = version || "latest";
+  let row: { filePath: string, deleted: number } | undefined;
+
+  if (game) {
+    // Single query with priority: exact game+version (1) > game+latest (2) > general+latest (3)
+    row = db.prepare(`
+      SELECT filePath, deleted FROM references_index
+      WHERE (name = ? OR id = ?)
+        AND (
+          (game = ? AND version = ?)
+          OR (game = ? AND version = 'latest')
+          OR (game = 'general' AND version = 'latest')
+        )
+      ORDER BY
+        CASE
+          WHEN game = ? AND version = ? THEN 1
+          WHEN game = ? AND version = 'latest' THEN 2
+          ELSE 3
+        END
+      LIMIT 1
+    `).get(name, name, game, resolvedVersion, game, game, resolvedVersion, game) as { filePath: string, deleted: number } | undefined;
+  } else {
+    // No game specified: exact version (1) > latest (2)
+    row = db.prepare(`
+      SELECT filePath, deleted FROM references_index
+      WHERE (name = ? OR id = ?)
+        AND (version = ? OR version = 'latest')
+      ORDER BY
+        CASE WHEN version = ? THEN 1 ELSE 2 END
+      LIMIT 1
+    `).get(name, name, resolvedVersion, resolvedVersion) as { filePath: string, deleted: number } | undefined;
+  }
+
   if (!row || row.deleted === 1) {
     return null;
   }

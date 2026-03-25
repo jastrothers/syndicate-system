@@ -1,6 +1,6 @@
 import { z } from "zod";
 import * as fs from "fs/promises";
-import { getRulebook, listRulebooks, listVersions, createVersion, invalidateVersionsCache } from "../../services/RulebookStore.js";
+import { getRulebook, listRulebooks, listVersions, createVersion, invalidateVersionsCache, removeVersionFromManifest } from "../../services/RulebookStore.js";
 import { getRulebookPath, getRulebookMdPath } from "../../config/paths.js";
 import { ToolDefinition } from "../types.js";
 import { jsonResponse } from "../response.js";
@@ -94,6 +94,7 @@ export const deleteRulebookVersionTool: ToolDefinition = {
     }
 
     invalidateVersionsCache(args.rulebookName);
+    await removeVersionFromManifest(args.rulebookName, args.versionTag);
     return jsonResponse({
       status: "success",
       message: `Version '${args.versionTag}' of rulebook '${args.rulebookName}' has been permanently deleted.`,
