@@ -45,7 +45,7 @@ export const evaluateGameStateTool: ToolDefinition = {
     
     // Create a new context passing only the state
     const context = vm.createContext({
-      state: JSON.parse(JSON.stringify(session.state)), // deep clone for safety
+      state: structuredClone(session.state), // deep clone for safety
     });
 
     try {

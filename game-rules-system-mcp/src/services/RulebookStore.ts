@@ -1,4 +1,5 @@
 import * as fs from "fs/promises";
+import * as path from "path";
 import { Rulebook, VersionInfo } from "../types/index.js";
 import {
   DATA_DIR,
@@ -9,6 +10,8 @@ import {
   sanitizeVersionTag,
 } from "../config/paths.js";
 import * as StorageService from "./StorageService.js";
+
+type VersionsManifest = Record<string, VersionInfo>;
 
 // In-memory cache: key is "name" for latest or "name@versionTag" for snapshots.
 const rulebookCache = new Map<string, Rulebook>();
@@ -166,13 +169,40 @@ export async function listRulebooks(): Promise<string[]> {
   }
 }
 
+function getManifestPath(name: string): string {
+  return path.join(getRulebookDir(name), "_versions.json");
+}
+
+async function readManifest(name: string): Promise<VersionsManifest | null> {
+  try {
+    const data = await fs.readFile(getManifestPath(name), "utf-8");
+    return JSON.parse(data) as VersionsManifest;
+  } catch {
+    return null;
+  }
+}
+
+async function writeManifest(name: string, manifest: VersionsManifest): Promise<void> {
+  await fs.writeFile(getManifestPath(name), JSON.stringify(manifest, null, 2), "utf-8");
+}
+
 /**
  * Lists all version snapshots for a given rulebook.
- * Returns version info for each snapshot (excludes "latest" from the list).
+ * Reads from _versions.json manifest when available, falls back to file scan.
  */
 export async function listVersions(name: string): Promise<VersionInfo[]> {
   if (versionsCache.has(name)) return versionsCache.get(name)!;
 
+  // Try manifest first (fast path: avoids parsing full rulebook JSONs)
+  const manifest = await readManifest(name);
+  if (manifest && Object.keys(manifest).length > 0) {
+    const versions = Object.values(manifest);
+    versions.sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime());
+    versionsCache.set(name, versions);
+    return versions;
+  }
+
+  // Fallback: scan individual version files
   const dir = getRulebookDir(name);
   let files: string[];
   try {
@@ -183,10 +213,10 @@ export async function listVersions(name: string): Promise<VersionInfo[]> {
   }
 
   const versions: VersionInfo[] = [];
+  const backfillManifest: VersionsManifest = {};
   for (const file of files) {
-    if (!file.endsWith(".json") || file === "latest.json") continue;
+    if (!file.endsWith(".json") || file === "latest.json" || file === "_versions.json") continue;
 
-    // Strip "v" prefix and ".json" suffix to get the tag
     const tag = file.replace(/^v/, "").replace(/\.json$/, "");
     try {
       const data = await fs.readFile(
@@ -194,19 +224,25 @@ export async function listVersions(name: string): Promise<VersionInfo[]> {
         "utf-8"
       );
       const rb = JSON.parse(data) as Rulebook;
-      versions.push({
+      const info: VersionInfo = {
         versionTag: tag,
         title: rb.metadata.title,
         version: rb.metadata.version,
         lastUpdated: rb.metadata.lastUpdated,
         description: rb.metadata.description,
-      });
+      };
+      versions.push(info);
+      backfillManifest[tag] = info;
     } catch {
       // Skip unparseable files
     }
   }
 
-  // Sort by lastUpdated descending
+  // Backfill manifest for future fast reads
+  if (Object.keys(backfillManifest).length > 0) {
+    await writeManifest(name, backfillManifest).catch(() => {});
+  }
+
   versions.sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime());
   versionsCache.set(name, versions);
   return versions;
@@ -250,11 +286,30 @@ export async function createVersion(
   // Write snapshot (locked via StorageService)
   await StorageService.saveJson(snapshotPath, rulebook);
 
-  return {
+  const versionInfo: VersionInfo = {
     versionTag: safeTag,
     title: rulebook.metadata.title,
     version: rulebook.metadata.version,
     lastUpdated: rulebook.metadata.lastUpdated,
     description: rulebook.metadata.description,
   };
+
+  // Update versions manifest
+  const manifest = await readManifest(name) || {};
+  manifest[safeTag] = versionInfo;
+  await writeManifest(name, manifest);
+
+  return versionInfo;
+}
+
+/**
+ * Removes a version tag from the _versions.json manifest.
+ * Called after deleting a version snapshot file.
+ */
+export async function removeVersionFromManifest(name: string, versionTag: string): Promise<void> {
+  const manifest = await readManifest(name);
+  if (manifest && manifest[versionTag]) {
+    delete manifest[versionTag];
+    await writeManifest(name, manifest);
+  }
 }

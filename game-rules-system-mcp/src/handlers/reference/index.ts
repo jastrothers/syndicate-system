@@ -26,14 +26,16 @@ export const saveReferenceTool: ToolDefinition = {
   }),
   handler: async (args) => {
     if (args.batch && args.batch.length > 0) {
-      const names: string[] = [];
-      for (const ref of args.batch) {
-        await ReferenceStore.saveReference(
-          ref.name, ref.game || args.game, ref.version || args.version,
-          ref.type, ref.tags, ref.content
-        );
-        names.push(ref.name);
-      }
+      const items: ReferenceStore.BatchReferenceItem[] = args.batch.map((ref: { name: string; game?: string; version?: string; type: string; tags: string[]; content: string }) => ({
+        name: ref.name,
+        game: ref.game || args.game,
+        version: ref.version || args.version,
+        type: ref.type,
+        tags: ref.tags,
+        content: ref.content,
+      }));
+      await ReferenceStore.saveReferenceBatch(items);
+      const names = items.map((i: ReferenceStore.BatchReferenceItem) => i.name);
       return jsonResponse({ saved: names.length, names });
     }
 

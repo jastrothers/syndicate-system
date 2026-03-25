@@ -101,4 +101,84 @@ describe("ReferenceStore Units", () => {
     const all = await queryReferences();
     assert.ok(all.length >= 3);
   });
+
+  it("getReference fallback: exact game+version > game+latest > general+latest", async () => {
+    // Set up 3 tiers of the same reference
+    await saveReference("FallbackRef", "general", "latest", "rule", [], "General latest content.");
+    await saveReference("FallbackRef", "FallbackGame", "latest", "rule", [], "Game latest content.");
+    await saveReference("FallbackRef", "FallbackGame", "v2", "rule", [], "Game v2 content.");
+
+    // Exact match should win
+    const exact = await getReference("FallbackRef", "FallbackGame", "v2");
+    assert.ok(exact !== null);
+    assert.ok(exact!.content.includes("Game v2 content."));
+
+    // Missing exact version should fall back to game+latest
+    const gameLatest = await getReference("FallbackRef", "FallbackGame", "v99");
+    assert.ok(gameLatest !== null);
+    assert.ok(gameLatest!.content.includes("Game latest content."));
+
+    // Different game should fall back to general+latest
+    const generalFallback = await getReference("FallbackRef", "OtherGame");
+    assert.ok(generalFallback !== null);
+    assert.ok(generalFallback!.content.includes("General latest content."));
+  });
+
+  it("getReference should respect deleted tombstone at each priority level", async () => {
+    await saveReference("TombstoneRef", "TombGame", "latest", "rule", [], "Alive content.", true);
+
+    const ref = await getReference("TombstoneRef", "TombGame");
+    assert.strictEqual(ref, null, "Deleted (tombstoned) reference should return null");
+  });
+
+  it("getReference without game: exact version > latest", async () => {
+    await saveReference("NoGameRef", "SomeGame", "latest", "rule", [], "Latest content.");
+    await saveReference("NoGameRef", "SomeGame", "v5", "rule", [], "V5 content.");
+
+    const v5 = await getReference("NoGameRef", undefined, "v5");
+    assert.ok(v5 !== null);
+    assert.ok(v5!.content.includes("V5 content."));
+
+    const latest = await getReference("NoGameRef");
+    assert.ok(latest !== null);
+    assert.ok(latest!.content.includes("Latest content."));
+  });
+
+  it("saveReferenceBatch should save multiple references atomically", async () => {
+    const { saveReferenceBatch } = await import("../../../src/services/ReferenceStore.js");
+
+    await saveReferenceBatch([
+      { name: "BatchRef1", game: "BatchGame", version: "latest", type: "rule", tags: ["batch"], content: "Batch content 1." },
+      { name: "BatchRef2", game: "BatchGame", version: "latest", type: "spell", tags: ["batch", "magic"], content: "Batch content 2." },
+      { name: "BatchRef3", game: "BatchGame", version: "latest", type: "equipment", tags: ["batch"], content: "Batch content 3." },
+    ]);
+
+    const ref1 = await getReference("BatchRef1", "BatchGame");
+    assert.ok(ref1 !== null, "BatchRef1 should be saved");
+    assert.ok(ref1!.content.includes("Batch content 1."));
+
+    const ref2 = await getReference("BatchRef2", "BatchGame");
+    assert.ok(ref2 !== null, "BatchRef2 should be saved");
+    assert.strictEqual(ref2!.type, "spell");
+
+    const ref3 = await getReference("BatchRef3", "BatchGame");
+    assert.ok(ref3 !== null, "BatchRef3 should be saved");
+
+    const all = await queryReferences("BatchGame", undefined, undefined, ["batch"]);
+    assert.ok(all.length >= 3, "All batch refs should be queryable by tag");
+  });
+
+  it("initialize called twice should preserve existing data (conditional rebuild)", async () => {
+    // Save a reference, then re-initialize. Data should persist because
+    // the schema version hasn't changed, so no rebuild occurs.
+    await saveReference("PersistTest", "TestGame", undefined, "spell", ["test"], "Should survive re-init.");
+
+    // Re-initialize (should be a no-op if schema is current)
+    await initialize();
+
+    const ref = await getReference("PersistTest", "TestGame");
+    assert.ok(ref !== null, "Reference should persist across initialize() calls");
+    assert.strictEqual(ref!.name, "PersistTest");
+    assert.ok(ref!.content.includes("Should survive re-init."));
+  });
 });
