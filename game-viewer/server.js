@@ -44,7 +44,7 @@ async function walkGameTypeDir(baseDir, type, ext) {
   const gameEntries = await fs.readdir(baseDir, { withFileTypes: true });
 
   for (const gameEntry of gameEntries) {
-    if (!gameEntry.isDirectory()) continue;
+    if (!gameEntry.isDirectory() || gameEntry.name.startsWith('_')) continue;
     const gameName = gameEntry.name;
     const typeDir = path.join(baseDir, gameName, type);
     
@@ -72,7 +72,7 @@ async function walkGameTypeDir(baseDir, type, ext) {
 // ── Rulebooks ────────────────────────────────────────────────────────
 app.get('/api/rulebooks', async (_req, res) => {
   try {
-    const games = (await fs.readdir(GAME_DATA, { withFileTypes: true })).filter(e => e.isDirectory());
+    const games = (await fs.readdir(GAME_DATA, { withFileTypes: true })).filter(e => e.isDirectory() && !e.name.startsWith('_'));
     const results = [];
     for (const game of games) {
       const rbDir = path.join(GAME_DATA, game.name, 'rulebooks');
@@ -199,7 +199,7 @@ app.get('/api/rulebooks/:name/designs', async (req, res) => {
   try {
     if (!await exists(gameDir)) return res.json([]);
 
-    // 1. Collect stepX-*.md files from game root
+    // 1. Collect stepX-*.md files from game root (legacy location)
     const items = await fs.readdir(gameDir, { withFileTypes: true });
     for (const item of items) {
       if (item.isFile() && item.name.startsWith('step') && item.name.endsWith('.md')) {
@@ -212,10 +212,21 @@ app.get('/api/rulebooks/:name/designs', async (req, res) => {
       }
     }
 
-    // 2. Collect design sessions from [game]/design/
+    // 2. Collect design sessions (JSON) and step*.md artifacts from [game]/design/
     const designDir = path.join(gameDir, 'design');
     if (await exists(designDir)) {
-      const sessionFiles = (await fs.readdir(designDir)).filter(f => f.endsWith('.json'));
+      const designDirItems = await fs.readdir(designDir, { withFileTypes: true });
+      for (const item of designDirItems) {
+        if (item.isFile() && item.name.startsWith('step') && item.name.endsWith('.md')) {
+          designs.push({
+            id: `design/${item.name}`,
+            name: item.name.replace(/^step\d+-/, '').replace(/\.md$/, '').replace(/-/g, ' '),
+            type: 'step',
+            filename: item.name
+          });
+        }
+      }
+      const sessionFiles = designDirItems.filter(e => e.isFile() && e.name.endsWith('.json')).map(e => e.name);
       for (const file of sessionFiles) {
         try {
           const data = JSON.parse(await fs.readFile(path.join(designDir, file), 'utf-8'));
@@ -244,7 +255,11 @@ app.get('/api/rulebooks/:name/designs/:id', async (req, res) => {
   
   try {
     let filePath;
-    if (id.endsWith('.md')) {
+    if (id.startsWith('design/') && id.endsWith('.md')) {
+      // step*.md living inside the design/ subdirectory
+      filePath = path.join(gameDir, id);
+    } else if (id.endsWith('.md')) {
+      // legacy step*.md at game root
       filePath = path.join(gameDir, id);
     } else if (id.endsWith('.json')) {
       filePath = path.join(gameDir, 'design', id);
@@ -386,9 +401,9 @@ app.get('/api/playtest-logs', async (_req, res) => {
     const logs = [];
     // Per-game logs
     try {
-      const games = (await fs.readdir(GAME_DATA, { withFileTypes: true })).filter(e => e.isDirectory());
+      const games = (await fs.readdir(GAME_DATA, { withFileTypes: true })).filter(e => e.isDirectory() && !e.name.startsWith('_'));
       for (const game of games) {
-        const logPath = path.join(GAME_DATA, game.name, 'rulebooks', 'playtest_logs.md');
+        const logPath = path.join(GAME_DATA, game.name, 'logs', 'playtest_logs.md');
         if (!await exists(logPath)) continue;
         try {
           logs.push({ source: game.name, content: await fs.readFile(logPath, 'utf-8') });
@@ -439,7 +454,7 @@ app.get('/api/validate', async (_req, res) => {
 
   // 2. Check rulebooks
   try {
-    const games = (await fs.readdir(GAME_DATA, { withFileTypes: true })).filter(e => e.isDirectory());
+    const games = (await fs.readdir(GAME_DATA, { withFileTypes: true })).filter(e => e.isDirectory() && !e.name.startsWith('_'));
     for (const game of games) {
       const latestPath = path.join(GAME_DATA, game.name, 'rulebooks', 'latest.json');
       if (!await exists(latestPath)) continue;
@@ -495,7 +510,7 @@ app.get('/api/validate', async (_req, res) => {
   // 4. Cross-reference: sessions reference existing rulebooks
   try {
     const sessionEntries = await walkGameTypeDir(GAME_DATA, 'sessions', '.json');
-    const games = (await fs.readdir(GAME_DATA, { withFileTypes: true })).filter(e => e.isDirectory());
+    const games = (await fs.readdir(GAME_DATA, { withFileTypes: true })).filter(e => e.isDirectory() && !e.name.startsWith('_'));
     const validGames = new Set(games.map(g => g.name));
 
     for (const { filePath } of sessionEntries) {
@@ -586,7 +601,7 @@ function generateMarkdown(sections, level = 1) {
 // ── Designer Profile ─────────────────────────────────────────────
 app.get('/api/designer-profile', async (_req, res) => {
   try {
-    const p = path.join(GAME_DATA, 'designer_profile.json');
+    const p = path.join(GAME_DATA, '_system', 'designer_profile.json');
     if (!await exists(p)) return res.status(404).json({ error: 'Designer profile not found' });
     res.json(JSON.parse(await fs.readFile(p, 'utf-8')));
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -595,7 +610,7 @@ app.get('/api/designer-profile', async (_req, res) => {
 // ── Design Sessions ───────────────────────────────────────────────
 app.get('/api/design-sessions', async (_req, res) => {
   try {
-    const gameEntries = (await fs.readdir(GAME_DATA, { withFileTypes: true })).filter(e => e.isDirectory());
+    const gameEntries = (await fs.readdir(GAME_DATA, { withFileTypes: true })).filter(e => e.isDirectory() && !e.name.startsWith('_'));
     const sessions = [];
     for (const gameEntry of gameEntries) {
       const designDir = path.join(GAME_DATA, gameEntry.name, 'design');
@@ -627,7 +642,7 @@ app.get('/api/design-sessions/:game/:id', async (req, res) => {
     const filePath = path.join(GAME_DATA, req.params.game, 'design', `${req.params.id}.json`);
     if (!await exists(filePath)) return res.status(404).json({ error: 'Design session not found' });
     const data = JSON.parse(await fs.readFile(filePath, 'utf-8'));
-    const decisionLogPath = path.join(GAME_DATA, req.params.game, 'decision_log.json');
+    const decisionLogPath = path.join(GAME_DATA, req.params.game, 'logs', 'decision_log.json');
     if (await exists(decisionLogPath)) {
       try { data._decisionLog = JSON.parse(await fs.readFile(decisionLogPath, 'utf-8')); } catch {}
     }
