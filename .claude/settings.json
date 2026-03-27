@@ -1,19 +1,16 @@
 {
   "permissions": {
     "allow": [
-      "Bash(grep \"name:\" c:/Users/Julian/git/syndicate-system/game-rules-system-mcp/**)",
-      "Edit(/.claude/skills/game-gen/**)",
-      "Edit(/.claude/skills/game-critique/**)",
-      "Bash(cmd /c dir \"c:\\\\Users\\\\Julian\\\\git\\\\syndicate-system\\\\.claude\\\\skills\\\\BoardGameDesign\\\\resources\\\\mechanisms.json\")",
-      "Edit(/.claude/skills/BoardGameDesign/**)",
+      "Bash(npm *)",
+      "Bash(node *)",
+      "Bash(ls *)",
+      "Bash(mkdir *)",
+      "Bash(rm *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Edit(/.claude/skills/**)",
       "WebFetch(domain:bennycheung.github.io)",
-      "Bash(grep -E \"\\\\.ts$\")",
-      "Bash(find c:UsersJuliangitsyndicate-systemgame-viewer -not -path */node_modules/* -type d)",
-      "Bash(xargs wc:*)",
-      "Bash(grep -v \"^$\")",
-      "Bash(find /c/Users/Julian/git/syndicate-system/game-rules-system-mcp/tests -type f -name *.ts)",
-      "Bash(grep -B2 -A2 \"err.code !== \"\"ENOENT\"\"\" \"/c/Users/Julian/git/syndicate-system/game-rules-system-mcp/src/handlers/\"*/*.ts)",
-      "Bash(node --test build/tests/unit/)"
+      "Bash(sqlite3 game-data/_system/reference_index.db \".tables\")"
     ],
     "additionalDirectories": [
       "c:\\Users\\Julian\\git\\syndicate-system"
