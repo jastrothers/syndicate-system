@@ -1,7 +1,7 @@
-# undefined
+# PokéNursery: Blissful Beginnings
 
-*Version: undefined*
-*Last Updated: 3/23/2026, 10:12:48 PM*
+*Version: 0.1.0-draft*
+*Last Updated: 3/24/2026, 2:12:48 AM*
 
 ---
 
@@ -122,7 +122,7 @@ Soft pastels (blush pink, powder blue, butter yellow, mint green). Watercolor wa
 
 Action Points = Care Points | VP = Gratitude | Feed = Nourish | Play = Frolic | Rest = Lullaby | Gather Supplies = Forage for Provisions | Adopt = Welcome to the Nursery | Use Upgrade = Open the Nursery Door | Evolution Recipe = Growth Recipe | Food = Berry Tokens | Joy = Delight Tokens | Rest = Slumber Tokens | Supply Cards = Provisions Cards | The Meadow = The Welcoming Meadow | Supply Draft = The Morning Caravan | Upgrade Draft = The Builder's Fair | Nursery Board = Your Nursery | Cradle Slots = The Cradle Row | Upgrade Slots = Nursery Rooms | Manager Slot = The Manager's Den | Evolution Garden = The Sunshine Garden | Harmony Bonus = Kinship Bond | First Player Marker = First Keeper Marker | Game End = The Golden Egg Ceremony
 
-## Components (326 pieces)
+## Components (292 pieces)
 
 ### Player Materials (per player)
 - 1 Nursery Board (dual-layer, 280x200mm) with 5 Cradle slots (5th locked), 3 Nursery Room slots, Manager's Den, Sunshine Garden
@@ -133,8 +133,7 @@ Action Points = Care Points | VP = Gratitude | Feed = Nourish | Play = Frolic | 
 - 1 Player Reference Card (double-sided)
 
 ### Cards
-- 34 Baby Pokemon Cards (poker-size) -- 2 copies each of 17 species
-- 34 Evolved Pokemon Cards (poker-size) -- matching 1:1 with babies
+- 34 Double-Sided Pokemon Cards (poker-size) — 2 copies each of 17 species; baby form on front, evolved form on back
 - 48 Provisions Cards (mini-Euro): 18 Basic, 10 Berry, 10 Delight, 10 Slumber
 - 4 Nursery Manager Cards (tarot-size)
 - 3 Nursery Star Cards (mini-square, foil-stamped)
@@ -153,6 +152,8 @@ Action Points = Care Points | VP = Gratitude | Feed = Nourish | Play = Frolic | 
 
 ## Baby Pokemon Reference
 
+Each Pokemon card is double-sided: baby form on the front, evolved form on the back. During the Welcoming Meadow draft, players may freely look at the back of any Meadow card to preview its evolved form.
+
 Each baby has a Growth Recipe: the exact number of Berry (B), Delight (D), and Slumber (S) tokens required to trigger its Evolutionary Moment.
 
 | Species | Type | B | D | S | Total | Gratitude | Evolves Into |
@@ -164,7 +165,8 @@ Each baby has a Growth Recipe: the exact number of Berry (B), Delight (D), and S
 | Wynaut | Psychic | 1 | 1 | 3 | 5 | 3 | Wobbuffet |
 | Bonsly | Rock | 3 | 1 | 1 | 5 | 3 | Sudowoodo |
 | Togepi | Fairy | 2 | 2 | 2 | 6 | 4 | Togetic |
-| Tyrogue | Fighting | 3 | 1 | 2 | 6 | 4 | Hitmonlee/chan/top |
+| Tyrogue (copy 1) | Fighting | 3 | 1 | 2 | 6 | 4 | Hitmonlee |
+| Tyrogue (copy 2) | Fighting | 3 | 1 | 2 | 6 | 4 | Hitmonchan |
 | Smoochum | Ice/Psychic | 1 | 3 | 2 | 6 | 4 | Jynx |
 | Elekid | Electric | 3 | 1 | 2 | 6 | 4 | Electabuzz |
 | Magby | Fire | 3 | 2 | 1 | 6 | 4 | Magmar |
@@ -175,7 +177,7 @@ Each baby has a Growth Recipe: the exact number of Berry (B), Delight (D), and S
 | Munchlax | Normal | 3 | 2 | 2 | 7 | 5 | Snorlax |
 | Riolu | Fighting | 2 | 2 | 3 | 7 | 5 | Lucario |
 
-**Tyrogue's Evolution:** When Tyrogue evolves, the player chooses Hitmonlee, Hitmonchan, or Hitmontop. All three are Fighting type. The Evolved deck contains one of each per Tyrogue copy. The player selects one; unchosen cards remain in the Evolved deck.
+**Tyrogue's Evolution:** The two Tyrogue cards have their evolved forms pre-assigned on the back: one evolves into Hitmonlee, the other into Hitmonchan. Both are Fighting type. No choice is made during play — the evolved form is printed on the card back.
 
 ## Nursery Managers (Revised)
 
@@ -194,27 +196,25 @@ Perform these steps in order:
 
 **1. Assemble Central Area:** Place the Round Tracker, Score Track tiles, Welcoming Meadow tile, Morning Caravan tile, Builder's Fair tile, and 3 Season Arc Cards. Place the Round Marker on space 1.
 
-**2. Baby Pokemon Deck:** Shuffle all 34 Baby cards face-down. Place beside the Meadow. Draw 4 face-up into the Meadow display.
+**2. Pokemon Deck:** Shuffle all 34 Pokemon cards face-down (baby side up). Place beside the Meadow. Draw 4 face-up into the Meadow display. Players may freely look at the back (evolved side) of any card in the Meadow.
 
-**3. Evolved Pokemon Deck:** Stack all 34 Evolved cards face-down nearby (sort alphabetically for easy lookup).
+**3. Provisions Deck:** Shuffle all 48 Provisions cards face-down. Place beside the Morning Caravan.
 
-**4. Provisions Deck:** Shuffle all 48 Provisions cards face-down. Place beside the Morning Caravan.
+**4. Nursery Room Tiles:** Shuffle all 8 tiles face-down in a stack near the Builder's Fair tile.
 
-**5. Nursery Room Tiles:** Shuffle all 8 tiles face-down in a stack near the Builder's Fair tile.
+**5. Token Supply:** Place all 120 Care Tokens (40 Berry, 40 Delight, 40 Slumber) in separate piles. Place all 28 Gratitude Tokens near the Score Track.
 
-**6. Token Supply:** Place all 120 Care Tokens (40 Berry, 40 Delight, 40 Slumber) in separate piles. Place all 28 Gratitude Tokens near the Score Track.
+**6. Nursery Star Cards:** Place the 3 Star cards face-up beside the Score Track.
 
-**7. Nursery Star Cards:** Place the 3 Star cards face-up beside the Score Track.
+**7. First Player:** The player who most recently cared for a real animal takes the First Keeper Marker. Otherwise, youngest player.
 
-**8. First Player:** The player who most recently cared for a real animal takes the First Keeper Marker. Otherwise, youngest player.
+**8. Manager Draft:** Lay out all 4 Managers face-up. Starting with the player to the RIGHT of the First Keeper (counterclockwise), each player selects one. Return unchosen Managers to the box.
 
-**9. Manager Draft:** Lay out all 4 Managers face-up. Starting with the player to the RIGHT of the First Keeper (counterclockwise), each player selects one. Return unchosen Managers to the box.
+**9. Player Boards:** Each player takes a Nursery Board, places the Lock Overlay on the 5th Cradle slot, places their Score Marker on 0, and takes their Reference Card and trackers.
 
-**10. Player Boards:** Each player takes a Nursery Board, places the Lock Overlay on the 5th Cradle slot, places their Score Marker on 0, and takes their Reference Card and trackers.
+**10. Starting Resources:** Each player receives 2 Berry, 2 Delight, 2 Slumber tokens and draws 2 Provisions cards (kept secret).
 
-**11. Starting Resources:** Each player receives 2 Berry, 2 Delight, 2 Slumber tokens and draws 2 Provisions cards (kept secret).
-
-**12. Initial Baby:** Starting with the First Keeper clockwise, each player selects 1 Baby from the Meadow and places it in a Cradle. Refill the Meadow to 4 after each selection. The game begins with Round 1.
+**11. Initial Baby:** Starting with the First Keeper clockwise, each player selects 1 card from the Meadow (baby side up) and places it in a Cradle. Refill the Meadow to 4 after each selection. The game begins with Round 1.
 
 ## Game Structure
 
@@ -250,7 +250,7 @@ Reveal 4 Provisions cards face-up (3 in 2p). Starting with the First Keeper cloc
 Starting with the First Keeper clockwise, each player takes a full turn: spend 3 Care Points on actions (any order, repeats allowed except Nursery Door), plus 1 free Manager action and 1 free Nursery Door activation. Unspent CP are lost. Provisions cards may be played freely throughout the turn at no CP cost.
 
 ### Phase 4: Twilight Phase -- Evolutionary Moments (Simultaneous)
-All players check cradles for completed Growth Recipes. For each completed baby: (1) return all tokens to supply, (2) remove Baby card to box, (3) place matching Evolved card in Sunshine Garden, (4) apply evolution bonuses (Chansey draw, Chime Tower token). Check Star of Swiftness. Refill Meadow to 4 (3 in 2p).
+All players check cradles for completed Growth Recipes. For each completed baby: (1) return all tokens to supply, (2) flip the card to its evolved side, (3) move it to your Sunshine Garden, (4) apply evolution bonuses (Chansey draw, Chime Tower token). Check Star of Swiftness. Refill Meadow to 4 (3 in 2p).
 
 ### Phase 5: Nightfall Phase -- Cleanup
 1. Discard remaining Caravan cards. 2. Builder's Fair on rounds 3, 6, 9. 3. Pass First Keeper Marker clockwise. 4. Advance Round Marker.
@@ -396,7 +396,9 @@ Recommended after 2+ plays of the base game.
 
 **Q: When is the Provisions discard reshuffled?** A: Whenever you need to draw and the deck is empty.
 
-**Q: How does Tyrogue's evolution work?** A: Player chooses Hitmonlee, Hitmonchan, or Hitmontop. All are Fighting type.
+**Q: How does Tyrogue's evolution work?** A: Each Tyrogue card has its evolved form pre-printed on the back — one becomes Hitmonlee, the other Hitmonchan. There is no choice during play.
+
+**Q: Can I look at the back (evolved side) of a card in the Welcoming Meadow?** A: Yes. Players may freely inspect the evolved side of any card in the Meadow at any time.
 
 **Q: Can I have two copies of the same evolved Pokemon?** A: Yes. They form a Kinship Bond with each other.
 
