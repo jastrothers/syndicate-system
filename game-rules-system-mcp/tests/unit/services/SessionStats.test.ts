@@ -64,4 +64,11 @@ describe("SessionStats.getSessionStats", () => {
     assert.ok(typeof stats.createdAt === "string");
     assert.ok(typeof stats.lastUpdatedAt === "string");
   });
+
+  it("throws when sessionId does not exist", async () => {
+    await assert.rejects(
+      () => getSessionStats("nonexistent-session-id-" + Date.now()),
+      /not found|invalid/i
+    );
+  });
 });

@@ -62,6 +62,13 @@ export const ACTION_LOG_TYPES = [
 
 export type ActionLogType = typeof ACTION_LOG_TYPES[number];
 
+/**
+ * ACTION_LOG_TYPES enumerates the built-in action types the server generates,
+ * serving as documentation and autocomplete hints. The union with `string`
+ * is intentional: the `record_action` tool accepts arbitrary user-defined
+ * actionType values from tool callers, so the field must accept any string.
+ * ACTION_LOG_TYPES is not enforced at runtime — it is a reference constant.
+ */
 export interface ActionLog {
   timestamp: string;
   actionType: ActionLogType | string;

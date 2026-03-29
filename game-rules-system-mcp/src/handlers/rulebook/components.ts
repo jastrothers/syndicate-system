@@ -32,7 +32,7 @@ export const upsertComponentTool = defineTool({
     component: ComponentSchema,
   }),
   handler: async (args) => {
-    const result = await upsertComponent(args.rulebookName, args.component as any);
+    const result = await upsertComponent(args.rulebookName, args.component);
     return jsonResponse(result, "Next: compile_markdown_rulebook to sync the markdown file");
   },
 });
@@ -46,7 +46,7 @@ export const deleteComponentTool = defineTool({
   }),
   handler: async (args) => {
     const result = await deleteComponent(args.rulebookName, args.componentName);
-    return jsonResponse(result);
+    return jsonResponse(result, "Next: compile_markdown_rulebook to sync the markdown file");
   },
 });
 

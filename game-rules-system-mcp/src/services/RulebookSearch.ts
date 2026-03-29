@@ -48,7 +48,7 @@ export async function searchRuleSections(
     const contentMatch = section.content?.toLowerCase().includes(lowerQuery) ?? false;
 
     if (titleMatch || contentMatch) {
-      const raw = section.content ?? section.title;
+      const raw = section.content ?? "";
       const snippet = raw.length > 200 ? raw.slice(0, 197) + "..." : raw;
       matches.push({ path: section.path, title: section.title, snippet });
     }

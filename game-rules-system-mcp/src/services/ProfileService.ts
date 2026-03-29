@@ -44,6 +44,12 @@ export async function updateAffinities(mechanisms: string[], delta: number): Pro
   return profile;
 }
 
+/**
+ * @internal Legacy utility — silently clamps the value to [1, 5].
+ * Note: this diverges from the newer {@link updateProfileFields} which throws
+ * on out-of-range values. Do not use in new tool handlers; prefer updateProfileFields.
+ * Retained because existing tests exercise the clamping contract.
+ */
 export async function updateComplexityTolerance(value: number): Promise<DesignerProfile> {
   const profile = await getProfile();
   profile.complexityTolerance = Math.max(1, Math.min(5, value));

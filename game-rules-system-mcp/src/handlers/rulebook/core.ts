@@ -5,24 +5,6 @@ import { RuleSection } from "../../types/index.js";
 import { defineTool, ToolDefinition } from "../types.js";
 import { jsonResponse, textResponse } from "../response.js";
 
-/**
- * Flattens a sections tree into a map of dot-notation path → {title, content}.
- * Exported for reuse by search and other handlers.
- */
-export function flattenSections(
-  sections: Record<string, RuleSection>,
-  prefix = ""
-): Record<string, { title: string; content?: string }> {
-  const result: Record<string, { title: string; content?: string }> = {};
-  for (const [key, section] of Object.entries(sections)) {
-    const path = prefix ? `${prefix}.${key}` : key;
-    result[path] = { title: section.title, content: section.content };
-    if (section.subsections && Object.keys(section.subsections).length > 0) {
-      Object.assign(result, flattenSections(section.subsections, path));
-    }
-  }
-  return result;
-}
 
 export const getRulebookStructureTool = defineTool({
   name: "get_rulebook_structure",

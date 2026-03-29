@@ -33,6 +33,11 @@ const TEST_RULEBOOK: Rulebook = {
       title: "Glossary",
       content: "Definitions for all TACTICAL terms used in this game.",
     },
+    longRules: {
+      title: "Extended Rules",
+      // Content intentionally >200 chars and contains "cards" to exercise truncation branch
+      content: "These are the extended rules for drawing cards. " + "X".repeat(180) + " cards are drawn at the end of each turn.",
+    },
   },
 };
 
@@ -75,8 +80,14 @@ describe("RulebookSearch.searchRuleSections", () => {
     assert.ok(typeof match.snippet === "string", "match.snippet must be string");
   });
 
-  it("snippets are truncated to at most 200 characters", async () => {
+  it("snippets are truncated to at most 200 characters and end with '...'", async () => {
     const results = await searchRuleSections(TEST_GAME, "cards");
+    // longRules section has content >200 chars and matches "cards"
+    const longMatch = results.matches.find(m => m.path === "longRules");
+    assert.ok(longMatch, "Should find the longRules section");
+    assert.strictEqual(longMatch!.snippet.length, 200, "Truncated snippet must be exactly 200 chars");
+    assert.ok(longMatch!.snippet.endsWith("..."), "Truncated snippet must end with '...'");
+    // All snippets must be at most 200 chars
     for (const match of results.matches) {
       assert.ok(match.snippet.length <= 200, `snippet too long: ${match.snippet.length} chars`);
     }

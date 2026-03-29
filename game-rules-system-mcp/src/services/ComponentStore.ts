@@ -45,7 +45,6 @@ export async function deleteComponent(rulebookName: string, componentName: strin
   }
 
   components.splice(idx, 1);
-  rulebook.components = components;
   await saveRulebook(rulebookName, rulebook);
 
   return { components, deleted: componentName };
