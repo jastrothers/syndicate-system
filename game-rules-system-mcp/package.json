@@ -1,6 +1,6 @@
 {
   "name": "game-rules-system-mcp",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "MCP Server for managing a living board game",
   "main": "build/src/index.js",
   "type": "module",

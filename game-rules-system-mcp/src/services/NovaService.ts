@@ -1,4 +1,4 @@
-import { DesignStep, DesignerProfile, DecisionLog, DecisionEntry } from "../types/index.js";
+import { DecisionLog, DecisionEntry } from "../types/index.js";
 import * as ProfileService from "./ProfileService.js";
 import * as StorageService from "./StorageService.js";
 import { getDecisionLogPath } from "../config/paths.js";
@@ -44,64 +44,3 @@ export async function processDecision(
   }
 }
 
-export interface NovaResponse {
-  conclusion: string; // Explain
-  reasoning: string;  // Trace
-  options: {           // Reason
-    level: "Values" | "Structure" | "Tuning";
-    label: string;
-    description: string;
-    action: string;
-  }[];
-  /** Designer affinity context derived from the profile — helps AI weigh suggestions. */
-  designerContext?: {
-    liked: string[];   // mechanisms with affinity >= 0.3
-    disliked: string[];// mechanisms with affinity <= -0.3
-  };
-}
-
-export function synthesizeNovaResponse(step: DesignStep, profile?: DesignerProfile): NovaResponse {
-  const trace = step.trace;
-
-  let designerContext: NovaResponse["designerContext"] | undefined;
-  if (profile && Object.keys(profile.affinities).length > 0) {
-    designerContext = {
-      liked: Object.entries(profile.affinities)
-        .filter(([, w]) => w >= 0.3)
-        .sort(([, a], [, b]) => b - a)
-        .map(([m]) => m),
-      disliked: Object.entries(profile.affinities)
-        .filter(([, w]) => w <= -0.3)
-        .sort(([, a], [, b]) => a - b)
-        .map(([m]) => m),
-    };
-  }
-
-  return {
-    conclusion: step.summary,
-    reasoning: trace ?
-      `**Observation:** ${trace.observation}\n**Data:** ${JSON.stringify(trace.data)}\n**Mechanism:** ${trace.mechanism}\n**Impact:** ${trace.impact}` :
-      step.output,
-    options: [
-      {
-        level: "Values",
-        label: "Pivoting Strategy",
-        description: "Change the core intent or design goal if this mechanism feels fundamentally wrong.",
-        action: "REDEFINE_GOAL"
-      },
-      {
-        level: "Structure",
-        label: "Mechanical Alternate",
-        description: "Swap this mechanism for a different one that achieves same goal but with different trade-offs.",
-        action: "SWAP_MECHANISM"
-      },
-      {
-        level: "Tuning",
-        label: "Parameter Adjustment",
-        description: "Keep the mechanism but tweak the numbers to resolve the specific issue.",
-        action: "ADJUST_PARAMS"
-      }
-    ],
-    ...(designerContext ? { designerContext } : {}),
-  };
-}

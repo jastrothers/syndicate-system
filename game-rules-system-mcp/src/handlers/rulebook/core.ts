@@ -5,90 +5,6 @@ import { RuleSection } from "../../types/index.js";
 import { defineTool, ToolDefinition } from "../types.js";
 import { jsonResponse, textResponse } from "../response.js";
 
-/**
- * Flattens a sections tree into a map of dot-notation path → {title, content}.
- */
-function flattenSections(
-  sections: Record<string, RuleSection>,
-  prefix = ""
-): Record<string, { title: string; content?: string }> {
-  const result: Record<string, { title: string; content?: string }> = {};
-  for (const [key, section] of Object.entries(sections)) {
-    const path = prefix ? `${prefix}.${key}` : key;
-    result[path] = { title: section.title, content: section.content };
-    if (section.subsections && Object.keys(section.subsections).length > 0) {
-      Object.assign(result, flattenSections(section.subsections, path));
-    }
-  }
-  return result;
-}
-
-export const compareRulebooksTool = defineTool({
-  name: "compare_rulebooks",
-  description: "Compares two rulebooks and returns the differences in their structures and content. Can compare different games or different versions of the same game.",
-  schema: z.object({
-    baseRulebook: z.string().describe("The name of the base rulebook to compare from"),
-    baseVersion: z.string().optional().describe("Optional version tag of the base rulebook. Defaults to the current working copy."),
-    targetRulebook: z.string().describe("The name of the target rulebook to compare against"),
-    targetVersion: z.string().optional().describe("Optional version tag of the target rulebook. Defaults to the current working copy."),
-  }),
-  handler: async (args) => {
-    const base = await getRulebook(args.baseRulebook, args.baseVersion);
-    const target = await getRulebook(args.targetRulebook, args.targetVersion);
-
-    const baseSections = flattenSections(base.sections);
-    const targetSections = flattenSections(target.sections);
-
-    const allPaths = new Set([...Object.keys(baseSections), ...Object.keys(targetSections)]);
-    const added: string[] = [];
-    const removed: string[] = [];
-    const modified: Array<{ path: string; baseTitle: string; targetTitle: string; contentChanged: boolean }> = [];
-    const unchanged: string[] = [];
-
-    for (const p of allPaths) {
-      const inBase = p in baseSections;
-      const inTarget = p in targetSections;
-      if (!inBase) {
-        added.push(p);
-      } else if (!inTarget) {
-        removed.push(p);
-      } else {
-        const b = baseSections[p];
-        const t = targetSections[p];
-        if (b.title !== t.title || b.content !== t.content) {
-          modified.push({ path: p, baseTitle: b.title, targetTitle: t.title, contentChanged: b.content !== t.content });
-        } else {
-          unchanged.push(p);
-        }
-      }
-    }
-
-    const comparison = {
-      baseRulebook: {
-        name: args.baseRulebook,
-        version: base.metadata.version,
-        versionTag: args.baseVersion || "latest",
-        lastUpdated: base.metadata.lastUpdated,
-      },
-      targetRulebook: {
-        name: args.targetRulebook,
-        version: target.metadata.version,
-        versionTag: args.targetVersion || "latest",
-        lastUpdated: target.metadata.lastUpdated,
-      },
-      summary: {
-        totalSections: allPaths.size,
-        added: added.length,
-        removed: removed.length,
-        modified: modified.length,
-        unchanged: unchanged.length,
-      },
-      differences: { added, removed, modified },
-    };
-
-    return jsonResponse(comparison);
-  },
-});
 
 export const getRulebookStructureTool = defineTool({
   name: "get_rulebook_structure",
@@ -277,7 +193,6 @@ export const deleteRuleTool = defineTool({
 });
 
 export const rulebookCoreTools: ToolDefinition[] = [
-  compareRulebooksTool,
   getRulebookStructureTool,
   readRuleSectionTool,
   updateRuleTool,

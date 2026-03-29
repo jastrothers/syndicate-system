@@ -96,24 +96,26 @@ test("Versioning Integration Tests", async (t) => {
     assert.ok(data.structure.setup, "v1.0.0 should have 'setup' section");
   });
 
-  await t.test("Compare versions of same game", async () => {
-    const result: any = await client.callTool({
-      name: "compare_rulebooks",
-      arguments: {
-        baseRulebook: "heist",
-        baseVersion: "1.0.0",
-        targetRulebook: "heist",
-        targetVersion: "1.1.0",
-      },
+  await t.test("Read both versions and verify structural differences", async () => {
+    // In v2.0 the LLM compares structures itself; this test verifies both versions are independently readable
+    const v1Result: any = await client.callTool({
+      name: "get_rulebook_structure",
+      arguments: { rulebookName: "heist", rulebookVersion: "1.0.0" },
     });
-    assert.strictEqual(result.isError, undefined);
-    const comparison = JSON.parse((result.content[0] as any).text);
-    assert.strictEqual(comparison.baseRulebook.versionTag, "1.0.0");
-    assert.strictEqual(comparison.targetRulebook.versionTag, "1.1.0");
-    // Target v1.1.0 has a 'gameplay' section that base v1.0.0 lacks — it should appear in the added list
-    assert.ok(comparison.summary.added > 0 || comparison.summary.modified > 0, "There should be added or modified sections between versions");
-    // The content diff should surface the gameplay section as added in target
-    const addedOrModified = [...comparison.differences.added, ...comparison.differences.modified.map((m: any) => m.path)];
-    assert.ok(addedOrModified.some((p: string) => p.includes("gameplay")), "gameplay section should appear in added/modified differences");
+    assert.strictEqual(v1Result.isError, undefined);
+    const v1 = JSON.parse((v1Result.content[0] as any).text);
+
+    const v11Result: any = await client.callTool({
+      name: "get_rulebook_structure",
+      arguments: { rulebookName: "heist", rulebookVersion: "1.1.0" },
+    });
+    assert.strictEqual(v11Result.isError, undefined);
+    const v11 = JSON.parse((v11Result.content[0] as any).text);
+
+    // v1.0.0 has 'setup' but not 'gameplay'; v1.1.0 has both
+    assert.ok(v1.structure.setup, "v1.0.0 should have 'setup' section");
+    assert.ok(!v1.structure.gameplay, "v1.0.0 should NOT have 'gameplay' section");
+    assert.ok(v11.structure.gameplay, "v1.1.0 should have 'gameplay' section");
+    assert.ok(v11.structure.setup, "v1.1.0 should still have 'setup' section");
   });
 });

@@ -2,7 +2,7 @@ import { describe, it, after } from "node:test";
 import assert from "node:assert";
 import * as fs from "fs/promises";
 import { getDesignerProfilePath } from "../../../src/config/paths.js";
-import { getProfile, saveProfile, updateAffinities, updateComplexityTolerance } from "../../../src/services/ProfileService.js";
+import { getProfile, saveProfile, updateAffinities, updateComplexityTolerance, updateProfileFields } from "../../../src/services/ProfileService.js";
 import { DesignerProfile } from "../../../src/types/index.js";
 
 describe("ProfileService Units", () => {
@@ -96,5 +96,53 @@ describe("ProfileService Units", () => {
     await updateComplexityTolerance(3);
     profile = await getProfile();
     assert.strictEqual(profile.complexityTolerance, 3);
+  });
+
+  it("updateProfileFields updates complexityTolerance", async () => {
+    try { await fs.unlink(profilePath); } catch {}
+    const profile = await updateProfileFields({ complexityTolerance: 4 });
+    assert.strictEqual(profile.complexityTolerance, 4);
+    const loaded = await getProfile();
+    assert.strictEqual(loaded.complexityTolerance, 4);
+  });
+
+  it("updateProfileFields rejects complexityTolerance outside [1,5]", async () => {
+    await assert.rejects(
+      () => updateProfileFields({ complexityTolerance: 6 }),
+      /invalid|range|must be/i
+    );
+    await assert.rejects(
+      () => updateProfileFields({ complexityTolerance: 0 }),
+      /invalid|range|must be/i
+    );
+  });
+
+  it("updateProfileFields replaces thematicPreferences array", async () => {
+    try { await fs.unlink(profilePath); } catch {}
+    await updateProfileFields({ thematicPreferences: ["fantasy", "sci-fi"] });
+    let profile = await getProfile();
+    assert.deepStrictEqual(profile.thematicPreferences, ["fantasy", "sci-fi"]);
+
+    await updateProfileFields({ thematicPreferences: ["horror"] });
+    profile = await getProfile();
+    assert.deepStrictEqual(profile.thematicPreferences, ["horror"], "Should replace, not append");
+  });
+
+  it("updateProfileFields appends via addThematicPreference without replacing", async () => {
+    try { await fs.unlink(profilePath); } catch {}
+    await updateProfileFields({ thematicPreferences: ["fantasy"] });
+    await updateProfileFields({ addThematicPreference: "sci-fi" });
+    const profile = await getProfile();
+    assert.ok(profile.thematicPreferences.includes("fantasy"), "Should still have fantasy");
+    assert.ok(profile.thematicPreferences.includes("sci-fi"), "Should have appended sci-fi");
+    assert.strictEqual(profile.thematicPreferences.length, 2);
+  });
+
+  it("updateProfileFields does not add duplicate via addThematicPreference", async () => {
+    try { await fs.unlink(profilePath); } catch {}
+    await updateProfileFields({ thematicPreferences: ["fantasy"] });
+    await updateProfileFields({ addThematicPreference: "fantasy" });
+    const profile = await getProfile();
+    assert.strictEqual(profile.thematicPreferences.filter(p => p === "fantasy").length, 1, "No duplicates");
   });
 });

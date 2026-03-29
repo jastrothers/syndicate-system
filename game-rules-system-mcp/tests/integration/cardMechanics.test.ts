@@ -124,7 +124,7 @@ test("Card Mechanics Integration Tests", async (t) => {
     const top = JSON.parse((peekRes.content[0] as any).text);
     assert.strictEqual(top[0].name, "Province");
 
-    // Clean it up
+    // Remove Province from deck top
     await client.callTool({
       name: "draw_from_deck",
       arguments: {
@@ -137,211 +137,150 @@ test("Card Mechanics Integration Tests", async (t) => {
     });
   });
 
-  await t.test("draw_with_reshuffle macro (normal)", async () => {
-    // Setup macro reference for test
-    await client.callTool({
-      name: "save_reference",
-      arguments: {
-        name: "test_draw_with_reshuffle",
-        content: `
-          const { deckId, recycleSourceId, targetHandId, count, actor } = inputs;
-          
-          if (!Array.isArray(state[deckId])) state[deckId] = [];
-          if (!Array.isArray(state[recycleSourceId])) state[recycleSourceId] = [];
-          if (!Array.isArray(state[targetHandId])) state[targetHandId] = [];
-          
-          let drawn = [];
-          let reshuffled = false;
-          
-          for (let i = 0; i < count; i++) {
-            if (state[deckId].length === 0) {
-              if (state[recycleSourceId].length === 0) break;
-              state[deckId].push(...state[recycleSourceId].splice(0));
-              // basic shuffle simulation for macro
-              state[deckId].sort(() => Math.random() - 0.5);
-              reshuffled = true;
-            }
-            drawn.push(state[deckId].shift());
-          }
-          
-          state[targetHandId].push(...drawn);
-          
-          ledger.push({
-            timestamp: new Date().toISOString(),
-            actionType: "draw_with_reshuffle_macro",
-            actor: actor,
-            data: { drawn: drawn.length, reshuffled }
-          });
-          
-          return { drawn: drawn.length, reshuffled };
-        `
-      }
-    });
-
+  await t.test("Draw cards from deck using primitives", async () => {
+    // Draw 2 cards from deck into hand
     const result: any = await client.callTool({
-      name: "execute_macro_action",
+      name: "draw_from_deck",
       arguments: {
         sessionId: cardSessionId,
-        macroScriptReferenceName: "test_draw_with_reshuffle",
-        inputs: {
-          deckId: "deck",
-          recycleSourceId: "discard",
-          targetHandId: "hand",
-          count: 2,
-          actor: "Player 1",
-        }
+        deckId: "deck",
+        targetHandId: "hand",
+        count: 2,
+        actor: "Player 1",
       },
     });
     assert.strictEqual(result.isError, undefined);
     const data = JSON.parse((result.content[0] as any).text);
-    assert.strictEqual(data.result.drawn, 2);
-  });
+    assert.strictEqual(data.drawn.length, 2);
 
-  await t.test("draw_with_reshuffle macro (triggers reshuffle)", async () => {
     const stateRes: any = await client.callTool({
       name: "get_game_state",
       arguments: { sessionId: cardSessionId },
     });
     const state = JSON.parse((stateRes.content[0] as any).text);
-    const deckSize = state.deck.length;
-    const discardSize = state.discard.length;
+    assert.strictEqual(state.hand.length, 2);
+    assert.strictEqual(state.deck.length, 3, "5 cards - 2 drawn = 3 remaining");
+  });
 
-    if (deckSize < 10 && discardSize > 0) {
-      const result: any = await client.callTool({
-        name: "execute_macro_action",
-        arguments: {
-          sessionId: cardSessionId,
-          macroScriptReferenceName: "test_draw_with_reshuffle",
-          inputs: {
-            deckId: "deck",
-            recycleSourceId: "discard",
-            targetHandId: "hand",
-            count: deckSize + 1,
-            actor: "Player 1",
-          }
-        },
+  await t.test("Shuffle deck and draw with empty deck recovery", async () => {
+    // Drain remaining deck into discard first
+    const stateRes: any = await client.callTool({
+      name: "get_game_state",
+      arguments: { sessionId: cardSessionId },
+    });
+    const stateBefore = JSON.parse((stateRes.content[0] as any).text);
+    const deckRemaining = stateBefore.deck.length;
+
+    if (deckRemaining > 0) {
+      await client.callTool({
+        name: "draw_from_deck",
+        arguments: { sessionId: cardSessionId, deckId: "deck", targetHandId: "discard", count: deckRemaining, actor: "System" },
       });
-      assert.strictEqual(result.isError, undefined);
-      const data = JSON.parse((result.content[0] as any).text);
-      assert.strictEqual(data.result.reshuffled, true);
     }
+
+    // Simulate reshuffle: move hand + discard back into deck, then shuffle
+    const state2: any = await client.callTool({ name: "get_game_state", arguments: { sessionId: cardSessionId } });
+    const s2 = JSON.parse((state2.content[0] as any).text);
+    const recycled = [...s2.discard];
+
+    await client.callTool({
+      name: "update_game_state",
+      arguments: { sessionId: cardSessionId, patch: { deck: recycled, discard: [] } },
+    });
+    await client.callTool({
+      name: "shuffle_deck",
+      arguments: { sessionId: cardSessionId, deckId: "deck" },
+    });
+
+    const afterShuffle: any = await client.callTool({ name: "get_game_state", arguments: { sessionId: cardSessionId } });
+    const stateAfter = JSON.parse((afterShuffle.content[0] as any).text);
+    assert.ok(stateAfter.deck.length > 0, "Deck should have cards after reshuffle");
+    assert.strictEqual(stateAfter.discard.length, 0, "Discard should be empty after reshuffle");
   });
 
-  await t.test("refill_market macro", async () => {
-    await client.callTool({
-      name: "save_reference",
-      arguments: {
-        name: "test_refill_market",
-        content: `
-          const { supplyDeckId, marketId, marketSize } = inputs;
-          if (!Array.isArray(state[supplyDeckId])) state[supplyDeckId] = [];
-          if (!Array.isArray(state[marketId])) state[marketId] = [];
-          
-          const slotsToFill = marketSize - state[marketId].length;
-          const toAdd = state[supplyDeckId].splice(0, Math.max(0, slotsToFill));
-          state[marketId].push(...toAdd);
-          return { added: toAdd.length };
-        `
-      }
-    });
-
-    const result: any = await client.callTool({
-      name: "execute_macro_action",
-      arguments: {
-        sessionId: cardSessionId,
-        macroScriptReferenceName: "test_refill_market",
-        inputs: {
-          supplyDeckId: "market_supply",
-          marketId: "market_row",
-          marketSize: 4,
-        }
-      },
-    });
-    assert.strictEqual(result.isError, undefined);
-
-    const stateRes: any = await client.callTool({
-      name: "get_game_state",
-      arguments: { sessionId: cardSessionId },
-    });
+  await t.test("Populate market row via move_entity", async () => {
+    // Get current market_supply to know what's available
+    const stateRes: any = await client.callTool({ name: "get_game_state", arguments: { sessionId: cardSessionId } });
     const state = JSON.parse((stateRes.content[0] as any).text);
-    assert.strictEqual(state.market_row.length, 4);
+    const supplyCount = state.market_supply.length;
+
+    // Move first 4 cards from supply to market_row
+    const toMove = Math.min(4, supplyCount);
+    for (let i = 0; i < toMove; i++) {
+      const supply: any = await client.callTool({ name: "get_game_state", arguments: { sessionId: cardSessionId } });
+      const s = JSON.parse((supply.content[0] as any).text);
+      const firstCard = s.market_supply[0];
+      await client.callTool({
+        name: "move_entity",
+        arguments: { sessionId: cardSessionId, entityId: firstCard.id, sourceId: "market_supply", targetId: "market_row", actor: "System" },
+      });
+    }
+
+    const finalState: any = await client.callTool({ name: "get_game_state", arguments: { sessionId: cardSessionId } });
+    const final = JSON.parse((finalState.content[0] as any).text);
+    assert.strictEqual(final.market_row.length, toMove, `Market row should have ${toMove} cards`);
   });
 
-  await t.test("buy_card macro (success)", async () => {
-    await client.callTool({
-      name: "save_reference",
-      arguments: {
-        name: "test_buy_card",
-        content: `
-          const { cardId, sourceId, targetId, costResourceId, costAmount } = inputs;
-          
-          if (state[costResourceId] < costAmount) {
-             throw new Error("Insufficient resources");
-          }
-          
-          const srcArray = state[sourceId];
-          const idx = srcArray.findIndex(c => c.name === cardId || c.id === cardId);
-          if (idx === -1) throw new Error("Card not found");
-          
-          const [boughtCard] = srcArray.splice(idx, 1);
-          state[costResourceId] -= costAmount;
-          state[targetId].push(boughtCard);
-          
-          return { success: true };
-        `
-      }
-    });
-
-    const stateRes: any = await client.callTool({
-      name: "get_game_state",
-      arguments: { sessionId: cardSessionId },
-    });
+  await t.test("Purchase card via primitives (success)", async () => {
+    const stateRes: any = await client.callTool({ name: "get_game_state", arguments: { sessionId: cardSessionId } });
     const state = JSON.parse((stateRes.content[0] as any).text);
-    const cardToBuy = state.market_row[0].name;
+    const cardToBuy = state.market_row[0];
     const goldBefore = state.player1_gold;
+    const cost = 3;
+
+    // Move card from market_row to discard (purchase)
+    const moveResult: any = await client.callTool({
+      name: "move_entity",
+      arguments: { sessionId: cardSessionId, entityId: cardToBuy.id, sourceId: "market_row", targetId: "discard", actor: "Player 1" },
+    });
+    assert.strictEqual(moveResult.isError, undefined);
+
+    // Deduct gold
+    await client.callTool({
+      name: "update_game_state",
+      arguments: { sessionId: cardSessionId, patch: { player1_gold: goldBefore - cost } },
+    });
+
+    const afterRes: any = await client.callTool({ name: "get_game_state", arguments: { sessionId: cardSessionId } });
+    const afterState = JSON.parse((afterRes.content[0] as any).text);
+    assert.strictEqual(afterState.player1_gold, goldBefore - cost);
+    assert.ok(!afterState.market_row.some((c: any) => c.id === cardToBuy.id), "Purchased card should be gone from market");
+  });
+
+  await t.test("validate_action blocks rule violation", async () => {
+    // Set up a constraint on buying (max cost = 5) and test validate_action
+    await client.callTool({
+      name: "update_rule",
+      arguments: {
+        rulebookName: "heist",
+        path: "actions.buy",
+        title: "Buy Action",
+        content: "Spend gold to acquire a market card.",
+      },
+    });
+
+    // Add constraints directly to the rulebook file (cache was cleared by update_rule above)
+    const fs = await import("fs/promises");
+    // @ts-ignore
+    const paths = await import("../../src/config/paths.js");
+    const rulebookPath = paths.getRulebookPath("heist");
+    const rbData = JSON.parse(await fs.readFile(rulebookPath, "utf-8"));
+    rbData.sections.actions.subsections.buy.constraints = {
+      cost: { type: "max", value: 5 },
+    };
+    await fs.writeFile(rulebookPath, JSON.stringify(rbData, null, 2));
 
     const result: any = await client.callTool({
-      name: "execute_macro_action",
+      name: "validate_action",
       arguments: {
         sessionId: cardSessionId,
-        macroScriptReferenceName: "test_buy_card",
-        inputs: {
-          cardId: cardToBuy,
-          sourceId: "market_row",
-          targetId: "discard",
-          costResourceId: "player1_gold",
-          costAmount: 3,
-        }
+        rulePath: "actions.buy",
+        actionData: { cost: 999 },
       },
     });
     assert.strictEqual(result.isError, undefined);
-
-    const afterRes: any = await client.callTool({
-      name: "get_game_state",
-      arguments: { sessionId: cardSessionId },
-    });
-    const afterState = JSON.parse((afterRes.content[0] as any).text);
-    assert.strictEqual(afterState.player1_gold, goldBefore - 3);
-    assert.strictEqual(afterState.market_row.length, 3); // 4 - 1
-  });
-
-  await t.test("buy_card macro (insufficient resources)", async () => {
-    const result: any = await client.callTool({
-      name: "execute_macro_action",
-      arguments: {
-        sessionId: cardSessionId,
-        macroScriptReferenceName: "test_buy_card",
-        inputs: {
-          cardId: "Laboratory",
-          sourceId: "market_row",
-          targetId: "discard",
-          costResourceId: "player1_gold",
-          costAmount: 9999,
-        }
-      },
-    });
-    assert.strictEqual(result.isError, true);
-    assert.ok((result.content[0] as any).text.includes("Insufficient resources"));
+    const data = JSON.parse((result.content[0] as any).text);
+    assert.strictEqual(data.valid, false, "Cost of 999 should violate max:5 constraint");
   });
 
   await t.test("create_deck_from_template", async () => {
@@ -371,60 +310,29 @@ test("Card Mechanics Integration Tests", async (t) => {
     assert.strictEqual(state.starter_deck[7].name, "Estate");
   });
 
-  await t.test("validate_deck_construction macro (valid)", async () => {
-    await client.callTool({
-      name: "save_reference",
-      arguments: {
-        name: "test_validate_deck",
-        content: `
-          const { deckId, minSize } = inputs;
-          const deck = state[deckId];
-          if (deck.length < minSize) return { valid: false, errors: ["too small"] };
-          
-          const maxCopies = 7;
-          const counts = {};
-          deck.forEach(c => counts[c.name] = (counts[c.name] || 0) + 1);
-          const errors = [];
-          for (const name in counts) {
-             if (counts[name] > maxCopies) errors.push(name + " has too many copies");
-          }
-          if (errors.length > 0) return { valid: false, errors };
-          return { valid: true, errors: [] };
-        `
-      }
-    });
-
+  await t.test("count_zone validates deck size constraint (valid)", async () => {
     const result: any = await client.callTool({
-      name: "execute_macro_action",
-      arguments: {
-        sessionId: cardSessionId,
-        macroScriptReferenceName: "test_validate_deck",
-        inputs: {
-          deckId: "starter_deck",
-          minSize: 10
-        }
-      },
+      name: "count_zone",
+      arguments: { sessionId: cardSessionId, zoneId: "starter_deck" },
     });
     assert.strictEqual(result.isError, undefined);
     const data = JSON.parse((result.content[0] as any).text);
-    assert.strictEqual(data.result.valid, true);
+    assert.ok(data.count >= 10, "starter_deck should have at least 10 cards (min deck size)");
   });
 
-  await t.test("validate_deck_construction macro (too small)", async () => {
+  await t.test("count_zone validates deck size constraint (filtered)", async () => {
+    // Victory cards: 3 Estates
     const result: any = await client.callTool({
-      name: "execute_macro_action",
+      name: "count_zone",
       arguments: {
         sessionId: cardSessionId,
-        macroScriptReferenceName: "test_validate_deck",
-        inputs: {
-          deckId: "starter_deck",
-          minSize: 40
-        }
+        zoneId: "starter_deck",
+        filter: { key: "type", op: "eq", value: "Victory" },
       },
     });
     const data = JSON.parse((result.content[0] as any).text);
-    assert.strictEqual(data.result.valid, false);
-    assert.ok(data.result.errors[0].includes("too small"));
+    assert.strictEqual(data.count, 3);
+    assert.strictEqual(data.filtered, true);
   });
 
   await t.test("count_zone (total)", async () => {

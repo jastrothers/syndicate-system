@@ -87,7 +87,17 @@ Frontend proxies `/api/*` to `localhost:3001`.
 
 ## Development Philosophy
 
-Approach tasks like John Carmack: explore and plan deeply before writing code, debug systematically with logs/isolation scripts, and build closed-loop systems that can be fully tested independently without requiring user feedback for each iteration. After data changes, run the relevant playtest script or validation macro to verify system integrity.
+Approach tasks like John Carmack: explore and plan deeply before writing code, debug systematically with logs/isolation scripts, and build closed-loop systems that can be fully tested independently without requiring user feedback for each iteration. After data changes, run the relevant playtest script or validation to verify system integrity.
+
+## Test-Driven Development
+
+Always follow **Red → Green → Refactor**:
+
+1. **Red** — Write a failing test that describes the exact expected behavior before writing any implementation.
+2. **Green** — Write the minimum code needed to make the test pass.
+3. **Refactor** — Clean up the implementation without breaking any tests.
+
+For new MCP tools: write the unit test in `tests/unit/services/` first, confirm it fails (import not found or assertion fails), then implement the handler. For deletions: remove the test first, then remove the implementation.
 
 ## Nova Loop Pattern
 
@@ -99,4 +109,4 @@ The Nova loop is a 5-stage reinforcement learning pattern used across all design
 4. **Track** — Designer responds Accept / Reject / Defer. Call `record_decision` to log the RL signal.
 5. **Compound** — Future proposals are weighted by the updated affinities in the profile.
 
-MCP tools involved: `get_designer_profile`, `get_design_session`, `add_design_step`, `record_decision`, `synthesize_nova_advice`.
+MCP tools involved: `get_designer_profile`, `get_design_session`, `add_design_step`, `record_decision`.

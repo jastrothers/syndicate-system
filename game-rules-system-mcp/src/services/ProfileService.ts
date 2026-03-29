@@ -44,9 +44,48 @@ export async function updateAffinities(mechanisms: string[], delta: number): Pro
   return profile;
 }
 
+/**
+ * @internal Legacy utility — silently clamps the value to [1, 5].
+ * Note: this diverges from the newer {@link updateProfileFields} which throws
+ * on out-of-range values. Do not use in new tool handlers; prefer updateProfileFields.
+ * Retained because existing tests exercise the clamping contract.
+ */
 export async function updateComplexityTolerance(value: number): Promise<DesignerProfile> {
   const profile = await getProfile();
   profile.complexityTolerance = Math.max(1, Math.min(5, value));
+  await saveProfile(profile);
+  return profile;
+}
+
+export interface ProfileFieldUpdate {
+  complexityTolerance?: number;
+  thematicPreferences?: string[];
+  addThematicPreference?: string;
+}
+
+export async function updateProfileFields(fields: ProfileFieldUpdate): Promise<DesignerProfile> {
+  if (fields.complexityTolerance !== undefined) {
+    if (fields.complexityTolerance < 1 || fields.complexityTolerance > 5) {
+      throw new Error(`complexityTolerance must be in range [1, 5], got ${fields.complexityTolerance}`);
+    }
+  }
+
+  const profile = await getProfile();
+
+  if (fields.complexityTolerance !== undefined) {
+    profile.complexityTolerance = fields.complexityTolerance;
+  }
+
+  if (fields.thematicPreferences !== undefined) {
+    profile.thematicPreferences = fields.thematicPreferences;
+  }
+
+  if (fields.addThematicPreference !== undefined) {
+    if (!profile.thematicPreferences.includes(fields.addThematicPreference)) {
+      profile.thematicPreferences.push(fields.addThematicPreference);
+    }
+  }
+
   await saveProfile(profile);
   return profile;
 }
