@@ -1,38 +1,11 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import {
-  compareRulebooksTool,
   getRulebookStructureTool,
   readRuleSectionTool,
   updateRuleTool,
   deleteRuleTool,
 } from "../../../../src/handlers/rulebook/core.js";
-
-// ── compare_rulebooks ─────────────────────────────────────────────────────────
-
-describe("compareRulebooksTool", () => {
-  it("has the correct tool name", () => {
-    assert.equal(compareRulebooksTool.name, "compare_rulebooks");
-  });
-
-  it("schema requires baseRulebook and targetRulebook", () => {
-    const valid = compareRulebooksTool.schema.safeParse({
-      baseRulebook: "heist",
-      targetRulebook: "heist-v2",
-    });
-    assert.ok(valid.success);
-  });
-
-  it("schema accepts optional version tags", () => {
-    const result = compareRulebooksTool.schema.safeParse({
-      baseRulebook: "heist",
-      baseVersion: "1.0.0",
-      targetRulebook: "heist",
-      targetVersion: "2.0.0",
-    });
-    assert.ok(result.success);
-  });
-});
 
 // ── get_rulebook_structure ────────────────────────────────────────────────────
 

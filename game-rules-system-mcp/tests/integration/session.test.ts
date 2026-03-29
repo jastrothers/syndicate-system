@@ -67,42 +67,19 @@ test("Playtesting Session Integration Tests", async (t) => {
     assert.strictEqual(finalState.discard.length, 1, "Discard should have 1 card");
   });
 
-  await t.test("Roll Dice macro & Get Ledger", async () => {
-    // Setup macro reference for test
-    await client.callTool({
-      name: "save_reference",
-      arguments: {
-        name: "test_roll_dice",
-        content: `
-          // Simple dice simulation for macro
-          const rolls = [Math.floor(Math.random() * 6) + 1, Math.floor(Math.random() * 6) + 1];
-          const modifier = 2;
-          const total = rolls[0] + rolls[1] + modifier;
-          const rollResult = { total, rolls, modifier };
-          
-          ledger.push({
-            timestamp: new Date().toISOString(),
-            actionType: "roll_dice_macro",
-            actor: inputs.actor,
-            data: { notation: "2d6+2", ...rollResult }
-          });
-          
-          return rollResult;
-        `
-      }
-    });
-
+  await t.test("Roll Dice & Get Ledger", async () => {
     const diceResult: any = await client.callTool({
-      name: "execute_macro_action",
-      arguments: { 
-        sessionId: currentSessionId, 
-        macroScriptReferenceName: "test_roll_dice", 
-        inputs: { actor: "Player 1" } 
+      name: "roll_dice",
+      arguments: {
+        notation: "2d6+2",
+        sessionId: currentSessionId,
+        actor: "Player 1"
       }
     });
+    assert.strictEqual(diceResult.isError, undefined);
     const data = JSON.parse((diceResult.content[0] as any).text);
-    assert.strictEqual(data.result.rolls.length, 2);
-    assert.strictEqual(data.result.modifier, 2);
+    assert.ok(data.total >= 4 && data.total <= 14, "2d6+2 total should be in range [4,14]");
+    assert.strictEqual(data.modifier, 2);
 
     const ledgerResult: any = await client.callTool({
       name: "get_action_history",
@@ -115,7 +92,7 @@ test("Playtesting Session Integration Tests", async (t) => {
     assert.ok(actions.includes("shuffle_deck"));
     assert.ok(actions.includes("draw_from_deck"));
     assert.ok(actions.includes("move_entity"));
-    assert.ok(actions.includes("roll_dice_macro"));
+    assert.ok(actions.includes("roll_dice"));
   });
 
   await t.test("Rule Validation", async () => {

@@ -1,7 +1,6 @@
 import { z } from "zod";
 import * as NovaService from "../../services/NovaService.js";
 import * as ProfileService from "../../services/ProfileService.js";
-import * as DesignStore from "../../services/DesignStore.js";
 import { jsonResponse, textResponse } from "../response.js";
 import { defineTool } from "../types.js";
 
@@ -31,7 +30,7 @@ export const novaTools = [
   }),
   defineTool({
     name: "get_designer_profile",
-    description: "Retrieves the global designer taste profile.",
+    description: "Retrieves the global designer taste profile including mechanism affinities, complexity tolerance, and thematic preferences.",
     schema: z.object({}),
     handler: async () => {
       const profile = await ProfileService.getProfile();
@@ -39,22 +38,20 @@ export const novaTools = [
     }
   }),
   defineTool({
-    name: "synthesize_nova_advice",
-    description: "Synthesizes a specialist agent's output into the Nova Trace-Explain-Reason format.",
+    name: "update_designer_profile",
+    description: "Directly updates editorial profile fields: complexity tolerance (1-5 scale) and thematic preferences. Use this to record explicit designer preferences separate from the affinity learning loop.",
     schema: z.object({
-      gameName: z.string(),
-      sessionId: z.string(),
-      stepId: z.number()
+      complexityTolerance: z.number().min(1).max(5).optional().describe("Complexity tolerance on a 1-5 scale."),
+      thematicPreferences: z.array(z.string()).optional().describe("Replace the entire thematic preferences array."),
+      addThematicPreference: z.string().optional().describe("Append a single thematic preference without replacing the array."),
     }),
     handler: async (args) => {
-      const session = await DesignStore.getDesignSession(args.gameName, args.sessionId);
-      const step = session.steps.find(s => s.stepNumber === args.stepId);
-      if (!step) {
-        throw new Error(`Step ${args.stepId} not found in session.`);
-      }
-      const profile = await ProfileService.getProfile();
-      const response = NovaService.synthesizeNovaResponse(step, profile);
-      return jsonResponse(response);
+      const profile = await ProfileService.updateProfileFields({
+        complexityTolerance: args.complexityTolerance,
+        thematicPreferences: args.thematicPreferences,
+        addThematicPreference: args.addThematicPreference,
+      });
+      return jsonResponse(profile);
     }
-  })
+  }),
 ];

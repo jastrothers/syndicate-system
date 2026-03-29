@@ -14,6 +14,17 @@ export interface Component {
   attributes?: Record<string, any>;
 }
 
+export interface SessionStats {
+  sessionId: string;
+  rulebookName: string;
+  rulebookVersion?: string;
+  createdAt: string;
+  lastUpdatedAt: string;
+  stateKeys: string[];
+  ledgerCount: number;
+  ledgerByType: Record<string, number>;
+}
+
 export interface Rulebook {
   metadata: {
     title: string;
@@ -35,9 +46,25 @@ export interface VersionInfo {
   description?: string;
 }
 
+/** Action types the server itself generates — used as ledger actionType values. */
+export const ACTION_LOG_TYPES = [
+  "draw_from_deck",
+  "shuffle_deck",
+  "update_game_state",
+  "move_entity",
+  "roll_dice",
+  "record_action",
+  "log_playtest_note",
+  "reveal_cards",
+  "create_deck_from_reference",
+  "insert_into_deck",
+] as const;
+
+export type ActionLogType = typeof ACTION_LOG_TYPES[number];
+
 export interface ActionLog {
   timestamp: string;
-  actionType: string;
+  actionType: ActionLogType | string;
   actor: string;
   data: Record<string, any>;
 }

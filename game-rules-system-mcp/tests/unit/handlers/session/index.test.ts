@@ -5,8 +5,8 @@ import { sessionTools } from "../../../../src/handlers/index.js";
 // ── Tool registration ─────────────────────────────────────────────────────────
 
 describe("sessionTools registration", () => {
-  it("exports sixteen tools", () => {
-    assert.equal(sessionTools.length, 16);
+  it("exports fourteen tools", () => {
+    assert.equal(sessionTools.length, 14);
   });
 
   it("contains the expected tool names", () => {
@@ -15,16 +15,14 @@ describe("sessionTools registration", () => {
       "create_session",
       "delete_playtest_session",
       "draw_from_deck",
-      "evaluate_game_state",
-      "execute_macro_action",
       "get_action_history",
       "get_game_state",
+      "get_session_stats",
       "list_sessions",
       "log_playtest_note",
       "move_entity",
       "record_action",
       "roll_dice",
-      "setup_game_from_manifest",
       "shuffle_deck",
       "update_game_state",
       "validate_action",

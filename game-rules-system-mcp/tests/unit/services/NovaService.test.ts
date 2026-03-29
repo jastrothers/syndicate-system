@@ -2,9 +2,8 @@ import { describe, it, before, after } from "node:test";
 import assert from "node:assert";
 import * as fs from "fs/promises";
 import { getDesignerProfilePath, getDecisionLogPath, getGameDir } from "../../../src/config/paths.js";
-import { processDecision, synthesizeNovaResponse } from "../../../src/services/NovaService.js";
+import { processDecision } from "../../../src/services/NovaService.js";
 import { getProfile } from "../../../src/services/ProfileService.js";
-import { DesignStep } from "../../../src/types/index.js";
 
 describe("NovaService Units", () => {
   const testGame = "nova-test-game-" + Date.now();
@@ -58,43 +57,4 @@ describe("NovaService Units", () => {
     assert.strictEqual(profile.affinities["auction"], undefined);
   });
 
-  it("synthesizeNovaResponse returns correct shape with trace block", () => {
-    const step: DesignStep = {
-      stepNumber: 1,
-      persona: "MechanicsArchitect",
-      output: "Full design output text",
-      summary: "Designed a deckbuilding core",
-      timestamp: new Date().toISOString(),
-      trace: {
-        observation: "Player engagement was high",
-        data: { avgTurns: 12 },
-        mechanism: "deckbuilding",
-        impact: "Creates variable power curves",
-      },
-    };
-    const response = synthesizeNovaResponse(step);
-    assert.ok(response.conclusion, "Should have conclusion");
-    assert.ok(response.reasoning, "Should have reasoning");
-    assert.ok(Array.isArray(response.options), "Should have options array");
-    assert.strictEqual(response.options.length, 3);
-    const levels = response.options.map(o => o.level);
-    assert.ok(levels.includes("Values"), "Should have Values option");
-    assert.ok(levels.includes("Structure"), "Should have Structure option");
-    assert.ok(levels.includes("Tuning"), "Should have Tuning option");
-    // Reasoning should reference trace fields
-    assert.ok(response.reasoning.includes("Player engagement was high"), "Reasoning should include observation");
-  });
-
-  it("synthesizeNovaResponse handles missing trace gracefully", () => {
-    const step: DesignStep = {
-      stepNumber: 2,
-      persona: "ThemeWeaver",
-      output: "The game is set in a cyberpunk city",
-      summary: "Applied cyberpunk theme",
-      timestamp: new Date().toISOString(),
-    };
-    const response = synthesizeNovaResponse(step);
-    assert.ok(response.conclusion === step.summary);
-    assert.ok(response.reasoning === step.output, "Without trace, reasoning should fall back to full output");
-  });
 });

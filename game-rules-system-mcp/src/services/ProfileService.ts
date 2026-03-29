@@ -50,3 +50,36 @@ export async function updateComplexityTolerance(value: number): Promise<Designer
   await saveProfile(profile);
   return profile;
 }
+
+export interface ProfileFieldUpdate {
+  complexityTolerance?: number;
+  thematicPreferences?: string[];
+  addThematicPreference?: string;
+}
+
+export async function updateProfileFields(fields: ProfileFieldUpdate): Promise<DesignerProfile> {
+  if (fields.complexityTolerance !== undefined) {
+    if (fields.complexityTolerance < 1 || fields.complexityTolerance > 5) {
+      throw new Error(`complexityTolerance must be in range [1, 5], got ${fields.complexityTolerance}`);
+    }
+  }
+
+  const profile = await getProfile();
+
+  if (fields.complexityTolerance !== undefined) {
+    profile.complexityTolerance = fields.complexityTolerance;
+  }
+
+  if (fields.thematicPreferences !== undefined) {
+    profile.thematicPreferences = fields.thematicPreferences;
+  }
+
+  if (fields.addThematicPreference !== undefined) {
+    if (!profile.thematicPreferences.includes(fields.addThematicPreference)) {
+      profile.thematicPreferences.push(fields.addThematicPreference);
+    }
+  }
+
+  await saveProfile(profile);
+  return profile;
+}
