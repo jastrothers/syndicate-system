@@ -1,7 +1,13 @@
 import { describe, it, before, after } from "node:test";
 import assert from "node:assert";
 import * as fs from "fs/promises";
+import * as path from "path";
+import { fileURLToPath } from "url";
 import { getRulebookPath, getRulebookDir } from "../../../src/config/paths.js";
+
+// Path to the real game-data directory (independent of TEST_DATA_DIR env var)
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const REAL_GAME_DATA = path.resolve(__dirname, "../../../../..", "game-data");
 import { ensureDataDirectory, getRulebook, saveRulebook, listRulebooks, listVersions, createVersion } from "../../../src/services/RulebookStore.js";
 import { Rulebook } from "../../../src/types/index.js";
 
@@ -166,5 +172,72 @@ describe("RulebookStore Units", () => {
     const backfilled = JSON.parse(await fs.readFile(manifestPath, "utf-8"));
     assert.ok(backfilled["1.0.0"]);
     assert.ok(backfilled["1.1.0"]);
+  });
+});
+
+describe("RulebookStore - schema conformance", () => {
+  it("getRulebook returns undefined metadata.title/version for non-conformant JSON (name at root)", async () => {
+    // Documents the pre-fix PokéNursery schema bug: name/version at root instead of metadata
+    const brokenName = "broken-schema-" + Date.now();
+    const dir = getRulebookDir(brokenName);
+    await fs.mkdir(dir, { recursive: true });
+    await fs.writeFile(getRulebookPath(brokenName), JSON.stringify({
+      name: "PokéNursery: Blissful Beginnings",
+      version: "0.1.0-draft",
+      metadata: { lastUpdated: new Date().toISOString() },
+      sections: {}
+    }), "utf-8");
+    try {
+      const loaded = await getRulebook(brokenName);
+      assert.strictEqual(loaded.metadata.title, undefined);
+      assert.strictEqual(loaded.metadata.version, undefined);
+    } finally {
+      await fs.rm(dir, { recursive: true, force: true }).catch(() => {});
+    }
+  });
+
+  it("getRulebook reads metadata.title and metadata.version correctly from conformant JSON", async () => {
+    const conformantName = "conformant-schema-" + Date.now();
+    const dir = getRulebookDir(conformantName);
+    await fs.mkdir(dir, { recursive: true });
+    await fs.writeFile(getRulebookPath(conformantName), JSON.stringify({
+      metadata: {
+        title: "PokéNursery: Blissful Beginnings",
+        version: "0.1.0-draft",
+        lastUpdated: new Date().toISOString()
+      },
+      sections: {}
+    }), "utf-8");
+    try {
+      const loaded = await getRulebook(conformantName);
+      assert.strictEqual(loaded.metadata.title, "PokéNursery: Blissful Beginnings");
+      assert.strictEqual(loaded.metadata.version, "0.1.0-draft");
+    } finally {
+      await fs.rm(dir, { recursive: true, force: true }).catch(() => {});
+    }
+  });
+});
+
+describe("PokNursery-BlissfulBeginnings data integrity", () => {
+  it("latest.json stores title and version inside metadata (not at root)", async () => {
+    const filePath = path.join(REAL_GAME_DATA, "PokNursery-BlissfulBeginnings", "rulebooks", "latest.json");
+    const raw = JSON.parse(await fs.readFile(filePath, "utf-8"));
+    assert.ok(raw.metadata?.title, "metadata.title must be present and non-empty");
+    assert.ok(raw.metadata?.version, "metadata.version must be present and non-empty");
+    assert.equal(raw.name, undefined, "name must NOT be at root level");
+    assert.equal(raw.version, undefined, "version must NOT be at root level");
+  });
+
+  it("all design session JSON files use consistent gameName", async () => {
+    const designDir = path.join(REAL_GAME_DATA, "PokNursery-BlissfulBeginnings", "design");
+    const files = (await fs.readdir(designDir)).filter((f: string) => f.endsWith(".json"));
+    for (const file of files) {
+      const raw = JSON.parse(await fs.readFile(path.join(designDir, file), "utf-8"));
+      assert.strictEqual(
+        raw.gameName,
+        "PokéNursery: Blissful Beginnings",
+        `${file}: expected gameName "PokéNursery: Blissful Beginnings", got "${raw.gameName}"`
+      );
+    }
   });
 });

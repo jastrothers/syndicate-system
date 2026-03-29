@@ -1,6 +1,6 @@
-# undefined
+# PokéNursery: Blissful Beginnings
 
-*Version: undefined*
+*Version: 0.1.0-draft*
 *Last Updated: 3/23/2026, 10:12:48 PM*
 
 ---

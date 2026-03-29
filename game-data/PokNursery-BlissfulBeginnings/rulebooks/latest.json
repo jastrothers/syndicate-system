@@ -1,8 +1,7 @@
 {
-  "name": "PokéNursery: Blissful Beginnings",
-  "version": "0.1.0-draft",
-  "status": "draft",
   "metadata": {
+    "title": "PokéNursery: Blissful Beginnings",
+    "version": "0.1.0-draft",
     "lastUpdated": "2026-03-24T02:12:48.094Z",
     "author": "Claude Game Gen"
   },
