@@ -104,3 +104,18 @@ describe("getReferenceFilePath", () => {
     assert.ok(p.endsWith("unnamed.md"), `Expected 'unnamed.md', got: ${p}`);
   });
 });
+
+describe("sanitizeFileName - PokéNursery naming variants", () => {
+  it("strips accented chars, colons, and spaces from display name (maps to wrong dir)", () => {
+    // Passing the human display name to an MCP tool creates a different dir than the canonical dir
+    assert.equal(sanitizeFileName("PokéNursery: Blissful Beginnings"), "PokNurseryBlissfulBeginnings");
+  });
+
+  it("strips only the accent from hyphen form (maps to canonical dir)", () => {
+    assert.equal(sanitizeFileName("PokéNursery-BlissfulBeginnings"), "PokNursery-BlissfulBeginnings");
+  });
+
+  it("canonical filesystem key is already safe and round-trips unchanged", () => {
+    assert.equal(sanitizeFileName("PokNursery-BlissfulBeginnings"), "PokNursery-BlissfulBeginnings");
+  });
+});
