@@ -46,7 +46,7 @@ test("Cleanup Integration Tests", async (t) => {
   await t.test("delete_design_session: removes session from game design directory", async () => {
     const createResult: any = await client.callTool({
       name: "create_design_session",
-      arguments: { gameName: "cleanup-design-game", theme: "space pirates" },
+      arguments: { gameName: "cleanup-design-game", theme: "space pirates", initialPrompt: "Design a space pirate game." },
     });
     assert.strictEqual(createResult.isError, undefined);
     const session = JSON.parse((createResult.content[0] as any).text);

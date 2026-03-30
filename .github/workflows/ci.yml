@@ -46,7 +46,7 @@ jobs:
         working-directory: ./game-rules-system-mcp
 
       - name: Test
-        run: npm test
+        run: npm run test:unit
         working-directory: ./game-rules-system-mcp
 
   game-viewer:

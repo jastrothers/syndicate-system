@@ -5,7 +5,7 @@ import { getDesignSessionPath, getDesignSessionDir } from "../config/paths.js";
 import * as StorageService from "./StorageService.js";
 import crypto from "crypto";
 
-export async function createDesignSession(gameName: string, theme: string): Promise<DesignSession> {
+export async function createDesignSession(gameName: string, theme: string, initialPrompt?: string): Promise<DesignSession> {
   const sessionId = crypto.randomUUID();
   const now = new Date().toISOString();
   
@@ -17,6 +17,7 @@ export async function createDesignSession(gameName: string, theme: string): Prom
     status: "active",
     createdAt: now,
     lastUpdatedAt: now,
+    ...(initialPrompt !== undefined ? { initialPrompt } : {}),
   };
   
   await saveDesignSession(session);

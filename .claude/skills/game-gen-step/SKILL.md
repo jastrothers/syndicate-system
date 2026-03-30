@@ -42,7 +42,7 @@ When invoked with a theme string, run `init` + `mechanics` together (init alone 
 ### Step 0: Initialize
 
 1. Derive a game name from the theme (e.g., "Deep sea creature evolution" → "Deep Sea Creature Evolution").
-2. Call `create_design_session` with the game name and theme. Note the returned `sessionId` and `gameSlug`.
+2. Call `create_design_session` with the game name, theme, and the full user prompt as `initialPrompt`. Note the returned `sessionId` and `gameSlug`.
 3. Call `save_draft` to initialize a draft rulebook using the `gameSlug`.
 4. **Profile Bias (opt-in)**: Only if `--profile` was passed:
    - Call `get_designer_profile`
@@ -95,7 +95,7 @@ To continue: /game-gen-step --continue
 
 If `sessionId` is provided:
 - Glob `game-data/*/design/{sessionId}.json` to find the matching file and derive `gameSlug` from the parent directory path.
-- Call `get_design_session(gameName, sessionId, includeFull: false)` to load step summaries.
+- Call `get_design_session(gameName, sessionId, includeFull: false)` to load step summaries. **Note:** The session includes `initialPrompt` if it was provided during initialization — use it for context if you need to re-run or iterate on the design from the original intent.
 
 If `sessionId` is NOT provided:
 - Run: `ls -t game-data/*/design/*.json | head -10`

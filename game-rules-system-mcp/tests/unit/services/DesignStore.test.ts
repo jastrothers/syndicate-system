@@ -102,4 +102,19 @@ describe("DesignStore Units", () => {
     const reloaded = await getDesignSession(testGame, session.sessionId);
     assert.ok(reloaded.lastUpdatedAt >= original, "lastUpdatedAt should be updated");
   });
+
+  it("createDesignSession stores initialPrompt when provided as 3rd arg and round-trips through getDesignSession", async () => {
+    const prompt = "Create a deck-building game about collecting rare items.";
+    const session = await createDesignSession(testGame, "Collection Game", prompt);
+    assert.strictEqual(session.initialPrompt, prompt, "Session should have initialPrompt");
+    const retrieved = await getDesignSession(testGame, session.sessionId);
+    assert.strictEqual(retrieved.initialPrompt, prompt, "Retrieved session should preserve initialPrompt");
+  });
+
+  it("createDesignSession works without initialPrompt (backward compat), field is undefined", async () => {
+    const session = await createDesignSession(testGame, "No Prompt Game");
+    assert.strictEqual(session.initialPrompt, undefined, "initialPrompt should be undefined");
+    const retrieved = await getDesignSession(testGame, session.sessionId);
+    assert.strictEqual(retrieved.initialPrompt, undefined, "Retrieved session should have undefined initialPrompt");
+  });
 });

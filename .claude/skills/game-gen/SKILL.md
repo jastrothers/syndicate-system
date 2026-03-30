@@ -17,7 +17,7 @@ The optional `--profile` flag enables Nova preference personalisation (see Step 
 
 ## Step 0: Initialize Workspace
 
-1. **Initialize MCP**: Run `create_design_session` with the game name and theme. Note the `sessionId` and the sanitized `gameSlug`.
+1. **Initialize MCP**: Run `create_design_session` with the game name, theme, and the full user prompt as `initialPrompt`. Note the `sessionId` and the sanitized `gameSlug`.
 2. **Create Draft**: Use `save_draft` to initialize a draft rulebook using the `gameSlug`.
 3. **Profile Bias (opt-in)**: Only if `--profile` was passed:
    - Call `get_designer_profile`

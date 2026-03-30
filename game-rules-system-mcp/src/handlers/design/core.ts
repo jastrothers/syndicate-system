@@ -17,10 +17,11 @@ export const createDesignSessionTool = defineTool({
   schema: z.object({
     gameName: z.string().describe("The name of the game being designed."),
     theme: z.string().describe("The core theme or high-level concept."),
+    initialPrompt: z.string().describe("The full user prompt that initiated this design session."),
   }),
   handler: async (args) => {
     validateGameName(args.gameName);
-    const session = await createDesignSession(args.gameName, args.theme);
+    const session = await createDesignSession(args.gameName, args.theme, args.initialPrompt);
     return jsonResponse(session);
   },
 });
@@ -85,6 +86,7 @@ export const getDesignSessionTool = defineTool({
       sessionId: session.sessionId,
       gameName: session.gameName,
       theme: session.theme,
+      initialPrompt: session.initialPrompt,
       status: session.status,
       createdAt: session.createdAt,
       lastUpdatedAt: session.lastUpdatedAt,
