@@ -16,6 +16,11 @@
       "c:\\Users\\Julian\\git\\syndicate-system"
     ]
   },
+  "planMode": {
+    "preferredPlanDirectory": ".claude/plans",
+    "forceRepoRoot": true,
+    "syncFromHomePlanDir": true
+  },
   "hooks": {
     "PreToolUse": [
       {
