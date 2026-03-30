@@ -7,7 +7,7 @@ description: Multi-agent pipeline to generate a complete board game design from 
 
 Use this workflow to generate a complete board game design from a simple theme and set of constraints, fully integrated with the MCP for data persistence.
 
-> **Autonomous Mode**: This workflow runs straight through from theme to finished rulebook without stopping for user feedback. For interactive co-design with preference learning, use `/designer` instead.
+> **Autonomous Mode**: This workflow runs straight through from theme to finished rulebook without stopping for user feedback. For interactive co-design with preference learning, use `/designer` instead. For phase-by-phase execution (one agent per turn, resumable across chats), use `/game-gen-step` instead.
 
 **Usage**: `/game-gen "<Theme>" [--profile]`
 
