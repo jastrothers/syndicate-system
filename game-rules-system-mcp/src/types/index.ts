@@ -104,6 +104,7 @@ export interface DesignSession {
   sessionId: string;
   gameName: string;
   theme: string;
+  initialPrompt?: string;
   steps: DesignStep[];
   status: "active" | "completed" | "archived";
   createdAt: string;

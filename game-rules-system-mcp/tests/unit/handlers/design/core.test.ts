@@ -32,12 +32,19 @@ describe("createDesignSessionTool", () => {
     assert.equal(createDesignSessionTool.name, "create_design_session");
   });
 
-  it("schema requires gameName and theme", () => {
-    const valid = createDesignSessionTool.schema.safeParse({ gameName: "heist", theme: "noir" });
+  it("schema requires gameName, theme, and initialPrompt", () => {
+    const valid = createDesignSessionTool.schema.safeParse({
+      gameName: "heist",
+      theme: "noir",
+      initialPrompt: "Create a gritty detective game.",
+    });
     assert.ok(valid.success);
 
     const missing = createDesignSessionTool.schema.safeParse({ gameName: "heist" });
     assert.ok(!missing.success, "Missing theme should fail");
+
+    const noPrompt = createDesignSessionTool.schema.safeParse({ gameName: "heist", theme: "noir" });
+    assert.ok(!noPrompt.success, "Missing initialPrompt should fail");
   });
 });
 
