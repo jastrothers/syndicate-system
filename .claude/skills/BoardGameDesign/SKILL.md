@@ -1,9 +1,9 @@
 ---
 name: BoardGameDesign
-description: Specialized capabilities for board game creation, mechanical taxonomy, and automated balance/consistency analysis. Provides shared resources for the v2.0 multi-agent pipeline.
+description: Specialized capabilities for board game creation, mechanical taxonomy, and automated balance/consistency analysis. Provides shared resources for the multi-agent game generation pipeline.
 ---
 
-# Board Game Design Skill (v2.0)
+# Board Game Design Skill
 
 This skill provides the necessary knowledge, tools, and validation infrastructure to design, analyze, and iterate on board game designs using the multi-agent pipeline.
 
@@ -24,7 +24,7 @@ This skill provides the necessary knowledge, tools, and validation infrastructur
 - `scripts/balance_critic.ts`: Heuristic-based balance analysis. Checks action point economy, reward variance, trap actions, and static vs. dynamic pricing. Reports findings with HIGH/MEDIUM/LOW severity tags.
 - `scripts/session_manager.ts`: Manages design session directories and step-level logging. Commands: `init <gameSlug> <theme>`, `log <gameSlug> <step> [--summary] <content>`.
 
-## v2.0 Agent Pipeline
+## Agent Pipeline
 
 The following agents use this skill's resources:
 
@@ -38,7 +38,7 @@ The following agents use this skill's resources:
 | **balance-critic** | 5/6 | Balance Report (5-dimension rubric) | Yes — `add_design_step` |
 | **fun-factor-judge** | 5/6 | Fun Factor Report (6-dimension rubric) | Yes — `add_design_step` |
 
-All v2.0 agents follow a 4-phase execution model:
+All agents follow a 4-phase execution model:
 1. **Context Loading**: Call `get_design_session` + load relevant prior work
 2. **Research**: Call `list_references` to check existing game patterns
 3. **Creative Execution**: Produce structured output following the agent's output contract

@@ -1,18 +1,17 @@
 ---
 name: game-gen
-description: Multi-agent pipeline to generate a complete board game design from a theme, integrated with the game-rules MCP for data persistence. v2.0 with self-sufficient agents, playtest simulation, setup validation, and targeted fix loops.
+description: Multi-agent pipeline to generate a complete board game design from a theme, integrated with the game-rules MCP for data persistence. Includes playtest simulation and targeted fix loops.
 ---
 
-# Board Game Generation Workflow v2.0 (/game-gen)
+# Board Game Generation Workflow (/game-gen)
 
-Use this workflow to generate a complete board game design from a simple theme, fully integrated with the MCP for data persistence. Each agent is self-sufficient — it loads its own context, produces structured output, and persists its own results.
+Use this workflow to generate a complete board game design from a simple theme and set of constraints, fully integrated with the MCP for data persistence.
 
 > **Autonomous Mode**: This workflow runs straight through from theme to finished rulebook without stopping for user feedback. For interactive co-design with preference learning, use `/designer` instead.
 
-**Usage**: `/game-gen "<Theme>" [--profile] [--weight light|medium|heavy]`
+**Usage**: `/game-gen "<Theme>" [--profile]`
 
-- `--profile`: Enables Nova preference personalisation (see Step 0)
-- `--weight`: Sets target complexity (default: medium). Passed to MechanicsArchitect.
+The optional `--profile` flag enables Nova preference personalisation (see Step 0).
 
 ---
 
@@ -21,228 +20,163 @@ Use this workflow to generate a complete board game design from a simple theme, 
 1. **Initialize MCP**: Run `create_design_session` with the game name and theme. Note the `sessionId` and the sanitized `gameSlug`.
 2. **Create Draft**: Use `save_draft` to initialize a draft rulebook using the `gameSlug`.
 3. **Profile (opt-in)**: Only if `--profile` was passed:
-   - Call `get_designer_profile`.
-   - Extract liked mechanisms (affinity >= 0.3) and disliked mechanisms (affinity <= -0.3).
-   - Construct a **Profile Context** block:
-     ```
-     Profile Context:
-       Liked: [mechanism IDs]
-       Disliked: [mechanism IDs]
-     ```
-   - If `--profile` was NOT passed, skip this entirely.
+   - Call `get_designer_profile`
+   - Extract liked mechanisms (affinity ≥ 0.3) and disliked mechanisms (affinity ≤ -0.3)
+   - Construct a **Profile Context** block to pass to the MechanicsArchitect in Step 1
+   - If `--profile` was NOT passed, skip this entirely
 
 ---
 
 ## Step 1: MechanicsArchitect
 
-Spawn the `mechanics-architect` subagent. Pass `sessionId`, `gameSlug`, `theme`, target weight, and — if `--profile` was used — the **Profile Context** block.
+Spawn the `mechanics-architect` subagent with `sessionId`, `gameSlug`, `theme`, and optionally the **Profile Context** block.
 
-The agent is self-sufficient (v2.0). It will:
-- Load context via `get_design_session`
-- Cross-reference existing games via `list_references`
-- Read the mechanisms taxonomy
-- Produce a **Mechanism Slate** with: Selected Mechanisms table, Core Loop, Parameter Specs, Synergy Matrix, Player Count Scaling
-- Self-persist via `add_design_step` + `save_reference` + `update_rule`
-
-**Expected Output**: Mechanism Slate (structured format — see agent spec)
-
-**Receive and Verify**: Confirm the output contains all required sections. Extract the mechanism list for downstream agents.
+The agent will:
+1. Load design session context
+2. Cross-reference `list_references(type: "mechanism")` to check existing patterns
+3. Read `.claude/skills/BoardGameDesign/resources/mechanisms.json` taxonomy
+4. Propose 3-5 mechanisms with core parameters and synergies
+5. Call `add_design_step` to log output
+6. Call `save_reference` for each mechanism
+7. Call `update_rule(path: "mechanics")` to write to draft
 
 ---
 
-## Step 1.5: Mechanics Coherence Check
+## Step 1.5: Lite Consistency Check (Optional)
 
-Quick sanity check on the mechanism selection:
+Optionally run a quick structural check:
+```bash
+npx ts-node .claude/skills/BoardGameDesign/scripts/consistency_checker.ts game-data/{gameSlug}/rulebooks/draft.json
+```
 
-1. Verify the Mechanism Slate has 3-5 mechanisms with complexity scores
-2. Verify the Core Loop has clear phases
-3. Verify Player Count Scaling addresses 2P/3P/4P
-4. If any check fails, ask the mechanics-architect to revise (pass the specific failure back)
-
-This is a lightweight gate — no scripts, just structural verification of the output format.
+If more than 3 warnings appear, ask the MechanicsArchitect to reconsider or proceed cautiously to the next step.
 
 ---
 
 ## Step 2: ThemeWeaver
 
-Spawn the `theme-weaver` subagent. Pass `sessionId` and `gameSlug`.
+Spawn the `theme-weaver` subagent with `sessionId` and `gameSlug`.
 
-The agent is self-sufficient (v2.0). It will:
-- Load the Mechanism Slate from the design session
-- Cross-reference thematic patterns from other games
-- Produce a **Thematic Blueprint** with: Setting, Player Identity, Mechanism Translation Table, Terminology Glossary, Narrative Arc, Flavor Hooks, Player Count Feel
-- Self-persist via `add_design_step` + `update_rule`
-
-**Expected Output**: Thematic Blueprint (structured format — see agent spec)
-
-**Receive and Verify**: Confirm every mechanism has a thematic mapping. Extract the Terminology Glossary for downstream agents.
+The agent will:
+1. Load design session and extract Mechanism Slate from Step 1
+2. Map every mechanism to thematic concepts
+3. Define setting, player identity, and narrative arc
+4. Call `add_design_step` to log output
+5. Call `update_rule(path: "overview")` and `update_rule(path: "metadata.thematicBrief")`
 
 ---
 
 ## Step 3: ComponentDesigner
 
-Spawn the `component-designer` subagent. Pass `sessionId` and `gameSlug`.
+Spawn the `component-designer` subagent with `sessionId` and `gameSlug`.
 
-The agent is self-sufficient (v2.0). It will:
-- Load the Mechanism Slate and Thematic Blueprint from the design session
-- Cross-reference component patterns from other games
-- Produce a **Component Manifest** with: Master Table, Card Breakdowns, Token Specs, Board Specs, Player Count Scaling, Prototype Notes
-- Self-persist via `add_design_step` + `update_rule` + `save_reference`
-
-**Expected Output**: Component Manifest (structured format — see agent spec)
+The agent will:
+1. Load design session, extract Mechanism Slate and Thematic Blueprint
+2. Specify all physical components with exact quantities
+3. Define player-count scaling for each component
+4. Call `add_design_step` to log output
+5. Call `update_rule(path: "components")` to write Component Manifest to draft
+6. Call `save_reference` for each major deck/component set
 
 ---
 
 ## Step 3.5: Consistency Gate
 
-Run the consistency checker against the draft rulebook:
+Run the consistency checker to verify component/rule alignment:
 
 ```bash
-npx ts-node .claude/skills/BoardGameDesign/scripts/consistency_checker.ts game-data/{gameSlug}/rulebooks/
+npx ts-node .claude/skills/BoardGameDesign/scripts/consistency_checker.ts game-data/{gameSlug}/rulebooks/draft.json
 ```
 
-- If **3 or fewer warnings**: proceed to Step 4.
-- If **more than 3 warnings**: review the warnings, apply targeted fixes using `update_rule` on the draft, then re-run the checker.
-- Maximum 2 fix attempts. If warnings persist, proceed with a note to the DetailsArchitect about known issues.
-
-> This gate catches component/rule mismatches before the DetailsArchitect writes the final rulebook.
+- If **≤3 warnings**: proceed to Step 4
+- If **>3 warnings**: review findings, use `update_rule` to apply targeted fixes, re-run until threshold is met
 
 ---
 
 ## Step 4: DetailsArchitect
 
-Spawn the `details-architect` subagent. Pass `sessionId` and `gameSlug`.
+Spawn the `details-architect` subagent with `sessionId` and `gameSlug`.
 
-The agent is self-sufficient (v2.0). It will:
-- Load ALL prior design steps from the session
-- Load the current draft rulebook
-- Cross-reference setup patterns from other games
-- Produce a **Complete Rulebook** with: Overview, Setup, Turn Structure, Action Catalog, Scoring & Endgame, Special Rules, Edge Cases, Quick Reference Card
-- Also produce a **Setup Manifest** (machine-readable initial game state)
-- Self-persist via `add_design_step` + `update_rule` (all sections) + `save_reference` (setup manifest)
-
-**Expected Output**: Complete Rulebook + Setup Manifest (structured format — see agent spec)
+The agent will:
+1. Load all prior design steps
+2. Define complete turn structure with unambiguous rules
+3. Cross-validate components against gameplay rules
+4. Create a machine-readable Setup Manifest
+5. Call `add_design_step` to log output
+6. Call `update_rule` for every rulebook section (overview, setup, turn-structure, actions, scoring, special-rules, edge-cases, quick-reference)
+7. Call `save_reference(name: "setup_manifest", type: "setup")`
 
 ---
 
 ## Step 4.5: Setup Validation
 
-Spawn the `setup-validator` subagent. Pass `sessionId` and `gameSlug`.
+Spawn the `setup-validator` subagent with `sessionId` and `gameSlug`.
 
 The agent will:
-- Cross-check every component against setup instructions
-- Scan for ambiguities and missing information
-- Trace the initial game state construction step by step
-- Verify first-turn readiness
-- Produce a **Setup Validation Report** with: Completeness Check, Ambiguity Scan, Initial State Trace, Player Count Coverage, First Turn Readiness, Verdict
+1. Load Component Manifest and Setup Manifest
+2. Verify every component has a clear setup home
+3. Flag ambiguities and missing player-count variants
+4. Verify the initial game state is constructible and playable
+5. Call `add_design_step` to log output
+6. Return a validation verdict (VALID or NEEDS_FIXES with fix list)
 
-**Gate Logic**:
-- If verdict is **VALID**: proceed to Step 5.
-- If verdict is **NEEDS_FIXES**:
-  - Apply CRITICAL fixes using `update_rule` (target the Setup section specifically)
-  - Re-run validation. Maximum 2 fix attempts.
-  - If fixes don't resolve all CRITICAL issues, proceed with a note to the critique step.
+If NEEDS_FIXES: Use `update_rule` to apply setup corrections. Re-run SetupValidator if many fixes were needed.
 
 ---
 
-## Step 5: Playtest Simulation
+## Step 5: Playtest Simulation (NEW)
 
-Simulate 2-3 turns of actual gameplay using MCP playtest tools. This catches rules that "look right on paper" but don't work in practice.
+Simulate 2-3 turns of actual gameplay using MCP playtest tools:
 
-### 5.1: Initialize Playtest Session
-1. Call `create_session` with the `gameSlug` to start a playtest session.
-2. Call `update_game_state` to set up the initial state based on the Setup Manifest.
+1. **Create Session**: Call `create_session(gameSlug)` to initialize a playtest session
+2. **Simulate Setup**: Use the Setup Manifest to reconstruct the initial game state via `update_game_state`
+3. **Simulate Turns**: For each turn (up to 3):
+   - Player 1 takes an action: Call `record_action` with a thematic, strategy-forward action
+   - Record playtest observations via `log_playtest_note` (e.g., "Action point economy feels tight", "Card draw is smooth")
+   - Check game state after each action via `get_game_state`
+4. **Record Findings**: Log observations about playability, pacing, and mechanical flow
+5. **Call `add_design_step`** with a summary of playtest findings
 
-### 5.2: Simulate Opening Turns
-For each of 2-3 simulated turns:
-1. Determine available actions using the Action Catalog from the rulebook.
-2. Choose a reasonable action (not optimal — just legal and representative).
-3. Call `record_action` to log the action and its outcome.
-4. Call `update_game_state` to apply the action's effects.
-5. If the action involves cards: use `draw_from_deck`, `peek_at_deck`, or `search_zone` as appropriate.
-6. If the action involves dice: use `roll_dice`.
-7. Call `validate_action` to confirm the action is legal per the written rules.
-
-### 5.3: Log Findings
-After simulation:
-1. Call `log_playtest_note` for any issues discovered:
-   - Rules that don't work as written
-   - Actions that are impossible on turn 1
-   - Missing state transitions
-   - Ambiguous resolution order
-2. Apply urgent fixes using `update_rule` if any rules are literally unplayable.
-3. Call `evaluate_game_state` to check the state is coherent.
-
-> The simulation doesn't need to play to completion — just verify the first few turns work mechanically.
+**Purpose**: Catch obvious gameplay issues (unplayable states, unclear action resolution, missing rule definitions) before full critique.
 
 ---
 
 ## Step 6: Critique & Refinement
 
-Run the `/game-critique` skill against the generated design. Pass `sessionId` and `gameSlug`.
+Run the `/game-critique` skill against the `gameSlug` with `sessionId` and `gameSlug` parameters. The skill will:
 
-The critique skill (v2.0) will:
-1. Run consistency checks
+1. Run consistency checking
 2. Spawn BalanceCritic and FunFactorJudge in parallel
-3. Both produce structured rubric scores with machine-parseable verdicts
-4. Apply targeted fixes based on which dimension/agent is responsible
-
-**Exit Criteria** (from game-critique):
-- No HIGH severity balance issues AND
-- Fun score >= 7/10 AND
-- Balance score >= 6/10
-- Maximum 2 critique iterations
-
-**Targeted Fix Dispatch** (if iteration needed):
-- Economy issues → re-consult MechanicsArchitect parameters
-- Rule gaps → re-run DetailsArchitect on specific sections
-- Component mismatches → re-run ComponentDesigner
-- Theme breaks → re-consult ThemeWeaver
-- Generic balance → apply `update_rule` directly
+3. Collect structured balance + fun scores
+4. Identify HIGH severity issues
+5. If HIGH issues exist:
+   - Propose targeted fixes
+   - Dispatch to the responsible agent (MechanicsArchitect for economy issues, DetailsArchitect for rule gaps, ComponentDesigner for missing pieces)
+   - Re-run critique (up to 1 additional iteration, max 2 total)
+6. Exit when no HIGH issues remain AND fun score ≥ 7/10
 
 ---
 
 ## Step 7: Save & Compile
 
-1. **Finalize Rulebook**: Run `promote_draft` to move the draft to `latest.json`.
-2. **Compile**: Trigger `compile_markdown_rulebook` to generate the human-readable Markdown version.
-3. **Rebuild Index**: Call `rebuild_reference_index` to ensure all new references are indexed.
-4. **Game Brief**: Call `save_reference` to create a permanent summary artifact:
+1. **Finalize**: Call `promote_draft` to move draft to `latest.json`
+2. **Compile**: Call `compile_markdown_rulebook` to generate human-readable Markdown
+3. **Rebuild Index**: Call `rebuild_reference_index` to update reference library
+4. **Game Brief**: Call `save_reference` with:
    - `name`: `{gameSlug}-brief`
    - `game`: `{gameSlug}`
    - `version`: `latest`
    - `type`: `game-brief`
-   - `content`: A ~200-word summary covering:
-     - Theme sentence
-     - Player count and playtime
-     - Key mechanisms (3-5 bullet points with themed names)
-     - Notable component highlights
-     - Win condition
-     - Balance verdict and fun score from critique
-5. **Version Snapshot**: Call `create_version` with tag `v1.0` to create an immutable snapshot of the generated design.
+   - `content`: A ~200-word summary drawn from all design steps covering theme, player count, mechanisms, components, and win condition
+
+**Done**: The game is fully designed, critiqued, compiled, and persisted.
 
 ---
 
-## Pipeline Summary
+## Key Differences from v1
 
-```
-Step 0:   Initialize Workspace
-Step 1:   MechanicsArchitect    → Mechanism Slate
-Step 1.5: Mechanics Coherence Check (lightweight gate)
-Step 2:   ThemeWeaver            → Thematic Blueprint
-Step 3:   ComponentDesigner      → Component Manifest
-Step 3.5: Consistency Gate       (script-based validation)
-Step 4:   DetailsArchitect       → Complete Rulebook + Setup Manifest
-Step 4.5: SetupValidator         → Setup Validation Report (gate)
-Step 5:   Playtest Simulation    → 2-3 turns simulated via MCP tools
-Step 6:   Critique & Refinement  → Balance Report + Fun Factor Report (with fix loops)
-Step 7:   Save & Compile         → Final artifacts persisted
-```
-
-**Total Agents Spawned**: 7 (mechanics-architect, theme-weaver, component-designer, details-architect, setup-validator, balance-critic, fun-factor-judge)
-
-**Agent Execution Model**: Each agent follows a 4-phase pattern:
-1. Context Loading (MCP calls to load prior work)
-2. Research (cross-reference existing games)
-3. Creative Execution (structured output)
-4. Self-Persistence (log step + save references + update draft)
+- **Step 1.5**: Lite consistency check after mechanics selection (catch structural issues early)
+- **Step 4.5**: SetupValidator agent validates setup completeness before playtest
+- **Step 5**: NEW playtest simulation step simulates actual gameplay turns
+- **Step 6**: Critique now dispatches fixes to specific agents (not generic `update_rule`)
+- **Agents self-persist**: Each agent calls its own MCP tools; orchestrator coordinates sequencing
