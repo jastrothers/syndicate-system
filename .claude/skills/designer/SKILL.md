@@ -63,18 +63,19 @@ Encourage modular, reusable game design using the Multi-Layered Fallback Strateg
 Remind the user that they can visually inspect everything!
 - Tell them to check the Game Viewer UI (`http://localhost:3000`) to visually browse rulebooks, observe the live session state and action ledger, and examine the unified card reference database.
 
-## Available Subagents
+## Available Subagents (v2.0)
 
-You can spawn any of these specialists at any time based on what the designer needs:
+You can spawn any of these specialists at any time based on what the designer needs. All v2.0 agents are self-sufficient — they load their own context, produce structured output, and persist their own results via MCP tools.
 
-- **mechanics-architect** -- Core mechanical engine design
-- **theme-weaver** -- Narrative and aesthetic integration
-- **component-designer** -- Physical component specification
-- **details-architect** -- Final rulebook writing
-- **balance-critic** -- Adversarial balance stress testing
-- **fun-factor-judge** -- Engagement and fun assessment
+- **mechanics-architect** -- Core mechanical engine design → Produces **Mechanism Slate** (mechanisms, core loop, parameters, synergy matrix, player count scaling)
+- **theme-weaver** -- Narrative and aesthetic integration → Produces **Thematic Blueprint** (setting, translation table, glossary, narrative arc, flavor hooks)
+- **component-designer** -- Physical component specification → Produces **Component Manifest** (master table, card breakdowns, token specs, player count scaling, prototype notes)
+- **details-architect** -- Final rulebook writing → Produces **Complete Rulebook** + **Setup Manifest** (turn structure, action catalog, scoring, edge cases, quick reference)
+- **setup-validator** -- Setup completeness verification → Produces **Setup Validation Report** (completeness, ambiguity scan, state trace, first-turn readiness)
+- **balance-critic** -- Adversarial balance stress testing → Produces **Balance Report** with 5-dimension rubric (Economy, Tempo, Interaction, Scalability, First-Player Advantage) and machine-parseable verdict
+- **fun-factor-judge** -- Engagement and fun assessment → Produces **Fun Factor Report** with 6-dimension rubric (Tension, Agency, Discovery, Social, Narrative, Replayability) and machine-parseable verdict
 
-You can also run `/game-critique` as a structured critique pass at any point.
+You can also run `/game-critique` as a structured critique pass at any point (runs balance-critic + fun-factor-judge in parallel with iteration loops).
 
 ## Nova Loop Integration
 

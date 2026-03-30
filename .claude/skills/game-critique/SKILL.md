@@ -1,71 +1,114 @@
 ---
 name: game-critique
-description: Multi-agent pipeline to critique and evaluate a board game design. Runs consistency checks, adversarial balance analysis, and fun factor assessment with an iteration loop.
+description: Multi-agent pipeline to critique and evaluate a board game design. Runs consistency checks, adversarial balance analysis, and fun factor assessment with structured rubrics and targeted iteration loops.
 ---
 
 # Board Game Critique Workflow (/game-critique)
 
-Use this workflow to identify balance issues and assess the "fun factor" of an existing design. Requires `gameSlug`, `sessionId` arguments.
+Use this workflow to identify balance issues and assess the "fun factor" of an existing design. Requires `gameSlug` and `sessionId` arguments.
 
-**Exit criteria**: Stop iterating when **(a)** no HIGH severity balance issues remain **and (b)** fun score ≥ 7/10. Maximum **2 critique iterations** per run — if issues persist after 2 passes, surface them to the user rather than looping further.
+**Exit Criteria**: Stop iterating when **(a)** balance score ≥ 6/10 AND no HIGH severity issues remain **and (b)** fun score ≥ 7/10. Maximum **2 critique iterations** per run.
 
 ---
 
 ## Step 0: Pre-flight Compilation
 
-1. **Sync Data**: Trigger `compile_markdown_rulebook` for the target game. This ensures the Markdown rules used by the scripts are in sync with the JSON source of truth.
+1. **Sync Data**: Call `compile_markdown_rulebook` for the target game to ensure the Markdown rules are in sync with the JSON source of truth.
 
 ---
 
 ## Step 1: Consistency Check
 
-1. **Run Script**: `npx ts-node .claude/skills/BoardGameDesign/scripts/consistency_checker.ts <path-to-design>`
-2. **Fix**: If errors are found, ask the user to adjust rules or components before proceeding.
+1. **Run Script**: `npx ts-node .claude/skills/BoardGameDesign/scripts/consistency_checker.ts game-data/{gameSlug}/rulebooks/`
+2. **Review**: If errors are found, ask the user to adjust rules or components before proceeding with critique agents.
 
 ---
 
-## Step 2 & 3: Adversarial Balance Review + Fun Factor Assessment (run in parallel)
+## Step 2 & 3: Balance + Fun Assessment (run in parallel)
 
-Spawn **both** subagents simultaneously in a single message. Each receives `sessionId` and `gameSlug` for context loading. Collect both outputs before proceeding to Step 4.
+Spawn **both** subagents simultaneously. Each receives `sessionId` and `gameSlug` for context loading.
 
-### balance-critic subagent
+### BalanceCritic Subagent
 
 #### Phase 1: Context Loading
-See `balance-critic` agent spec — loads `get_design_session` + `get_full_rulebook_markdown`.
+- Load design session + full rulebook
+- Run balance_critic.ts script if available
+- Extract economic parameters and mechanism specs
 
 #### Phase 2: Adversarial Execution
-1. Run adversarial simulations or mental stress tests.
-2. Identify HIGH, MEDIUM, and LOW severity issues with proposed fixes.
-3. If applicable, invoke the balance script: `npx ts-node .claude/skills/BoardGameDesign/scripts/balance_critic.ts <path-to-design>`
+- Stress-test 5 dimensions: Economy, Tempo, Interaction, Scalability, First-Player Advantage
+- Hunt for exploits, infinite loops, dominant strategies
+- Identify HIGH/MEDIUM/LOW severity issues
 
 #### Phase 3: Persistence
-1. **Log**: Call `add_design_step` with the balance report.
-2. **Present**: Surface the balance findings.
+- Call `add_design_step` with the balance report
+- Return machine-parseable verdict block
 
-**Output**: Balance Report identifying severity-tagged issues.
+**Output**: Structured Balance Report with:
+- 5-dimension score table (1-10 per dimension)
+- Issue catalog (severity, category, fix recommendation)
+- Overall balance score
+- Verdict: PASS | CONDITIONAL_PASS | FAIL
 
 ---
 
-### fun-factor-judge subagent
+### FunFactorJudge Subagent
 
 #### Phase 1: Context Loading
-See `fun-factor-judge` agent spec — loads `get_design_session` + `get_full_rulebook_markdown`.
+- Load design session + full rulebook
+- Extract thematic blueprint, turn structure, endgame conditions
 
 #### Phase 2: Qualitative Execution
-1. Evaluate tension — does the action economy drive meaningful choices?
-2. Identify the core "hook" and assess player satisfaction.
-3. Consider player downtime and social dynamics across 2-4 players.
+- Evaluate 6 dimensions: Tension, Agency, Discovery, Social, Narrative, Replayability
+- Simulate play mentally; identify highlight moments
+- Assess engagement curve and downtime
 
 #### Phase 3: Persistence
-1. **Log**: Call `add_design_step` with the fun factor assessment.
+- Call `add_design_step` with the fun factor report
+- Return machine-parseable verdict block
 
-**Output**: Qualitative review with a 1-10 fun score and specific engagement highlights.
+**Output**: Structured Fun Factor Report with:
+- 6-dimension score table (1-10 per dimension)
+- Overall fun score
+- Highlight moments (3-5 specific scenarios)
+- Downtime analysis
+- Verdict: EXCITING | SOLID | FLAT | TEDIOUS
 
 ---
 
 ## Step 4: Iteration Loop
 
-1. **Check exit criteria**: If no HIGH severity issues remain **and** fun score ≥ 7/10 — stop. The design passes critique.
-2. **Propose Fixes**: Suggest specific mechanical changes to address the critic's concerns.
-3. **Update**: Use `update_rule` to apply agreed-upon changes.
-4. **Re-evaluate**: Run `/game-critique` again (up to 1 additional iteration). After 2 total passes, surface remaining issues to the user instead of iterating further.
+After collecting both reports:
+
+1. **Check Exit Criteria**:
+   - Balance score ≥ 6/10 AND no HIGH severity issues?
+   - Fun score ≥ 7/10?
+   - If both yes → **PASS**. Stop here.
+
+2. **If Criteria Not Met**:
+   - Extract HIGH severity issues from BalanceCritic report
+   - Categorize each issue by responsible agent:
+     - **Economy issues** → MechanicsArchitect (adjust parameters, resource generation/drain)
+     - **Rule/pacing issues** → DetailsArchitect (rewrite turn structure, clarify mechanics)
+     - **Component issues** → ComponentDesigner (add missing pieces, rebalance quantities)
+   - Propose specific fixes for each HIGH issue
+   - Ask user to approve fixes or skip iteration
+
+3. **If Fixes Approved**:
+   - Spawn the responsible agent(s) to apply targeted fixes
+   - Each agent calls `update_rule` and/or `update_reference` as needed
+   - Re-run `/game-critique` (up to 1 additional iteration, max 2 total)
+
+4. **After 2 Iterations**:
+   - If HIGH issues remain, surface them to the user rather than looping further
+   - User can choose to proceed with known issues or continue iterating manually
+
+---
+
+## Key Differences from v1
+
+- **Structured Rubrics**: Both critics use explicit scoring dimensions (5 for balance, 6 for fun)
+- **Machine-Parseable Verdicts**: Both critics return structured verdict blocks for automation
+- **Targeted Fix Dispatch**: HIGH issues are assigned to the specific agent responsible, not generic `update_rule`
+- **Clear Exit Criteria**: Quantified thresholds (balance ≥ 6, fun ≥ 7) instead of vague "no HIGH issues"
+- **Iteration Cap**: Max 2 passes prevents infinite loops
