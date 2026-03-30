@@ -27,7 +27,7 @@ export const createDesignSessionTool = defineTool({
 
 export const addDesignStepTool = defineTool({
   name: "add_design_step",
-  description: "Logs a step in the design process (e.g., MechanicsArchitect output).",
+  description: "Logs a step in the design process (e.g., MechanicsArchitect output). Optionally includes a forensic trace block linking the step to its evidence trail.",
   schema: z.object({
     gameName: z.string().describe("The name of the game."),
     sessionId: z.string().describe("The design session ID."),
@@ -35,6 +35,12 @@ export const addDesignStepTool = defineTool({
     persona: z.string().describe("The persona performing the step (e.g., 'MechanicsArchitect')."),
     output: z.string().describe("The full output/data from the step."),
     summary: z.string().describe("A concise summary of the step's result."),
+    trace: z.object({
+      observation: z.string().describe("The measured pattern or creative choice observed."),
+      data: z.any().default(null).describe("Specific metrics, parameters, or evidence supporting the observation."),
+      mechanism: z.string().describe("The underlying design principle or mechanism at work."),
+      impact: z.string().describe("Downstream consequences for the overall game experience."),
+    }).optional().describe("Forensic trace block linking this step to its evidence trail (Nova Loop format)."),
   }),
   handler: async (args) => {
     validateGameName(args.gameName);
@@ -43,6 +49,12 @@ export const addDesignStepTool = defineTool({
       persona: args.persona,
       output: args.output,
       summary: args.summary,
+      ...(args.trace ? { trace: {
+        observation: args.trace.observation,
+        data: args.trace.data ?? null,
+        mechanism: args.trace.mechanism,
+        impact: args.trace.impact,
+      }} : {}),
     });
     return textResponse(`Successfully logged step ${args.stepNumber} to design session: ${args.sessionId}`);
   },

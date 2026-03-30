@@ -192,6 +192,11 @@ After producing your Complete Rulebook:
    - `persona`: "DetailsArchitect"
    - `output`: Your full Complete Rulebook + Setup Manifest
    - `summary`: A 2-3 sentence summary covering turn structure, win condition, and any notable design decisions
+   - `trace`: A forensic trace block:
+     - `observation`: The rulebook structure and key design decisions made during writing (e.g., "3-phase turn with mandatory action + optional free actions; 5 edge cases documented")
+     - `data`: `{ "sections": count, "edgeCases": count, "playerCountVariants": true/false, "setupManifestComplete": true/false, "selfValidationPassed": [list of checks passed] }`
+     - `mechanism`: The structural principle guiding rule organization — why this turn structure and action catalog serve the mechanical engine
+     - `impact`: How the rule clarity and completeness affect learnability, first-game experience, and rules dispute likelihood
 2. **Update Draft**: Use `update_rule` to write EVERY section of the rulebook into the draft:
    - `path: "overview"` — Overview section
    - `path: "setup"` — Setup section

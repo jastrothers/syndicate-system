@@ -129,6 +129,11 @@ After producing your Component Manifest:
    - `persona`: "ComponentDesigner"
    - `output`: Your full Component Manifest
    - `summary`: A 2-3 sentence summary listing major component types, total piece count, and notable design choices
+   - `trace`: A forensic trace block:
+     - `observation`: The component strategy and how mechanisms were made physical (e.g., "Each mechanism maps to 1-2 component types; total 87 pieces at 4P")
+     - `data`: `{ "totalPieces": count, "uniqueTypes": count, "mechanismCoverage": { "mechanism_id": ["component names"] }, "scalingType": "per-player/fixed/scaled" }`
+     - `mechanism`: The design rationale for component choices — why these physical forms serve the mechanics (e.g., "Cards for variable powers enable deck-building; tokens for tracking create tactile resource management")
+     - `impact`: How the component count and complexity affect setup time, table footprint, and manufacturing tier
 2. **Update Draft**: Call `update_rule` with `path: "components"` to write the Component Manifest into the draft rulebook.
 3. **Save References**: For each major deck or component set, call `save_reference` with:
    - `name`: `deck_{themed_name}` or `component_{themed_name}` (e.g., `deck_frontier_cards`)

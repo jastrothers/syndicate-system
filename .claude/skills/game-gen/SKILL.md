@@ -19,11 +19,13 @@ The optional `--profile` flag enables Nova preference personalisation (see Step 
 
 1. **Initialize MCP**: Run `create_design_session` with the game name and theme. Note the `sessionId` and the sanitized `gameSlug`.
 2. **Create Draft**: Use `save_draft` to initialize a draft rulebook using the `gameSlug`.
-3. **Profile (opt-in)**: Only if `--profile` was passed:
+3. **Profile Bias (opt-in)**: Only if `--profile` was passed:
    - Call `get_designer_profile`
    - Extract liked mechanisms (affinity ≥ 0.3) and disliked mechanisms (affinity ≤ -0.3)
    - Construct a **Profile Context** block to pass to the MechanicsArchitect in Step 1
-   - If `--profile` was NOT passed, skip this entirely
+   - If `--profile` was NOT passed, skip this entirely — do NOT load or use the profile for biasing decisions
+
+> **Preference Learning (always on)**: Regardless of `--profile`, this pipeline records every design decision via `record_decision` after each step (Steps 1-4, 6). This accumulates designer preference data for future use without influencing the current run.
 
 ---
 
@@ -36,9 +38,11 @@ The agent will:
 2. Cross-reference `list_references(type: "mechanism")` to check existing patterns
 3. Read `.claude/skills/BoardGameDesign/resources/mechanisms.json` taxonomy
 4. Propose 3-5 mechanisms with core parameters and synergies
-5. Call `add_design_step` to log output
+5. Call `add_design_step` to log output (with `trace` block — see Forensic Traces below)
 6. Call `save_reference` for each mechanism
 7. Call `update_rule(path: "mechanics")` to write to draft
+
+**After the agent completes**: Call `record_decision` with `decision: "accept"`, a rationale summarizing the key mechanism choices, and `impactedMechanisms` listing the selected mechanism IDs. This feeds the preference learning system without biasing the current run.
 
 ---
 
@@ -61,8 +65,10 @@ The agent will:
 1. Load design session and extract Mechanism Slate from Step 1
 2. Map every mechanism to thematic concepts
 3. Define setting, player identity, and narrative arc
-4. Call `add_design_step` to log output
+4. Call `add_design_step` to log output (with `trace` block)
 5. Call `update_rule(path: "overview")` and `update_rule(path: "metadata.thematicBrief")`
+
+**After the agent completes**: Call `record_decision` with `decision: "accept"`, a rationale summarizing the thematic direction, and `impactedMechanisms` listing the mechanism IDs that were themed.
 
 ---
 
@@ -74,9 +80,11 @@ The agent will:
 1. Load design session, extract Mechanism Slate and Thematic Blueprint
 2. Specify all physical components with exact quantities
 3. Define player-count scaling for each component
-4. Call `add_design_step` to log output
+4. Call `add_design_step` to log output (with `trace` block)
 5. Call `update_rule(path: "components")` to write Component Manifest to draft
 6. Call `save_reference` for each major deck/component set
+
+**After the agent completes**: Call `record_decision` with `decision: "accept"`, a rationale summarizing the component strategy, and `impactedMechanisms` listing mechanisms that each component supports.
 
 ---
 
@@ -102,9 +110,11 @@ The agent will:
 2. Define complete turn structure with unambiguous rules
 3. Cross-validate components against gameplay rules
 4. Create a machine-readable Setup Manifest
-5. Call `add_design_step` to log output
+5. Call `add_design_step` to log output (with `trace` block)
 6. Call `update_rule` for every rulebook section (overview, setup, turn-structure, actions, scoring, special-rules, edge-cases, quick-reference)
 7. Call `save_reference(name: "setup_manifest", type: "setup")`
+
+**After the agent completes**: Call `record_decision` with `decision: "accept"`, a rationale summarizing the rulebook structure and key design choices, and `impactedMechanisms` listing all mechanisms that now have written rules.
 
 ---
 
@@ -155,6 +165,8 @@ Run the `/game-critique` skill against the `gameSlug` with `sessionId` and `game
    - Re-run critique (up to 1 additional iteration, max 2 total)
 6. Exit when no HIGH issues remain AND fun score ≥ 7/10
 
+**After critique completes**: For each fix that was applied, call `record_decision` with `decision: "accept"`, a rationale describing the fix, and the `impactedMechanisms`. For any unresolved issues surfaced to the user, call `record_decision` with `decision: "defer"`.
+
 ---
 
 ## Step 7: Save & Compile
@@ -173,8 +185,37 @@ Run the `/game-critique` skill against the `gameSlug` with `sessionId` and `game
 
 ---
 
+## Forensic Traces
+
+Every subagent step (1-4) includes a `trace` block in its `add_design_step` call. This is the Nova Loop evidence format:
+
+```json
+{
+  "observation": "What was produced or decided",
+  "data": { "key_metrics": "or parameters" },
+  "mechanism": "The design principle or mechanism driving the decision",
+  "impact": "How this affects the overall game experience"
+}
+```
+
+Example (MechanicsArchitect):
+```json
+{
+  "observation": "Selected action-point system with 3 AP per turn as the core loop driver",
+  "data": { "mechanisms": ["action_points", "set_collection", "area_control"], "complexity": 3 },
+  "mechanism": "Action points create tension through constrained choice; set collection provides a secondary goal that rewards long-term planning",
+  "impact": "Players face meaningful decisions each turn without analysis paralysis; 3 AP keeps turns under 2 minutes"
+}
+```
+
+These traces are persisted in the design session and can be reviewed via `get_design_session(includeFull: true)`. The `/designer` skill's Nova Loop uses them for `synthesize_nova_advice`.
+
+---
+
 ## Key Differences from v1
 
+- **Forensic Traces**: Every subagent step includes a `trace` block linking decisions to evidence (GameGrammar 2.0 "Forensic Persistence")
+- **Always-On Preference Learning**: `record_decision` is called after every step, accumulating designer preferences for future runs — without biasing the current run (bias requires explicit `--profile`)
 - **Step 1.5**: Lite consistency check after mechanics selection (catch structural issues early)
 - **Step 4.5**: SetupValidator agent validates setup completeness before playtest
 - **Step 5**: NEW playtest simulation step simulates actual gameplay turns
