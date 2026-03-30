@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  setup:
+    name: Setup repo + Node
+    runs-on: ubuntu-latest
+    outputs:
+      node-version: ${{ steps.set-node.outputs.node-version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set Node version
+        id: set-node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: game-rules-system-mcp/package-lock.json
+
+      - name: Verify environment
+        run: |
+          node --version
+          npm --version
+
+  game-rules-system-mcp:
+    name: Build & test game-rules-system-mcp
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Use workspace
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./game-rules-system-mcp
+
+      - name: Build
+        run: npm run build
+        working-directory: ./game-rules-system-mcp
+
+      - name: Test
+        run: npm test
+        working-directory: ./game-rules-system-mcp
+
+  game-viewer:
+    name: Build game-viewer
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Use workspace
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./game-viewer
+
+      - name: Build
+        run: npm run build
+        working-directory: ./game-viewer
+
