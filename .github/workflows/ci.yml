@@ -33,6 +33,9 @@ jobs:
     name: Build & test game-rules-system-mcp
     runs-on: ubuntu-latest
     needs: setup
+    strategy:
+      matrix:
+        test-suite: [unit, integration, e2e]
     steps:
       - name: Use workspace
         uses: actions/checkout@v4
@@ -45,9 +48,39 @@ jobs:
         run: npm run build
         working-directory: ./game-rules-system-mcp
 
-      - name: Test
-        run: npm run test:unit
+      - name: Run tests (${{ matrix.test-suite }})
+        run: npm run test:${{ matrix.test-suite }}
         working-directory: ./game-rules-system-mcp
+        timeout-minutes: 10
+
+      - name: Generate coverage report
+        if: matrix.test-suite == 'unit'
+        run: npm run test:coverage
+        working-directory: ./game-rules-system-mcp
+
+      - name: Upload coverage
+        if: matrix.test-suite == 'unit' && always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: game-rules-system-mcp/.test-coverage/
+          retention-days: 7
+
+      - name: Comment on PR with test results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = '${{ job.status }}';
+            const suite = '${{ matrix.test-suite }}';
+            let comment = `## Test Results: ${suite}\n\n`;
+            comment += `Status: ${status === 'success' ? '✅ PASSED' : '❌ FAILED'}\n`;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
 
   game-viewer:
     name: Build game-viewer
