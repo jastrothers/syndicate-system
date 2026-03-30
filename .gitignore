@@ -3,5 +3,6 @@ game-rules-system-mcp/build/
 game-data/_test_*/
 .vite/
 *.log
+*.db
 settings.local.json
 .vscode/
