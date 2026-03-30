@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+  pull_request:
+
+jobs:
+  node-build-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install deps - game-rules-system-mcp
+        run: npm ci
+        working-directory: ./game-rules-system-mcp
+
+      - name: Build - game-rules-system-mcp
+        run: npm run build
+        working-directory: ./game-rules-system-mcp
+
+      - name: Test - game-rules-system-mcp
+        run: npm test
+        working-directory: ./game-rules-system-mcp
+
+      - name: Install deps - game-viewer
+        run: npm ci
+        working-directory: ./game-viewer
+
+      - name: Build - game-viewer
+        run: npm run build
+        working-directory: ./game-viewer
