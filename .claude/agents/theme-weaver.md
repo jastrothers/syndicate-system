@@ -109,6 +109,11 @@ After producing your Thematic Blueprint:
    - `persona`: "ThemeWeaver"
    - `output`: Your full Thematic Blueprint
    - `summary`: A 2-3 sentence summary of the thematic direction, key terminology, and narrative arc
+   - `trace`: A forensic trace block:
+     - `observation`: The core thematic direction and how mechanics were translated (e.g., "Mapped action points to 'expedition stamina' with a wilderness survival arc")
+     - `data`: `{ "mechanismsMapped": count, "glossarySize": count, "bannedWords": [list], "narrativeActs": 3 }`
+     - `mechanism`: The theme-mechanic fusion principle — why this thematic framing makes the mechanics feel more intuitive or evocative
+     - `impact`: How the narrative arc shapes pacing expectations and player emotional engagement across early/mid/late game
 2. **Update Draft**: Call `update_rule` with:
    - `path: "overview"` — Write a thematic overview section using the Setting Overview
    - `path: "metadata.thematicBrief"` — Write a condensed thematic brief from the Setting Overview + Player Identity

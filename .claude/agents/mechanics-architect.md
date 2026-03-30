@@ -119,6 +119,11 @@ After producing your Mechanism Slate:
    - `persona`: "MechanicsArchitect"
    - `output`: Your full Mechanism Slate
    - `summary`: A 2-3 sentence summary of your selections and core loop
+   - `trace`: A forensic trace block:
+     - `observation`: The core mechanical identity chosen (e.g., "Selected action-point system with set collection as the engine")
+     - `data`: `{ "mechanisms": [list of mechanism IDs], "totalComplexity": sum, "synergies": [key synergy pairs] }`
+     - `mechanism`: Why these mechanisms work together — the design principle driving the selection
+     - `impact`: How this mechanical foundation shapes the player experience (tension type, decision space, estimated game length)
 2. **Save References**: For each selected mechanism, call `save_reference` with:
    - `name`: `mechanism_{id}` (e.g., `mechanism_action_points`)
    - `game`: The `gameSlug`
