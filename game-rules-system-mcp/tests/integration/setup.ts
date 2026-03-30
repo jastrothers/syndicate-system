@@ -4,12 +4,19 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import os from "node:os";
 
-export async function setupTestServer(testId: string) {
+export interface SetupOptions {
+  /** Reuse an existing data directory instead of creating a fresh one. */
+  dataDir?: string;
+  /** If true, cleanup() will close the transport but NOT delete the data directory. */
+  keepDataOnClose?: boolean;
+}
+
+export async function setupTestServer(testId: string, options: SetupOptions = {}) {
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
   const serverPath = path.join(__dirname, "..", "..", "src", "index.js");
-  const TEST_DATA_DIR = path.join(os.tmpdir(), `test-mcp-int-${testId}-${Date.now()}`);
+  const TEST_DATA_DIR = options.dataDir ?? path.join(os.tmpdir(), `test-mcp-int-${testId}-${Date.now()}`);
   process.env.TEST_DATA_DIR = TEST_DATA_DIR;
-  
+
   const transport = new StdioClientTransport({
     command: "node",
     args: [serverPath],
@@ -22,14 +29,16 @@ export async function setupTestServer(testId: string) {
   );
 
   await client.connect(transport);
-  
+
   const cleanup = async () => {
     await transport.close();
-    try {
-      const fs = await import("fs/promises");
-      await fs.rm(TEST_DATA_DIR, { recursive: true, force: true });
-    } catch (e) {
-      console.error(`Cleanup failed for ${testId}:`, e);
+    if (!options.keepDataOnClose) {
+      try {
+        const fs = await import("fs/promises");
+        await fs.rm(TEST_DATA_DIR, { recursive: true, force: true });
+      } catch (e) {
+        console.error(`Cleanup failed for ${testId}:`, e);
+      }
     }
   };
 
