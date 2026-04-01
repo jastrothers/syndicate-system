@@ -12,6 +12,8 @@
     "test:unit": "npm run build && node --import ./build/tests/helpers/setup.js --test --test-concurrency=1 build/tests/unit/",
     "test:integration": "npm run build && node --import ./build/tests/helpers/setup.js --test --test-concurrency=1 build/tests/integration/",
     "test:e2e": "npm run build && node --import ./build/tests/helpers/setup.js --test --test-concurrency=1 build/tests/e2e/",
+    "test:coverage": "npm run build && node --import ./build/tests/helpers/setup.js --test --test-concurrency=1 --test-coverage build/tests/",
+    "test:watch": "tsc --watch --onSuccess 'npm run test:unit'",
     "validate": "npx tsx tests/harness/validatePipelineOutput.ts",
     "cleanup:test": "node build/scripts/cleanup-test-data.js"
   },
