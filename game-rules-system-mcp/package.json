@@ -8,9 +8,9 @@
     "build": "tsc",
     "start": "node build/src/index.js",
     "dev": "tsc --watch",
-    "test": "npm run build && node --import ./build/tests/helpers/setup.js --test --test-concurrency=1 build/tests/**/*.test.js",
-    "test:unit": "npm run build && node --import ./build/tests/helpers/setup.js --test --test-concurrency=1 build/tests/unit/**/*.test.js",
-    "test:e2e": "npm run build && node --import ./build/tests/helpers/setup.js --test --test-concurrency=1 build/tests/e2e/**/*.test.js",
+    "test": "npm run build && node --import ./build/tests/helpers/setup.js --test --test-concurrency=1 build/tests/",
+    "test:unit": "npm run build && node --import ./build/tests/helpers/setup.js --test --test-concurrency=1 build/tests/unit/",
+    "test:e2e": "npm run build && node --import ./build/tests/helpers/setup.js --test --test-concurrency=1 build/tests/e2e/",
     "validate": "npx tsx tests/harness/validatePipelineOutput.ts",
     "cleanup:test": "node build/scripts/cleanup-test-data.js"
   },
