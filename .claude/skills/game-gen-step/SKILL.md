@@ -11,7 +11,7 @@ Run the same multi-agent game generation pipeline as `/game-gen`, but **one phas
 
 **Usage**:
 ```
-/game-gen-step "<Theme>" [--profile]        # New game: runs init + mechanics
+/game-gen-step "<Theme>" [--profile] [--mechanics "mech_id1,mech_id2,..."]  # New game: runs init + mechanics
 /game-gen-step --continue [<sessionId>]      # Next phase of existing session
 /game-gen-step --phase <name> [<sessionId>]  # Run a specific phase (re-run or skip)
 /game-gen-step --status [<sessionId>]        # Show progress dashboard
@@ -42,17 +42,33 @@ When invoked with a theme string, run `init` + `mechanics` together (init alone 
 ### Step 0: Initialize
 
 1. Derive a game name from the theme (e.g., "Deep sea creature evolution" → "Deep Sea Creature Evolution").
-2. Call `create_design_session` with the game name, theme, and the full user prompt as `initialPrompt`. Note the returned `sessionId` and `gameSlug`.
+2. Call `create_design_session` with the game name, theme, the full user prompt as `initialPrompt`, and optionally `prePickedMechanics` (see step 5 below). Note the returned `sessionId` and `gameSlug`.
 3. Call `save_draft` to initialize a draft rulebook using the `gameSlug`.
 4. **Profile Bias (opt-in)**: Only if `--profile` was passed:
    - Call `get_designer_profile`
    - Extract liked mechanisms (affinity ≥ 0.3) and disliked mechanisms (affinity ≤ -0.3)
    - Construct a **Profile Context** block to pass to the MechanicsArchitect
    - If `--profile` was NOT passed, skip this entirely
+5. **Mechanics Pre-Pick (opt-in)**: Only if `--mechanics` was passed:
+   - Parse the comma-separated list into individual mechanism IDs
+   - Normalise any hyphens to underscores (e.g. `area-control` → `area_control`)
+   - Read `.claude/skills/BoardGameDesign/resources/mechanisms.json` and extract all valid IDs
+   - Validate each provided ID exists in the taxonomy. If any ID is unknown, report the invalid ID(s), list the valid IDs, and stop — do not continue the pipeline
+   - Validate the list has at most 6 entries; if more than 6, report the error and stop
+   - Pass the validated list to `create_design_session` as `prePickedMechanics`
+   - Construct a **Pre-Picked Mechanics** block to pass to the MechanicsArchitect:
+     ```
+     ### Pre-Picked Mechanics
+     The following mechanism IDs have been pre-selected by the user and are non-negotiable anchors:
+     - {id1}
+     - {id2}
+     ...
+     ```
+   - If both `--profile` and `--mechanics` are provided: pre-picks take priority as anchors; include the **Profile Context** block so the MechanicsArchitect can use profile affinities when filling any remaining slots
 
 ### Step 1: MechanicsArchitect
 
-Spawn the `mechanics-architect` subagent with `sessionId`, `gameSlug`, `theme`, and optionally the **Profile Context** block.
+Spawn the `mechanics-architect` subagent with `sessionId`, `gameSlug`, `theme`, and optionally the **Profile Context** block and/or the **Pre-Picked Mechanics** block.
 
 The agent self-persists via `add_design_step`, `save_reference`, and `update_rule`.
 
@@ -95,7 +111,7 @@ To continue: /game-gen-step --continue
 
 If `sessionId` is provided:
 - Glob `game-data/*/design/{sessionId}.json` to find the matching file and derive `gameSlug` from the parent directory path.
-- Call `get_design_session(gameName, sessionId, includeFull: false)` to load step summaries. **Note:** The session includes `initialPrompt` if it was provided during initialization — use it for context if you need to re-run or iterate on the design from the original intent.
+- Call `get_design_session(gameName, sessionId, includeFull: false)` to load step summaries. **Note:** The session includes `initialPrompt` and `prePickedMechanics` if they were provided during initialization. Use `initialPrompt` for context on the original intent. If `prePickedMechanics` is present, reconstruct the **Pre-Picked Mechanics** block and pass it to the MechanicsArchitect if the `mechanics` phase still needs to run — do NOT re-prompt the user for mechanics on resume.
 
 If `sessionId` is NOT provided:
 - Run: `ls -t game-data/*/design/*.json | head -10`

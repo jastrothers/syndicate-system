@@ -117,4 +117,19 @@ describe("DesignStore Units", () => {
     const retrieved = await getDesignSession(testGame, session.sessionId);
     assert.strictEqual(retrieved.initialPrompt, undefined, "Retrieved session should have undefined initialPrompt");
   });
+
+  it("createDesignSession stores prePickedMechanics when provided as 4th arg and round-trips through getDesignSession", async () => {
+    const picks = ["hand_management", "deck_building", "area_control"];
+    const session = await createDesignSession(testGame, "Pre-Pick Game", "Full prompt text.", picks);
+    assert.deepStrictEqual(session.prePickedMechanics, picks, "Session should have prePickedMechanics");
+    const retrieved = await getDesignSession(testGame, session.sessionId);
+    assert.deepStrictEqual(retrieved.prePickedMechanics, picks, "Retrieved session should preserve prePickedMechanics");
+  });
+
+  it("createDesignSession works without prePickedMechanics (backward compat), field is undefined", async () => {
+    const session = await createDesignSession(testGame, "No Pre-Pick Game");
+    assert.strictEqual(session.prePickedMechanics, undefined, "prePickedMechanics should be undefined");
+    const retrieved = await getDesignSession(testGame, session.sessionId);
+    assert.strictEqual(retrieved.prePickedMechanics, undefined, "Retrieved session should have undefined prePickedMechanics");
+  });
 });

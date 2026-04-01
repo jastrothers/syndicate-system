@@ -43,6 +43,18 @@ If a **Profile Context** block is present in your input (listing `Liked` and `Di
 - **Avoid** disliked mechanisms unless no reasonable alternative exists. If you must use one, justify it.
 - If no Profile Context block is present, ignore this directive entirely.
 
+### Pre-Picked Mechanics (opt-in)
+
+If a **Pre-Picked Mechanics** block is present in your input (listing mechanism IDs):
+- These are **non-negotiable anchors**. Include ALL of them in your final slate.
+- Still run your full synergy analysis, compatibility checks, and complexity budgeting on the pre-picked set.
+- If the pre-picked set has **fewer than 3** mechanisms, fill to 3-5 with your own selections based on theme alignment and synergy with the anchors.
+- If the pre-picked set has **3-5** mechanisms, you MAY add one complementary mechanism but are not required to.
+- If the pre-picked set has **6** mechanisms, do NOT add more. Validate the set and report any synergy concerns in the Synergy Matrix.
+- If a pre-picked mechanism has poor synergy with the others, **flag it** in the Synergy Matrix but do NOT remove it — the user chose it deliberately.
+- Mark pre-picked mechanisms with `[PRE-PICKED]` in the Justification column of the Mechanism Slate table.
+- If no Pre-Picked Mechanics block is present, ignore this directive entirely.
+
 ### Creative Freedom
 
 You are NOT limited to the taxonomy. If the theme demands a novel mechanism not in `mechanisms.json`, invent it. Assign it a complexity score (1-5), describe its synergies with your other selections, and flag it as `[CUSTOM]` in your output.
@@ -121,7 +133,7 @@ After producing your Mechanism Slate:
    - `summary`: A 2-3 sentence summary of your selections and core loop
    - `trace`: A forensic trace block:
      - `observation`: The core mechanical identity chosen (e.g., "Selected action-point system with set collection as the engine")
-     - `data`: `{ "mechanisms": [list of mechanism IDs], "totalComplexity": sum, "synergies": [key synergy pairs] }`
+     - `data`: `{ "mechanisms": [list of mechanism IDs], "prePickedCount": N, "autoFilledCount": M, "totalComplexity": sum, "synergies": [key synergy pairs] }`
      - `mechanism`: Why these mechanisms work together — the design principle driving the selection
      - `impact`: How this mechanical foundation shapes the player experience (tension type, decision space, estimated game length)
 2. **Save References**: For each selected mechanism, call `save_reference` with:
@@ -138,7 +150,8 @@ After producing your Mechanism Slate:
 
 Before returning your output, verify:
 
-- [ ] 3-5 mechanisms selected, all with IDs and complexity scores
+- [ ] 3-6 mechanisms selected (3-5 normally; up to 6 if pre-picks fill the slate), all with IDs and complexity scores
+- [ ] All pre-picked mechanisms are present and marked `[PRE-PICKED]` in the Justification column
 - [ ] Total complexity is within the target range for the intended weight
 - [ ] Core loop has clear phases (acquisition → transformation → scoring)
 - [ ] Every mechanism has at least 2 specific parameters with concrete values

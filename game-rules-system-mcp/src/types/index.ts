@@ -105,6 +105,7 @@ export interface DesignSession {
   gameName: string;
   theme: string;
   initialPrompt?: string;
+  prePickedMechanics?: string[];
   steps: DesignStep[];
   status: "active" | "completed" | "archived";
   createdAt: string;
