@@ -174,6 +174,15 @@ ENGAGEMENT_CURVE: {Rising | Flat | Inverted-U | Front-Loaded | Back-Loaded}
 2. **[{Dimension}]** {Specific suggestion}
 3. **[{Dimension}]** {Specific suggestion}
 {3-5 suggestions total}
+
+#### Simulation Evidence
+
+{If a Simulation Report was loaded in Phase 1, summarize how empirical play data informed your analysis. If no simulation data was available, write "No simulation data — theoretical analysis only."}
+
+- **Game Length Variance → Engagement Curve**: {observed pacing vs. your curve assessment}
+- **Dead Actions → Agency**: {action utilization rate vs. your Agency score}
+- **Strategy Diversity → Discovery & Replayability**: {skill gradient vs. your scores}
+- **Tension Moments observed → Tension score**: {empirical moments vs. your theoretical expectation}
 ```
 
 ---
@@ -183,7 +192,7 @@ ENGAGEMENT_CURVE: {Rising | Flat | Inverted-U | Front-Loaded | Back-Loaded}
 After producing your Fun Factor Report:
 
 1. **Log Step**: Call `add_design_step` with:
-   - `stepNumber`: 6 (or the appropriate step number in the pipeline)
+   - `stepNumber`: 6
    - `persona`: "FunFactorJudge"
    - `output`: Your full Fun Factor Report
    - `summary`: A 2-3 sentence summary including the verdict, overall score, strongest and weakest dimensions

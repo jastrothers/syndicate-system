@@ -159,6 +159,16 @@ BLOCKING: {YES if any HIGH issues exist, NO otherwise}
 2. **[HIGH]** {Fix description} → Assign to: {agent}
 3. **[MEDIUM]** {Fix description} → Assign to: {agent}
 {...}
+
+#### Simulation Evidence
+
+{If a Simulation Report was loaded in Phase 1, summarize how empirical data supported or contradicted your theoretical findings. If no simulation data was available, write "No simulation data — theoretical analysis only."}
+
+- **Seat Advantage → First-Player Advantage**: {empirical finding vs. your score}
+- **Strategy Diversity → Dominant Strategies**: {empirical finding vs. your analysis}
+- **Dead Actions → Trap Options**: {empirical finding vs. your analysis}
+- **Resource Flow → Economy**: {empirical finding vs. your Economy score}
+- **Game Length Variance → Tempo**: {empirical finding vs. your Tempo score}
 ```
 
 ---
@@ -168,7 +178,7 @@ BLOCKING: {YES if any HIGH issues exist, NO otherwise}
 After producing your Balance Report:
 
 1. **Log Step**: Call `add_design_step` with:
-   - `stepNumber`: 5 (or the appropriate step number in the pipeline)
+   - `stepNumber`: 6
    - `persona`: "BalanceCritic"
    - `output`: Your full Balance Report
    - `summary`: A 2-3 sentence summary including the verdict, overall score, and count of HIGH issues

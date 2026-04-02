@@ -163,7 +163,10 @@ The agent:
 4. Produces a Simulation Report with 4 heuristic scores (Seat Advantage, Strategy Diversity, Dead Actions, Game Length Variance)
 5. Self-persists via `add_design_step` (stepNumber: 5, persona: "SimulationRunner") and `save_reference` (name: "simulation_report")
 
-**After**: Call `record_decision` with `decision: "accept"`, a rationale summarizing the simulation findings, and `impactedMechanisms` for any mechanisms flagged by the report.
+**After**: Call `record_decision` based on the simulation verdict:
+- **PASS** → `decision: "accept"`, rationale summarizing the simulation findings, `impactedMechanisms` for any flagged mechanisms
+- **CONCERNS** → `decision: "defer"`, rationale noting which metrics were borderline
+- **FAIL** → `decision: "reject"`, rationale listing metrics below threshold; surface findings to the user and ask whether to proceed to Step 6 or iterate
 
 ---
 
