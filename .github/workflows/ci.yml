@@ -6,6 +6,10 @@ on:
     branches: ['**']
   pull_request:
 
+permissions:
+  issues: write
+  pull-requests: write
+
 jobs:
   setup:
     name: Setup repo + Node
@@ -20,7 +24,7 @@ jobs:
         id: set-node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
           cache-dependency-path: game-rules-system-mcp/package-lock.json
 
@@ -33,9 +37,19 @@ jobs:
     name: Build & test game-rules-system-mcp
     runs-on: ubuntu-latest
     needs: setup
+    strategy:
+      matrix:
+        test-suite: [unit, integration, e2e]
     steps:
       - name: Use workspace
         uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: game-rules-system-mcp/package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -45,9 +59,25 @@ jobs:
         run: npm run build
         working-directory: ./game-rules-system-mcp
 
-      - name: Test
-        run: npm run test:unit
+      - name: Run tests (${{ matrix.test-suite }})
+        run: npm run test:${{ matrix.test-suite }}
         working-directory: ./game-rules-system-mcp
+        timeout-minutes: 10
+
+      - name: Generate coverage report
+        if: always() && matrix.test-suite == 'unit'
+        run: |
+          mkdir -p .test-coverage
+          npm run test:coverage | tee .test-coverage/report.txt || true
+        working-directory: ./game-rules-system-mcp
+
+      - name: Upload coverage
+        if: matrix.test-suite == 'unit' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: game-rules-system-mcp/.test-coverage/
+          retention-days: 7
 
   game-viewer:
     name: Build game-viewer
@@ -57,6 +87,13 @@ jobs:
       - name: Use workspace
         uses: actions/checkout@v4
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: game-viewer/package-lock.json
+
       - name: Install dependencies
         run: npm ci
         working-directory: ./game-viewer
@@ -64,4 +101,3 @@ jobs:
       - name: Build
         run: npm run build
         working-directory: ./game-viewer
-
