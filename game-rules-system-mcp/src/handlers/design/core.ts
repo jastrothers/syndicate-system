@@ -18,10 +18,11 @@ export const createDesignSessionTool = defineTool({
     gameName: z.string().describe("The name of the game being designed."),
     theme: z.string().describe("The core theme or high-level concept."),
     initialPrompt: z.string().describe("The full user prompt that initiated this design session."),
+    prePickedMechanics: z.array(z.string()).optional().describe("Optional list of mechanism IDs pre-selected by the user (max 6). IDs use underscores (e.g. hand_management, deck_building)."),
   }),
   handler: async (args) => {
     validateGameName(args.gameName);
-    const session = await createDesignSession(args.gameName, args.theme, args.initialPrompt);
+    const session = await createDesignSession(args.gameName, args.theme, args.initialPrompt, args.prePickedMechanics);
     return jsonResponse(session);
   },
 });
@@ -87,6 +88,7 @@ export const getDesignSessionTool = defineTool({
       gameName: session.gameName,
       theme: session.theme,
       initialPrompt: session.initialPrompt,
+      prePickedMechanics: session.prePickedMechanics,
       status: session.status,
       createdAt: session.createdAt,
       lastUpdatedAt: session.lastUpdatedAt,
