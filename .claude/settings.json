@@ -31,6 +31,26 @@
             "command": "node -e \"const p = process.env.TOOL_INPUT_FILE_PATH || process.env.CLAUDE_TOOL_INPUT_FILE_PATH || ''; if (p.match(/rulebooks[\\\\/]latest\\.json/)) { process.stdout.write('Direct edit blocked: use the update_rule MCP tool to modify latest.json'); process.exit(2); }\""
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"const p = process.env.TOOL_INPUT_FILE_PATH || process.env.CLAUDE_TOOL_INPUT_FILE_PATH || ''; if (p.endsWith('.db')) { process.stdout.write('Direct DB edit blocked: use the appropriate MCP tool (rebuild_reference_index, etc.)'); process.exit(2); }\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"const p = process.env.TOOL_INPUT_FILE_PATH || process.env.CLAUDE_TOOL_INPUT_FILE_PATH || ''; if (!p.includes('game-rules-system-mcp') || !/\\.ts$/.test(p)) process.exit(0); const {execSync} = require('child_process'); const root = p.substring(0, p.indexOf('game-rules-system-mcp') + 'game-rules-system-mcp'.length); try { execSync('npx tsc --noEmit', {cwd: root, timeout: 30000, stdio: 'pipe'}); } catch(e) { process.stdout.write('TypeScript errors:\\n' + ((e.stdout||e.stderr||Buffer.from('')).toString().slice(0,2000))); process.exit(2); }\""
+          }
+        ]
       }
     ]
   }
