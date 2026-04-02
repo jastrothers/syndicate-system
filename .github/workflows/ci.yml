@@ -65,10 +65,10 @@ jobs:
         timeout-minutes: 10
 
       - name: Generate coverage report
-        if: matrix.test-suite == 'unit'
+        if: always() && matrix.test-suite == 'unit'
         run: |
           mkdir -p .test-coverage
-          npm run test:coverage | tee .test-coverage/report.txt
+          npm run test:coverage | tee .test-coverage/report.txt || true
         working-directory: ./game-rules-system-mcp
 
       - name: Upload coverage
