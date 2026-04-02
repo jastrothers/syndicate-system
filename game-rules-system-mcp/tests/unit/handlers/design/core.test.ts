@@ -46,6 +46,37 @@ describe("createDesignSessionTool", () => {
     const noPrompt = createDesignSessionTool.schema.safeParse({ gameName: "heist", theme: "noir" });
     assert.ok(!noPrompt.success, "Missing initialPrompt should fail");
   });
+
+  it("schema accepts prePickedMechanics as an optional string array", () => {
+    const withMechanics = createDesignSessionTool.schema.safeParse({
+      gameName: "heist",
+      theme: "noir",
+      initialPrompt: "Create a gritty detective game.",
+      prePickedMechanics: ["hand_management", "deck_building"],
+    });
+    assert.ok(withMechanics.success, "Should accept prePickedMechanics array");
+    assert.deepEqual(withMechanics.data?.prePickedMechanics, ["hand_management", "deck_building"]);
+  });
+
+  it("schema accepts call without prePickedMechanics (backward compat)", () => {
+    const withoutMechanics = createDesignSessionTool.schema.safeParse({
+      gameName: "heist",
+      theme: "noir",
+      initialPrompt: "Create a gritty detective game.",
+    });
+    assert.ok(withoutMechanics.success, "Should work without prePickedMechanics");
+    assert.equal(withoutMechanics.data?.prePickedMechanics, undefined);
+  });
+
+  it("schema rejects prePickedMechanics if not array of strings", () => {
+    const badType = createDesignSessionTool.schema.safeParse({
+      gameName: "heist",
+      theme: "noir",
+      initialPrompt: "Create a gritty detective game.",
+      prePickedMechanics: "hand_management,deck_building",
+    });
+    assert.ok(!badType.success, "Should reject string instead of array");
+  });
 });
 
 // ── delete_design_session ─────────────────────────────────────────────────────

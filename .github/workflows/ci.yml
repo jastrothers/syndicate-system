@@ -6,6 +6,10 @@ on:
     branches: ['**']
   pull_request:
 
+permissions:
+  issues: write
+  pull-requests: write
+
 jobs:
   setup:
     name: Setup repo + Node
@@ -20,7 +24,7 @@ jobs:
         id: set-node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
           cache-dependency-path: game-rules-system-mcp/package-lock.json
 
@@ -40,6 +44,13 @@ jobs:
       - name: Use workspace
         uses: actions/checkout@v4
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: game-rules-system-mcp/package-lock.json
+
       - name: Install dependencies
         run: npm ci
         working-directory: ./game-rules-system-mcp
@@ -54,8 +65,10 @@ jobs:
         timeout-minutes: 10
 
       - name: Generate coverage report
-        if: matrix.test-suite == 'unit'
-        run: npm run test:coverage
+        if: always() && matrix.test-suite == 'unit'
+        run: |
+          mkdir -p .test-coverage
+          npm run test:coverage | tee .test-coverage/report.txt || true
         working-directory: ./game-rules-system-mcp
 
       - name: Upload coverage
@@ -66,22 +79,6 @@ jobs:
           path: game-rules-system-mcp/.test-coverage/
           retention-days: 7
 
-      - name: Comment on PR with test results
-        if: github.event_name == 'pull_request' && always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const status = '${{ job.status }}';
-            const suite = '${{ matrix.test-suite }}';
-            let comment = `## Test Results: ${suite}\n\n`;
-            comment += `Status: ${status === 'success' ? '✅ PASSED' : '❌ FAILED'}\n`;
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
-
   game-viewer:
     name: Build game-viewer
     runs-on: ubuntu-latest
@@ -90,6 +87,13 @@ jobs:
       - name: Use workspace
         uses: actions/checkout@v4
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: game-viewer/package-lock.json
+
       - name: Install dependencies
         run: npm ci
         working-directory: ./game-viewer
@@ -97,4 +101,3 @@ jobs:
       - name: Build
         run: npm run build
         working-directory: ./game-viewer
-

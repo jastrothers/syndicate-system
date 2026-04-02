@@ -9,21 +9,39 @@ Use this workflow to generate a complete board game design from a simple theme a
 
 > **Autonomous Mode**: This workflow runs straight through from theme to finished rulebook without stopping for user feedback. For interactive co-design with preference learning, use `/designer` instead. For phase-by-phase execution (one agent per turn, resumable across chats), use `/game-gen-step` instead.
 
-**Usage**: `/game-gen "<Theme>" [--profile]`
+**Usage**: `/game-gen "<Theme>" [--profile] [--mechanics "mech_id1,mech_id2,..."]`
 
 The optional `--profile` flag enables Nova preference personalisation (see Step 0).
+
+The optional `--mechanics` flag lets you pre-select up to 6 mechanisms from the taxonomy (see `.claude/skills/BoardGameDesign/resources/mechanisms.json`). Mechanism IDs use underscores (e.g. `hand_management`, `deck_building`, `area_control`). Hyphens are also accepted and will be normalised to underscores. The MechanicsArchitect will treat these as non-negotiable anchors and build the remaining slate around them.
 
 ---
 
 ## Step 0: Initialize Workspace
 
-1. **Initialize MCP**: Run `create_design_session` with the game name, theme, and the full user prompt as `initialPrompt`. Note the `sessionId` and the sanitized `gameSlug`.
+1. **Initialize MCP**: Run `create_design_session` with the game name, theme, the full user prompt as `initialPrompt`, and optionally `prePickedMechanics` (see step 4 below). Note the `sessionId` and the sanitized `gameSlug`.
 2. **Create Draft**: Use `save_draft` to initialize a draft rulebook using the `gameSlug`.
 3. **Profile Bias (opt-in)**: Only if `--profile` was passed:
    - Call `get_designer_profile`
    - Extract liked mechanisms (affinity ≥ 0.3) and disliked mechanisms (affinity ≤ -0.3)
    - Construct a **Profile Context** block to pass to the MechanicsArchitect in Step 1
    - If `--profile` was NOT passed, skip this entirely — do NOT load or use the profile for biasing decisions
+4. **Mechanics Pre-Pick (opt-in)**: Only if `--mechanics` was passed:
+   - Parse the comma-separated list into individual mechanism IDs
+   - Normalise any hyphens to underscores (e.g. `area-control` → `area_control`)
+   - Read `.claude/skills/BoardGameDesign/resources/mechanisms.json` and extract all valid IDs
+   - Validate each provided ID exists in the taxonomy. If any ID is unknown, report the invalid ID(s), list the valid IDs, and stop — do not continue the pipeline
+   - Validate the list has at most 6 entries; if more than 6, report the error and stop
+   - Pass the validated list to `create_design_session` as `prePickedMechanics`
+   - Construct a **Pre-Picked Mechanics** block to pass to the MechanicsArchitect in Step 1:
+     ```
+     ### Pre-Picked Mechanics
+     The following mechanism IDs have been pre-selected by the user and are non-negotiable anchors:
+     - {id1}
+     - {id2}
+     ...
+     ```
+   - If both `--profile` and `--mechanics` are provided: pre-picks take priority as anchors; include the **Profile Context** block so the MechanicsArchitect can use profile affinities when filling any remaining slots
 
 > **Preference Learning (always on)**: Regardless of `--profile`, this pipeline records every design decision via `record_decision` after each step (Steps 1-4, 6). This accumulates designer preference data for future use without influencing the current run.
 
@@ -31,7 +49,7 @@ The optional `--profile` flag enables Nova preference personalisation (see Step 
 
 ## Step 1: MechanicsArchitect
 
-Spawn the `mechanics-architect` subagent with `sessionId`, `gameSlug`, `theme`, and optionally the **Profile Context** block.
+Spawn the `mechanics-architect` subagent with `sessionId`, `gameSlug`, `theme`, and optionally the **Profile Context** block and/or the **Pre-Picked Mechanics** block.
 
 The agent will:
 1. Load design session context
