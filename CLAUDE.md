@@ -8,7 +8,7 @@ A strategic deckbuilding game system split into two domains:
 
 - **The Foundry** (`syndicate-deckbuilder/`) — Theme-agnostic R&D for core mechanics (Market Churn, Tension Scaling, Wound mechanics).
 - **The Vault** (`game-rules-system-mcp/`) — Executable MCP server with 30+ tools for rulebook management, playtest simulations, card mechanics, and design assistance. Active games: *Syndicate Heist* and *PokéNursery: Blissful Beginnings*.
-- **Game Viewer** (`game-viewer/`) — Web UI to browse rulebooks, sessions, and design artifacts.
+- **Game Viewer** (`game-viewer/`) — Vanilla JS + Vite web UI with Express API backend to browse rulebooks, sessions, and design artifacts.
 - **Game Data** (`game-data/`) — Persisted JSON rulebooks, Markdown references, session ledgers, and design docs. Structure: `game-data/[game]/rulebooks|reference|sessions|design/`.
 
 ## Terminal Commands (Windows)
@@ -36,9 +36,14 @@ npm run build        # tsc → build/
 npm run dev          # watch mode (use run_in_background: true)
 npm test             # Node.js built-in test runner (serial, no concurrency)
 npm run build && npm test  # build then test
+npm run test:unit        # unit tests only
+npm run test:integration # integration tests only
+npm run test:e2e         # e2e tests only
+npm run test:coverage    # tests with experimental coverage report
+npm run validate         # run pipeline output validation harness
 ```
 
-Tests live in `tests/unit/`, `tests/integration/`, and `tests/e2e/`. There is no external test framework — uses Node's built-in `assert` and test runner. No linting is configured.
+Tests live in `tests/unit/`, `tests/integration/`, and `tests/e2e/`. Supporting infrastructure: `tests/fixtures/` (test data seeds), `tests/helpers/` (setup, utilities, reporter), `tests/harness/` (pipeline validation), `tests/validators/`. Uses Node's built-in `assert` and test runner — no external test framework. No linting is configured.
 
 To run a specific test file, compile it and invoke Node directly:
 ```bash
@@ -72,6 +77,12 @@ Frontend proxies `/api/*` to `localhost:3001`.
   - `StorageService.ts` — Atomic file ops with `proper-lockfile`
   - `MarkdownFormatter.ts` — Compiles JSON rulebooks to Markdown
   - `ValidationService.ts` — Constraint checking
+  - `ComponentStore.ts` — Component inventory management
+  - `DesignStore.ts` — Design session persistence
+  - `NovaService.ts` — Nova loop utilities
+  - `ProfileService.ts` — Designer profile management
+  - `RulebookSearch.ts` — Full-text rulebook search
+  - `SessionStats.ts` — Session statistics aggregation
 - **`config/paths.ts`** — All file path resolution helpers. Never hardcode `game-data/` paths in new code.
 - **`types/index.ts`** — Shared TypeScript types and Zod schemas.
 
@@ -84,6 +95,10 @@ Frontend proxies `/api/*` to `localhost:3001`.
 **Versioning:** Call `create_version` before major rulebook overhauls. Ensure a corresponding `reference/v[version]/` folder exists when releasing a new rulebook version.
 
 **Sanitization:** Pass all game names and version tags through `sanitizeFileName` and `sanitizeVersionTag` from `paths.ts`.
+
+## CI/CD
+
+GitHub Actions (`.github/workflows/ci.yml`) runs on `ubuntu-latest` with Node 22. Triggers on push/PR to `main` and `test-structure`. Runs: build, unit, integration, and e2e tests, and coverage report generation for the MCP server. Also builds game-viewer.
 
 ## Development Philosophy
 
