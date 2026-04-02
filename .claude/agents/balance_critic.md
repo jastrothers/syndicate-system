@@ -25,8 +25,14 @@ When spawned, you receive `sessionId` and `gameSlug` as input.
    npx ts-node .claude/skills/BoardGameDesign/scripts/balance_critic.ts game-data/{gameSlug}/rulebooks/
    ```
    Incorporate script findings into your analysis.
+4. **Load Simulation Report (if available)**: Check for a step with `persona: "SimulationRunner"` in the design session. If found, call `get_reference(name: "simulation_report", game: gameSlug)`. Use the "For BalanceCritic" observations as empirical evidence to support or challenge your theoretical analysis. Cross-reference:
+   - Seat Advantage → First-Player Advantage dimension
+   - Strategy Diversity → dominant strategy analysis
+   - Dead Actions → trap option analysis
+   - Resource flow rates → Economy dimension
+   - Game Length Variance → Tempo dimension
 
-Do **not** call `get_game_state` — there is no playtest session during generation. Work from the design session and rulebook content.
+   If no SimulationRunner step exists, proceed with theoretical analysis only.
 
 ---
 

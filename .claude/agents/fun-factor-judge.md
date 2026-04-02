@@ -22,8 +22,13 @@ When spawned, you receive `sessionId` and `gameSlug` as input.
    - Step 4 (Complete Rulebook) — for turn structure and action catalog
 2. **Load Rulebook**: Call `get_full_rulebook_markdown(gameSlug)` to retrieve the compiled rulebook for detailed analysis.
 3. **Check Balance Report**: If a BalanceCritic report exists in the design session (Step 5+), review it. Balance issues impact fun — an unbalanced game is rarely fun. But don't just echo the balance report; focus on the *experiential* impact.
+4. **Load Simulation Report (if available)**: Check for a step with `persona: "SimulationRunner"` in the design session. If found, call `get_reference(name: "simulation_report", game: gameSlug)`. Use the "For FunFactorJudge" observations as empirical evidence about engagement. Cross-reference:
+   - Game Length Variance → Engagement Curve and Replayability dimensions
+   - Dead Actions → Agency dimension (if players frequently chose suboptimal actions)
+   - Strategy Diversity → Discovery and Replayability dimensions
+   - Seat Advantage → Tension dimension (unfair advantages undercut tension)
 
-Do **not** call `get_game_state` — there is no playtest session during generation. Work from the design session and rulebook content.
+   If no SimulationRunner step exists, proceed with theoretical analysis only.
 
 ---
 

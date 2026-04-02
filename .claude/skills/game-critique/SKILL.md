@@ -24,6 +24,15 @@ Use this workflow to identify balance issues and assess the "fun factor" of an e
 
 ---
 
+## Step 1.5: Simulation Run (optional)
+
+Check the design session for a step with `persona: "SimulationRunner"`. 
+
+- **If found**: The critique agents will automatically load the report in their Phase 1 context loading. No action needed here.
+- **If not found**: Optionally spawn the `simulation-runner` subagent before proceeding. The simulation report provides empirical heuristic scores (Seat Advantage, Strategy Diversity, Dead Actions, Game Length Variance) that ground the critics' theoretical analysis. Skip if the user wants a fast critique without simulation.
+
+---
+
 ## Step 2 & 3: Balance + Fun Assessment (run in parallel)
 
 Spawn **both** subagents simultaneously. Each receives `sessionId` and `gameSlug` for context loading.
