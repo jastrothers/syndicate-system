@@ -77,22 +77,6 @@ jobs:
           path: game-rules-system-mcp/.test-coverage/
           retention-days: 7
 
-      - name: Comment on PR with test results
-        if: github.event_name == 'pull_request' && always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const status = '${{ job.status }}';
-            const suite = '${{ matrix.test-suite }}';
-            let comment = `## Test Results: ${suite}\n\n`;
-            comment += `Status: ${status === 'success' ? '✅ PASSED' : '❌ FAILED'}\n`;
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
-
   game-viewer:
     name: Build game-viewer
     runs-on: ubuntu-latest
