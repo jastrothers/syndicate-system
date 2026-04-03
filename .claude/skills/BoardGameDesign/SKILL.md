@@ -35,8 +35,9 @@ The following agents use this skill's resources:
 | **component-designer** | 3 | Component Manifest | Yes — `add_design_step` + `update_rule` + `save_reference` |
 | **details-architect** | 4 | Complete Rulebook + Setup Manifest | Yes — `add_design_step` + `update_rule` + `save_reference` |
 | **setup-validator** | 4.5 | Setup Validation Report | Yes — `add_design_step` |
-| **balance-critic** | 5/6 | Balance Report (5-dimension rubric) | Yes — `add_design_step` |
-| **fun-factor-judge** | 5/6 | Fun Factor Report (6-dimension rubric) | Yes — `add_design_step` |
+| **simulation-runner** | 5 | Simulation Report (4-metric rubric) | Yes — `add_design_step` + `save_reference` |
+| **balance-critic** | 6 | Balance Report (5-dimension rubric) | Yes — `add_design_step` |
+| **fun-factor-judge** | 6 | Fun Factor Report (6-dimension rubric) | Yes — `add_design_step` |
 
 All agents follow a 4-phase execution model:
 1. **Context Loading**: Call `get_design_session` + load relevant prior work

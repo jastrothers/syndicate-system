@@ -152,20 +152,21 @@ If NEEDS_FIXES: Use `update_rule` to apply setup corrections. Re-run SetupValida
 
 ---
 
-## Step 5: Playtest Simulation (NEW)
+## Step 5: Playtest Simulation
 
-Simulate 2-3 turns of actual gameplay using MCP playtest tools:
+Spawn the `simulation-runner` subagent with `sessionId`, `gameSlug`, and `playerCount` (default: 2).
 
-1. **Create Session**: Call `create_session(gameSlug)` to initialize a playtest session
-2. **Simulate Setup**: Use the Setup Manifest to reconstruct the initial game state via `update_game_state`
-3. **Simulate Turns**: For each turn (up to 3):
-   - Player 1 takes an action: Call `record_action` with a thematic, strategy-forward action
-   - Record playtest observations via `log_playtest_note` (e.g., "Action point economy feels tight", "Card draw is smooth")
-   - Check game state after each action via `get_game_state`
-4. **Record Findings**: Log observations about playability, pacing, and mechanical flow
-5. **Call `add_design_step`** with a summary of playtest findings
+The agent:
+1. Loads the complete rulebook and setup manifest
+2. Creates 3 MCP playtest sessions (one per strategy: Random, Greedy, Strategic)
+3. Simulates 5-8 turns per game
+4. Produces a Simulation Report with 4 heuristic scores (Seat Advantage, Strategy Diversity, Dead Actions, Game Length Variance)
+5. Self-persists via `add_design_step` (stepNumber: 5, persona: "SimulationRunner") and `save_reference` (name: "simulation_report")
 
-**Purpose**: Catch obvious gameplay issues (unplayable states, unclear action resolution, missing rule definitions) before full critique.
+**After**: Call `record_decision` based on the simulation verdict:
+- **PASS** → `decision: "accept"`, rationale summarizing the simulation findings, `impactedMechanisms` for any flagged mechanisms
+- **CONCERNS** → `decision: "defer"`, rationale noting which metrics were borderline
+- **FAIL** → `decision: "reject"`, rationale listing metrics below threshold; surface findings to the user and ask whether to proceed to Step 6 or iterate
 
 ---
 
@@ -236,6 +237,6 @@ These traces are persisted in the design session and can be reviewed via `get_de
 - **Always-On Preference Learning**: `record_decision` is called after every step, accumulating designer preferences for future runs — without biasing the current run (bias requires explicit `--profile`)
 - **Step 1.5**: Lite consistency check after mechanics selection (catch structural issues early)
 - **Step 4.5**: SetupValidator agent validates setup completeness before playtest
-- **Step 5**: NEW playtest simulation step simulates actual gameplay turns
+- **Step 5**: Playtest simulation via `simulation-runner` subagent — 3 games × 3 strategies, 4 heuristic scores, empirical evidence for critics
 - **Step 6**: Critique now dispatches fixes to specific agents (not generic `update_rule`)
 - **Agents self-persist**: Each agent calls its own MCP tools; orchestrator coordinates sequencing

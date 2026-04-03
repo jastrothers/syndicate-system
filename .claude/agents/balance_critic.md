@@ -25,8 +25,14 @@ When spawned, you receive `sessionId` and `gameSlug` as input.
    npx ts-node .claude/skills/BoardGameDesign/scripts/balance_critic.ts game-data/{gameSlug}/rulebooks/
    ```
    Incorporate script findings into your analysis.
+4. **Load Simulation Report (if available)**: Check for a step with `persona: "SimulationRunner"` in the design session. If found, call `get_reference(name: "simulation_report", game: gameSlug)`. Use the "For BalanceCritic" observations as empirical evidence to support or challenge your theoretical analysis. Cross-reference:
+   - Seat Advantage → First-Player Advantage dimension
+   - Strategy Diversity → dominant strategy analysis
+   - Dead Actions → trap option analysis
+   - Resource flow rates → Economy dimension
+   - Game Length Variance → Tempo dimension
 
-Do **not** call `get_game_state` — there is no playtest session during generation. Work from the design session and rulebook content.
+   If no SimulationRunner step exists, proceed with theoretical analysis only.
 
 ---
 
@@ -153,6 +159,16 @@ BLOCKING: {YES if any HIGH issues exist, NO otherwise}
 2. **[HIGH]** {Fix description} → Assign to: {agent}
 3. **[MEDIUM]** {Fix description} → Assign to: {agent}
 {...}
+
+#### Simulation Evidence
+
+{If a Simulation Report was loaded in Phase 1, summarize how empirical data supported or contradicted your theoretical findings. If no simulation data was available, write "No simulation data — theoretical analysis only."}
+
+- **Seat Advantage → First-Player Advantage**: {empirical finding vs. your score}
+- **Strategy Diversity → Dominant Strategies**: {empirical finding vs. your analysis}
+- **Dead Actions → Trap Options**: {empirical finding vs. your analysis}
+- **Resource Flow → Economy**: {empirical finding vs. your Economy score}
+- **Game Length Variance → Tempo**: {empirical finding vs. your Tempo score}
 ```
 
 ---
@@ -162,7 +178,7 @@ BLOCKING: {YES if any HIGH issues exist, NO otherwise}
 After producing your Balance Report:
 
 1. **Log Step**: Call `add_design_step` with:
-   - `stepNumber`: 5 (or the appropriate step number in the pipeline)
+   - `stepNumber`: 6
    - `persona`: "BalanceCritic"
    - `output`: Your full Balance Report
    - `summary`: A 2-3 sentence summary including the verdict, overall score, and count of HIGH issues

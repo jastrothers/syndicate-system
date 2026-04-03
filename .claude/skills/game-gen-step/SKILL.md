@@ -29,7 +29,7 @@ Run the same multi-agent game generation pipeline as `/game-gen`, but **one phas
 | `theme` | 2 | `theme-weaver` subagent | `mechanics` |
 | `components` | 3 (+ 3.5) | `component-designer` subagent + consistency gate | `theme` |
 | `rules` | 4 (+ 4.5) | `details-architect` + `setup-validator` subagents | `components` |
-| `playtest` | 5 | Orchestrator: MCP playtest tools | `rules` |
+| `playtest` | 5 | `simulation-runner` subagent | `rules` |
 | `critique` | 6 | `/game-critique` skill (balance-critic + fun-factor-judge + fix loop) | `playtest` |
 | `finalize` | 7 | Orchestrator: `promote_draft`, `compile_markdown_rulebook`, `rebuild_reference_index` | `critique` |
 
@@ -189,15 +189,19 @@ If **NEEDS_FIXES**: Use `update_rule` to apply setup corrections. Re-run SetupVa
 
 ### Phase: `playtest` (Step 5)
 
-Simulate 2-3 turns of gameplay using MCP playtest tools (no subagent — orchestrator handles this directly):
+Spawn the `simulation-runner` subagent with `sessionId`, `gameSlug`, and `playerCount` (default: 2).
 
-1. Call `create_session(gameSlug)` to initialize a playtest session.
-2. Use the Setup Manifest to reconstruct the initial game state via `update_game_state`.
-3. For each turn (up to 3):
-   - Call `record_action` with a thematic, strategy-forward action.
-   - Call `log_playtest_note` with observations.
-   - Call `get_game_state` to check state.
-4. Call `add_design_step` with a summary of playtest findings.
+The agent:
+1. Loads the complete rulebook and setup manifest
+2. Creates 3 MCP playtest sessions (one per strategy: Random, Greedy, Strategic)
+3. Simulates 5-8 turns per game
+4. Produces a Simulation Report with 4 heuristic scores (Seat Advantage, Strategy Diversity, Dead Actions, Game Length Variance)
+5. Self-persists via `add_design_step` (stepNumber: 5, persona: "SimulationRunner") and `save_reference` (name: "simulation_report")
+
+**After**: Call `record_decision` based on the simulation verdict:
+- **PASS** → `decision: "accept"`, rationale summarizing the simulation findings, `impactedMechanisms` for any flagged mechanisms
+- **CONCERNS** → `decision: "defer"`, rationale noting which metrics were borderline
+- **FAIL** → `decision: "reject"`, rationale listing metrics below threshold; surface findings to the user and ask whether to proceed to Step 6 or iterate
 
 ### Phase: `critique` (Step 6)
 
