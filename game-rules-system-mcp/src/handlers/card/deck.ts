@@ -1,58 +1,18 @@
 /**
  * cardHandlers.deck.ts
- * Phase 1 — Core Deck Primitives: peek, search, draw-with-reshuffle, insert.
+ * Phase 1 — Core Deck Primitives: query (peek/search/count).
  */
 import { z } from "zod";
-import { getSession, saveSession } from "../../services/SessionStore.js";
+import { getSession } from "../../services/SessionStore.js";
 import {
   peekCards,
   searchArray,
-  insertIntoArray,
   validateFilterClause,
+  matchesFilter,
   FilterClause,
 } from "../../services/DeckService.js";
 import { defineTool, ToolDefinition } from "../types.js";
 import { jsonResponse } from "../response.js";
-
-export const peekAtDeckTool = defineTool({
-  name: "peek_at_deck",
-  description:
-    "Look at top or bottom N cards of a deck array without moving them. Returns the peeked cards. Useful for scry, reveal, and information-gathering mechanics.",
-  schema: z.object({
-    sessionId: z.string().describe("The ID of the playtest session."),
-    deckId: z.string().describe("State property key of the deck array."),
-    count: z.number().int().positive().describe("How many cards to peek at."),
-    from: z
-      .enum(["top", "bottom"])
-      .optional()
-      .default("top")
-      .describe("Which end of the deck to peek from. Default: top."),
-  }),
-  handler: async (args) => {
-    const session = await getSession(args.sessionId);
-    const deck = session.state[args.deckId];
-    if (!Array.isArray(deck)) {
-      throw new Error(`State key '${args.deckId}' is not an array.`);
-    }
-
-    const peeked = peekCards(deck, args.count, args.from);
-
-    session.ledger.push({
-      timestamp: new Date().toISOString(),
-      actionType: "peek_at_deck",
-      actor: "System",
-      data: {
-        deckId: args.deckId,
-        count: args.count,
-        from: args.from,
-        cardsReturned: peeked.length,
-      },
-    });
-    await saveSession(args.sessionId, session);
-
-    return jsonResponse(peeked);
-  },
-});
 
 export const filterSchema = z.object({
   key: z.string().describe("The property name on card objects to filter by."),
@@ -60,14 +20,19 @@ export const filterSchema = z.object({
   value: z.union([z.string(), z.number(), z.boolean()]).describe("The value to compare against."),
 });
 
-export const searchZoneTool = defineTool({
-  name: "search_zone",
+export const queryZoneTool = defineTool({
+  name: "query_zone",
   description:
-    "Query a state array for cards matching a filter. Returns matching items and their indices without moving any cards. Useful for tutoring, targeted selection, and information.",
+    "Read-only inspection of a state array. action='peek' looks at top/bottom N cards without moving them; action='search' returns cards matching a filter with their indices; action='count' returns the number of items, optionally filtered.",
   schema: z.object({
     sessionId: z.string().describe("The ID of the playtest session."),
-    zoneId: z.string().describe("State property key of the array to search."),
-    filter: filterSchema.describe("Filter criteria: { key, op, value }."),
+    zoneId: z.string().describe("State property key of the array to inspect."),
+    action: z.enum(["peek", "search", "count"]).describe("The inspection operation to perform."),
+    // peek params
+    count: z.number().int().positive().optional().describe("(peek) How many cards to peek at."),
+    from: z.enum(["top", "bottom"]).optional().default("top").describe("(peek) Which end to peek from. Default: top."),
+    // search/count params
+    filter: filterSchema.optional().describe("(search/count) Filter criteria: { key, op, value }."),
   }),
   handler: async (args) => {
     const session = await getSession(args.sessionId);
@@ -76,52 +41,31 @@ export const searchZoneTool = defineTool({
       throw new Error(`State key '${args.zoneId}' is not an array.`);
     }
 
-    validateFilterClause(args.filter as FilterClause);
-    const results = searchArray(zone, args.filter as FilterClause);
+    if (args.action === "peek") {
+      if (!args.count) throw new Error("action='peek' requires a count.");
+      const peeked = peekCards(zone, args.count, args.from ?? "top");
+      return jsonResponse(peeked);
+    }
 
-    return jsonResponse({ matches: results.length, results });
-  },
-});
+    if (args.action === "search") {
+      if (!args.filter) throw new Error("action='search' requires a filter.");
+      validateFilterClause(args.filter as FilterClause);
+      const results = searchArray(zone, args.filter as FilterClause);
+      return jsonResponse({ matches: results.length, results });
+    }
 
-
-export const insertIntoDeckTool = defineTool({
-  name: "insert_into_deck",
-  description:
-    'Place cards at a specific position in a deck array. Supports "top", "bottom", or a numeric index. Useful for scry resolution, return-to-deck effects, and setup.',
-  schema: z.object({
-    sessionId: z.string().describe("The ID of the playtest session."),
-    deckId: z.string().describe("State key of the target deck array."),
-    cards: z.array(z.record(z.unknown())).describe("Card objects or strings to insert."),
-    position: z
-      .union([z.enum(["top", "bottom"]), z.number().int().min(0)])
-      .describe('Where to insert: "top", "bottom", or a numeric index.'),
-    actor: z.string().describe("The player performing the action."),
-  }),
-  handler: async (args) => {
-    const session = await getSession(args.sessionId);
-    if (!Array.isArray(session.state[args.deckId]))
-      session.state[args.deckId] = [];
-
-    insertIntoArray(session.state[args.deckId], args.cards, args.position);
-
-    session.ledger.push({
-      timestamp: new Date().toISOString(),
-      actionType: "insert_into_deck",
-      actor: args.actor,
-      data: {
-        deckId: args.deckId,
-        count: args.cards.length,
-        position: args.position,
-      },
-    });
-    await saveSession(args.sessionId, session);
-
-    return jsonResponse({ inserted: args.cards.length, deckSize: session.state[args.deckId].length, deckId: args.deckId, position: args.position });
+    // count
+    let count: number;
+    if (args.filter) {
+      validateFilterClause(args.filter as FilterClause);
+      count = zone.filter((item) => matchesFilter(item, args.filter as FilterClause)).length;
+    } else {
+      count = zone.length;
+    }
+    return jsonResponse({ zoneId: args.zoneId, count, filtered: !!args.filter });
   },
 });
 
 export const deckTools: ToolDefinition[] = [
-  peekAtDeckTool,
-  searchZoneTool,
-  insertIntoDeckTool,
+  queryZoneTool,
 ];

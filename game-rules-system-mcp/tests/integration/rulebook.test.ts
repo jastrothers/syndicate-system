@@ -13,7 +13,7 @@ test("General & Rulebook Integration Tests", async (t) => {
     const toolNames = toolsResult.tools.map((tm) => tm.name);
     assert.ok(toolNames.includes("update_rule"));
     assert.ok(toolNames.includes("create_session"));
-    assert.ok(toolNames.includes("search_zone"));
+    assert.ok(toolNames.includes("query_zone"));
   });
 
   await t.test("Update rule (Create new)", async () => {
@@ -140,8 +140,8 @@ test("General & Rulebook Integration Tests", async (t) => {
 
   await t.test("Full Rulebook Display", async () => {
     const result: any = await client.callTool({
-      name: "get_full_rulebook_markdown",
-      arguments: {} 
+      name: "compile_markdown_rulebook",
+      arguments: { returnOnly: true }
     });
     if (result.isError) console.error(result.content[0].text);
     assert.strictEqual(result.isError, undefined);

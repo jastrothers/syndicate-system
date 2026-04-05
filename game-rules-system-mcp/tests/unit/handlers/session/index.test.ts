@@ -5,8 +5,8 @@ import { sessionTools } from "../../../../src/handlers/index.js";
 // ── Tool registration ─────────────────────────────────────────────────────────
 
 describe("sessionTools registration", () => {
-  it("exports fourteen tools", () => {
-    assert.equal(sessionTools.length, 14);
+  it("exports twelve tools", () => {
+    assert.equal(sessionTools.length, 12);
   });
 
   it("contains the expected tool names", () => {
@@ -14,18 +14,16 @@ describe("sessionTools registration", () => {
     const expectedTools = [
       "create_session",
       "delete_playtest_session",
-      "draw_from_deck",
       "get_action_history",
       "get_game_state",
       "get_session_stats",
       "list_sessions",
       "log_playtest_note",
-      "move_entity",
       "record_action",
       "roll_dice",
-      "shuffle_deck",
       "update_game_state",
       "validate_action",
+      "zone_action",
     ];
     assert.deepEqual(names.sort(), expectedTools.sort());
   });

@@ -4,6 +4,7 @@ import { createDesignSession, addDesignStep, getDesignSession, listDesignSession
 import { getDesignSessionPath, sanitizeFileName } from "../../config/paths.js";
 import { defineTool } from "../types.js";
 import { jsonResponse, textResponse } from "../response.js";
+import { paginate } from "../pagination.js";
 
 function validateGameName(gameName: string): string {
   const safe = sanitizeFileName(gameName);
@@ -75,14 +76,10 @@ export const getDesignSessionTool = defineTool({
   handler: async (args) => {
     validateGameName(args.gameName);
     const session = await getDesignSession(args.gameName, args.sessionId);
-    const total = session.steps.length;
-    const offset = args.offset ?? 0;
-    const sliced = args.limit !== undefined
-      ? session.steps.slice(offset, offset + args.limit)
-      : session.steps.slice(offset);
+    const page = paginate(session.steps, args.offset, args.limit);
     const steps = args.includeFull
-      ? sliced
-      : sliced.map(({ output: _output, ...rest }) => rest);
+      ? page.items
+      : page.items.map(({ output: _output, ...rest }) => rest);
     return jsonResponse({
       sessionId: session.sessionId,
       gameName: session.gameName,
@@ -92,8 +89,8 @@ export const getDesignSessionTool = defineTool({
       status: session.status,
       createdAt: session.createdAt,
       lastUpdatedAt: session.lastUpdatedAt,
-      totalSteps: total,
-      offset,
+      totalSteps: page.total,
+      offset: page.offset,
       count: steps.length,
       steps,
     });

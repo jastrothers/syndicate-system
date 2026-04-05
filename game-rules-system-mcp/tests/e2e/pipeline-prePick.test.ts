@@ -57,8 +57,9 @@ test("E2E: Pre-Pick Mechanics pipeline flow", async (t) => {
     sessionId = session.sessionId;
 
     await client.callTool({
-      name: "save_draft",
+      name: "manage_draft",
       arguments: {
+        action: "save",
         rulebookName: RULEBOOK_NAME,
         rulebook: {
           metadata: { title: GAME_NAME, version: "0.1.0-draft", lastUpdated: new Date().toISOString() },

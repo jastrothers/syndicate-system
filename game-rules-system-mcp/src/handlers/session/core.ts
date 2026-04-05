@@ -5,6 +5,7 @@ import { getPlaytestLogPath } from "../../config/paths.js";
 import { ensureSessionsDirectory, createSession, getSession, saveSession, listSessions } from "../../services/SessionStore.js";
 import { ToolDefinition } from "../types.js";
 import { jsonResponse, textResponse } from "../response.js";
+import { paginate } from "../pagination.js";
 
 export const createSessionTool: ToolDefinition = {
   name: "create_session",
@@ -109,12 +110,7 @@ export const listSessionsTool: ToolDefinition = {
   }),
   handler: async (args) => {
     const allSessions = await listSessions(args.rulebookName, args.rulebookVersion);
-    const total = allSessions.length;
-    const offset = args.offset ?? 0;
-    const items = args.limit !== undefined
-      ? allSessions.slice(offset, offset + args.limit)
-      : allSessions.slice(offset);
-    return jsonResponse({ total, offset, count: items.length, items });
+    return jsonResponse(paginate(allSessions, args.offset, args.limit));
   },
 };
 

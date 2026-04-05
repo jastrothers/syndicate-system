@@ -44,19 +44,19 @@ test("Playtesting Session Integration Tests", async (t) => {
   });
 
   await t.test("Draw from deck, Shuffle, Move", async () => {
-    await client.callTool({ name: "shuffle_deck", arguments: { sessionId: currentSessionId, deckId: "deck" } });
+    await client.callTool({ name: "zone_action", arguments: { sessionId: currentSessionId, action: "shuffle", deckId: "deck" } });
     await client.callTool({
-      name: "draw_from_deck",
-      arguments: { sessionId: currentSessionId, deckId: "deck", targetHandId: "hand", count: 2, actor: "Player 1" }
+      name: "zone_action",
+      arguments: { sessionId: currentSessionId, action: "draw", deckId: "deck", targetHandId: "hand", count: 2, actor: "Player 1" }
     });
 
     const stateBeforeMove: any = await client.callTool({ name: "get_game_state", arguments: { sessionId: currentSessionId } });
     const stateData = JSON.parse((stateBeforeMove.content[0] as any).text);
-    const drawnCard = stateData.hand[0]; 
+    const drawnCard = stateData.hand[0];
 
     await client.callTool({
-      name: "move_entity",
-      arguments: { sessionId: currentSessionId, entityId: drawnCard, sourceId: "hand", targetId: "discard", actor: "Player 1" }
+      name: "zone_action",
+      arguments: { sessionId: currentSessionId, action: "move", entityId: drawnCard, sourceId: "hand", targetId: "discard", actor: "Player 1" }
     });
 
     const finalStateReq: any = await client.callTool({ name: "get_game_state", arguments: { sessionId: currentSessionId } });

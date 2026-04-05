@@ -57,8 +57,9 @@ test("E2E: Full game-gen pipeline simulation", async (t) => {
     sessionId = session.sessionId;
 
     const draftResult: any = await client.callTool({
-      name: "save_draft",
+      name: "manage_draft",
       arguments: {
+        action: "save",
         rulebookName: RULEBOOK_NAME,
         rulebook: {
           metadata: { title: GAME_NAME, version: "0.1.0-draft", lastUpdated: new Date().toISOString() },
@@ -400,8 +401,8 @@ test("E2E: Full game-gen pipeline simulation", async (t) => {
   // ─── Step 7: Finalize ────────────────────────────────────────────────────────
   await t.test("Step 7: Finalize — promote draft, compile markdown, rebuild index", async () => {
     const promoteResult: any = await client.callTool({
-      name: "promote_draft",
-      arguments: { rulebookName: RULEBOOK_NAME },
+      name: "manage_draft",
+      arguments: { action: "promote", rulebookName: RULEBOOK_NAME },
     });
     assert.ok(promoteResult.content[0].text.includes("promoted") || promoteResult.content[0].text.includes("success"), "Draft should be promoted");
 

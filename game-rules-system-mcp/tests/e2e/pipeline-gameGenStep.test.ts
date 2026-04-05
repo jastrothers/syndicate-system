@@ -62,8 +62,9 @@ test("E2E: game-gen-step resumability across client sessions", async (t) => {
       assert.ok(sessionId, "Session should be created");
 
       await clientA.callTool({
-        name: "save_draft",
+        name: "manage_draft",
         arguments: {
+          action: "save",
           rulebookName: RULEBOOK_NAME,
           rulebook: {
             metadata: { title: GAME_NAME, version: "0.1.0-draft", lastUpdated: new Date().toISOString() },
@@ -198,7 +199,7 @@ test("E2E: game-gen-step resumability across client sessions", async (t) => {
       }
 
       // Finalize
-      await clientB.callTool({ name: "promote_draft", arguments: { rulebookName: RULEBOOK_NAME } });
+      await clientB.callTool({ name: "manage_draft", arguments: { action: "promote", rulebookName: RULEBOOK_NAME } });
       await clientB.callTool({ name: "compile_markdown_rulebook", arguments: { rulebookName: RULEBOOK_NAME } });
 
       // Final assertion: session now has all 4 steps from both client sessions

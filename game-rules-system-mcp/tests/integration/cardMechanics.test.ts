@@ -47,12 +47,13 @@ test("Card Mechanics Integration Tests", async (t) => {
     });
   });
 
-  await t.test("peek_at_deck (top)", async () => {
+  await t.test("query_zone (peek top)", async () => {
     const result: any = await client.callTool({
-      name: "peek_at_deck",
+      name: "query_zone",
       arguments: {
         sessionId: cardSessionId,
-        deckId: "deck",
+        zoneId: "deck",
+        action: "peek",
         count: 3,
         from: "top",
       },
@@ -70,12 +71,13 @@ test("Card Mechanics Integration Tests", async (t) => {
     assert.strictEqual(state.deck.length, 5, "Deck should still have 5 cards");
   });
 
-  await t.test("peek_at_deck (bottom)", async () => {
+  await t.test("query_zone (peek bottom)", async () => {
     const result: any = await client.callTool({
-      name: "peek_at_deck",
+      name: "query_zone",
       arguments: {
         sessionId: cardSessionId,
-        deckId: "deck",
+        zoneId: "deck",
+        action: "peek",
         count: 2,
         from: "bottom",
       },
@@ -86,12 +88,13 @@ test("Card Mechanics Integration Tests", async (t) => {
     assert.strictEqual(peeked[1].id, "c5");
   });
 
-  await t.test("search_zone", async () => {
+  await t.test("query_zone (search)", async () => {
     const result: any = await client.callTool({
-      name: "search_zone",
+      name: "query_zone",
       arguments: {
         sessionId: cardSessionId,
         zoneId: "deck",
+        action: "search",
         filter: { key: "type", op: "eq", value: "Treasure" },
       },
     });
@@ -104,11 +107,12 @@ test("Card Mechanics Integration Tests", async (t) => {
     assert.ok(names.includes("Gold"));
   });
 
-  await t.test("insert_into_deck", async () => {
+  await t.test("zone_action (insert)", async () => {
     const result: any = await client.callTool({
-      name: "insert_into_deck",
+      name: "zone_action",
       arguments: {
         sessionId: cardSessionId,
+        action: "insert",
         deckId: "deck",
         cards: [{ id: "c6", name: "Province", type: "Victory", cost: 8 }],
         position: "top",
@@ -118,17 +122,18 @@ test("Card Mechanics Integration Tests", async (t) => {
     assert.strictEqual(result.isError, undefined);
 
     const peekRes: any = await client.callTool({
-      name: "peek_at_deck",
-      arguments: { sessionId: cardSessionId, deckId: "deck", count: 1 },
+      name: "query_zone",
+      arguments: { sessionId: cardSessionId, zoneId: "deck", action: "peek", count: 1 },
     });
     const top = JSON.parse((peekRes.content[0] as any).text);
     assert.strictEqual(top[0].name, "Province");
 
     // Remove Province from deck top
     await client.callTool({
-      name: "draw_from_deck",
+      name: "zone_action",
       arguments: {
         sessionId: cardSessionId,
+        action: "draw",
         deckId: "deck",
         targetHandId: "discard",
         count: 1,
@@ -140,9 +145,10 @@ test("Card Mechanics Integration Tests", async (t) => {
   await t.test("Draw cards from deck using primitives", async () => {
     // Draw 2 cards from deck into hand
     const result: any = await client.callTool({
-      name: "draw_from_deck",
+      name: "zone_action",
       arguments: {
         sessionId: cardSessionId,
+        action: "draw",
         deckId: "deck",
         targetHandId: "hand",
         count: 2,
@@ -173,8 +179,8 @@ test("Card Mechanics Integration Tests", async (t) => {
 
     if (deckRemaining > 0) {
       await client.callTool({
-        name: "draw_from_deck",
-        arguments: { sessionId: cardSessionId, deckId: "deck", targetHandId: "discard", count: deckRemaining, actor: "System" },
+        name: "zone_action",
+        arguments: { sessionId: cardSessionId, action: "draw", deckId: "deck", targetHandId: "discard", count: deckRemaining, actor: "System" },
       });
     }
 
@@ -188,8 +194,8 @@ test("Card Mechanics Integration Tests", async (t) => {
       arguments: { sessionId: cardSessionId, patch: { deck: recycled, discard: [] } },
     });
     await client.callTool({
-      name: "shuffle_deck",
-      arguments: { sessionId: cardSessionId, deckId: "deck" },
+      name: "zone_action",
+      arguments: { sessionId: cardSessionId, action: "shuffle", deckId: "deck" },
     });
 
     const afterShuffle: any = await client.callTool({ name: "get_game_state", arguments: { sessionId: cardSessionId } });
@@ -198,7 +204,7 @@ test("Card Mechanics Integration Tests", async (t) => {
     assert.strictEqual(stateAfter.discard.length, 0, "Discard should be empty after reshuffle");
   });
 
-  await t.test("Populate market row via move_entity", async () => {
+  await t.test("Populate market row via zone_action (move)", async () => {
     // Get current market_supply to know what's available
     const stateRes: any = await client.callTool({ name: "get_game_state", arguments: { sessionId: cardSessionId } });
     const state = JSON.parse((stateRes.content[0] as any).text);
@@ -211,8 +217,8 @@ test("Card Mechanics Integration Tests", async (t) => {
       const s = JSON.parse((supply.content[0] as any).text);
       const firstCard = s.market_supply[0];
       await client.callTool({
-        name: "move_entity",
-        arguments: { sessionId: cardSessionId, entityId: firstCard.id, sourceId: "market_supply", targetId: "market_row", actor: "System" },
+        name: "zone_action",
+        arguments: { sessionId: cardSessionId, action: "move", entityId: firstCard.id, sourceId: "market_supply", targetId: "market_row", actor: "System" },
       });
     }
 
@@ -230,8 +236,8 @@ test("Card Mechanics Integration Tests", async (t) => {
 
     // Move card from market_row to discard (purchase)
     const moveResult: any = await client.callTool({
-      name: "move_entity",
-      arguments: { sessionId: cardSessionId, entityId: cardToBuy.id, sourceId: "market_row", targetId: "discard", actor: "Player 1" },
+      name: "zone_action",
+      arguments: { sessionId: cardSessionId, action: "move", entityId: cardToBuy.id, sourceId: "market_row", targetId: "discard", actor: "Player 1" },
     });
     assert.strictEqual(moveResult.isError, undefined);
 
@@ -310,23 +316,24 @@ test("Card Mechanics Integration Tests", async (t) => {
     assert.strictEqual(state.starter_deck[7].name, "Estate");
   });
 
-  await t.test("count_zone validates deck size constraint (valid)", async () => {
+  await t.test("query_zone (count) validates deck size constraint (valid)", async () => {
     const result: any = await client.callTool({
-      name: "count_zone",
-      arguments: { sessionId: cardSessionId, zoneId: "starter_deck" },
+      name: "query_zone",
+      arguments: { sessionId: cardSessionId, zoneId: "starter_deck", action: "count" },
     });
     assert.strictEqual(result.isError, undefined);
     const data = JSON.parse((result.content[0] as any).text);
     assert.ok(data.count >= 10, "starter_deck should have at least 10 cards (min deck size)");
   });
 
-  await t.test("count_zone validates deck size constraint (filtered)", async () => {
+  await t.test("query_zone (count) validates deck size constraint (filtered)", async () => {
     // Victory cards: 3 Estates
     const result: any = await client.callTool({
-      name: "count_zone",
+      name: "query_zone",
       arguments: {
         sessionId: cardSessionId,
         zoneId: "starter_deck",
+        action: "count",
         filter: { key: "type", op: "eq", value: "Victory" },
       },
     });
@@ -335,12 +342,13 @@ test("Card Mechanics Integration Tests", async (t) => {
     assert.strictEqual(data.filtered, true);
   });
 
-  await t.test("count_zone (total)", async () => {
+  await t.test("query_zone (count total)", async () => {
     const result: any = await client.callTool({
-      name: "count_zone",
+      name: "query_zone",
       arguments: {
         sessionId: cardSessionId,
         zoneId: "starter_deck",
+        action: "count",
       },
     });
     assert.strictEqual(result.isError, undefined);
@@ -349,12 +357,13 @@ test("Card Mechanics Integration Tests", async (t) => {
     assert.strictEqual(data.filtered, false);
   });
 
-  await t.test("count_zone (filtered)", async () => {
+  await t.test("query_zone (count filtered)", async () => {
     const result: any = await client.callTool({
-      name: "count_zone",
+      name: "query_zone",
       arguments: {
         sessionId: cardSessionId,
         zoneId: "starter_deck",
+        action: "count",
         filter: { key: "type", op: "eq", value: "Victory" },
       },
     });
