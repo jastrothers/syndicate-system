@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert";
-import { peekAtDeckTool, searchZoneTool, insertIntoDeckTool } from "../../../../src/handlers/card/deck.js";
+import { queryZoneTool } from "../../../../src/handlers/card/deck.js";
 import { initialize as initSessions, createSession, closeDb } from "../../../../src/services/SessionStore.js";
 import { updateGameStateTool } from "../../../../src/handlers/session/core.js";
 
@@ -17,15 +17,16 @@ test("card/deck handler tests", async (t) => {
     closeDb();
   });
 
-  await t.test("peekAtDeckTool: peeks top cards without mutation", async () => {
+  await t.test("queryZoneTool (peek): peeks top cards without mutation", async () => {
     await updateGameStateTool.handler({
       sessionId,
       patch: { peekDeck: [{ id: "c1", name: "A" }, { id: "c2", name: "B" }, { id: "c3", name: "C" }] },
     } as any);
 
-    const result = await peekAtDeckTool.handler({
+    const result = await queryZoneTool.handler({
       sessionId,
-      deckId: "peekDeck",
+      zoneId: "peekDeck",
+      action: "peek",
       count: 2,
       from: "top",
     } as any);
@@ -41,10 +42,11 @@ test("card/deck handler tests", async (t) => {
     assert.strictEqual(state.peekDeck.length, 3, "Deck should still have 3 cards after peek");
   });
 
-  await t.test("peekAtDeckTool: peeks bottom cards", async () => {
-    const result = await peekAtDeckTool.handler({
+  await t.test("queryZoneTool (peek): peeks bottom cards", async () => {
+    const result = await queryZoneTool.handler({
       sessionId,
-      deckId: "peekDeck",
+      zoneId: "peekDeck",
+      action: "peek",
       count: 1,
       from: "bottom",
     } as any);
@@ -54,24 +56,24 @@ test("card/deck handler tests", async (t) => {
     assert.strictEqual(cards[0].id, "c3");
   });
 
-  await t.test("peekAtDeckTool: throws for non-array state key", async () => {
+  await t.test("queryZoneTool (peek): throws for non-array state key", async () => {
     await updateGameStateTool.handler({
       sessionId,
       patch: { notAnArray: "hello" },
     } as any);
 
     await assert.rejects(
-      () => peekAtDeckTool.handler({
+      () => queryZoneTool.handler({
         sessionId,
-        deckId: "notAnArray",
+        zoneId: "notAnArray",
+        action: "peek",
         count: 1,
-        from: "top",
       } as any),
       (err: Error) => err.message.includes("not an array")
     );
   });
 
-  await t.test("searchZoneTool: finds matching cards", async () => {
+  await t.test("queryZoneTool (search): finds matching cards", async () => {
     await updateGameStateTool.handler({
       sessionId,
       patch: {
@@ -83,9 +85,10 @@ test("card/deck handler tests", async (t) => {
       },
     } as any);
 
-    const result = await searchZoneTool.handler({
+    const result = await queryZoneTool.handler({
       sessionId,
       zoneId: "searchZone",
+      action: "search",
       filter: { key: "type", op: "eq", value: "spell" },
     } as any);
 
@@ -94,10 +97,11 @@ test("card/deck handler tests", async (t) => {
     assert.ok(data.results.every((r: any) => r.item.type === "spell"));
   });
 
-  await t.test("searchZoneTool: returns empty for no matches", async () => {
-    const result = await searchZoneTool.handler({
+  await t.test("queryZoneTool (search): returns empty for no matches", async () => {
+    const result = await queryZoneTool.handler({
       sessionId,
       zoneId: "searchZone",
+      action: "search",
       filter: { key: "type", op: "eq", value: "armor" },
     } as any);
 
@@ -105,48 +109,50 @@ test("card/deck handler tests", async (t) => {
     assert.strictEqual(data.matches, 0);
   });
 
-  await t.test("insertIntoDeckTool: inserts at top", async () => {
+  await t.test("queryZoneTool (count): counts total items", async () => {
     await updateGameStateTool.handler({
       sessionId,
-      patch: { insertDeck: [{ id: "existing" }] },
+      patch: { countZone: [{ type: "a" }, { type: "b" }, { type: "a" }] },
     } as any);
 
-    const result = await insertIntoDeckTool.handler({
+    const result = await queryZoneTool.handler({
       sessionId,
-      deckId: "insertDeck",
-      cards: [{ id: "new-top" }],
-      position: "top",
-      actor: "Tester",
+      zoneId: "countZone",
+      action: "count",
     } as any);
 
     const data = JSON.parse(result.content[0].text);
-    assert.strictEqual(data.inserted, 1);
-    assert.strictEqual(data.deckSize, 2);
-
-    // Verify order
-    const { getGameStateTool } = await import("../../../../src/handlers/session/core.js");
-    const state = JSON.parse((await getGameStateTool.handler({ sessionId, fields: ["insertDeck"] } as any)).content[0].text);
-    assert.strictEqual(state.insertDeck[0].id, "new-top");
-    assert.strictEqual(state.insertDeck[1].id, "existing");
+    assert.strictEqual(data.count, 3);
+    assert.strictEqual(data.filtered, false);
   });
 
-  await t.test("insertIntoDeckTool: inserts at bottom", async () => {
+  await t.test("queryZoneTool (count): counts filtered items", async () => {
+    const result = await queryZoneTool.handler({
+      sessionId,
+      zoneId: "countZone",
+      action: "count",
+      filter: { key: "type", op: "eq", value: "a" },
+    } as any);
+
+    const data = JSON.parse(result.content[0].text);
+    assert.strictEqual(data.count, 2);
+    assert.strictEqual(data.filtered, true);
+  });
+
+  await t.test("queryZoneTool (count): throws for non-array zone", async () => {
     await updateGameStateTool.handler({
       sessionId,
-      patch: { bottomDeck: [{ id: "first" }] },
+      patch: { notArray: 42 },
     } as any);
 
-    await insertIntoDeckTool.handler({
-      sessionId,
-      deckId: "bottomDeck",
-      cards: [{ id: "last" }],
-      position: "bottom",
-      actor: "Tester",
-    } as any);
-
-    const { getGameStateTool } = await import("../../../../src/handlers/session/core.js");
-    const state = JSON.parse((await getGameStateTool.handler({ sessionId, fields: ["bottomDeck"] } as any)).content[0].text);
-    assert.strictEqual(state.bottomDeck[0].id, "first");
-    assert.strictEqual(state.bottomDeck[1].id, "last");
+    await assert.rejects(
+      () => queryZoneTool.handler({
+        sessionId,
+        zoneId: "notArray",
+        action: "count",
+      } as any),
+      (err: Error) => err.message.includes("not an array")
+    );
   });
+
 });

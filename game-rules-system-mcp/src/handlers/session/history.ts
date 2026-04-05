@@ -4,6 +4,7 @@ import { validateConstraint } from "../../services/ValidationService.js";
 import { getRulebook } from "../../services/RulebookStore.js";
 import { ToolDefinition } from "../types.js";
 import { jsonResponse, textResponse } from "../response.js";
+import { paginate } from "../pagination.js";
 
 export const recordActionTool: ToolDefinition = {
   name: "record_action",
@@ -42,12 +43,7 @@ export const getActionHistoryTool: ToolDefinition = {
     if (args.actionType) {
       ledger = ledger.filter((e: any) => e.actionType === args.actionType);
     }
-    const total = ledger.length;
-    const offset = args.offset ?? 0;
-    const items = args.limit !== undefined
-      ? ledger.slice(offset, offset + args.limit)
-      : ledger.slice(offset);
-    return jsonResponse({ total, offset, count: items.length, items });
+    return jsonResponse(paginate(ledger, args.offset, args.limit));
   },
 };
 

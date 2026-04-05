@@ -6,13 +6,10 @@ describe("cardHandlers barrel export", () => {
   it("exports a non-empty cardTools array", () => {
     assert.ok(Array.isArray(cardTools), "cardTools should be an array");
     const expectedTools = [
-      "count_zone",
       "create_deck_from_reference",
       "create_deck_from_template",
-      "insert_into_deck",
-      "peek_at_deck",
+      "query_zone",
       "reveal_cards",
-      "search_zone",
     ];
     const actualToolNames = cardTools.map((t: any) => t.name);
     assert.deepStrictEqual(actualToolNames.sort(), expectedTools.sort(), "cardTools should contain the expected tools");

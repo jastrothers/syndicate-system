@@ -143,8 +143,9 @@ test("E2E: game-critique iteration loop simulation", async (t) => {
     sessionId = session.sessionId;
 
     await client.callTool({
-      name: "save_draft",
+      name: "manage_draft",
       arguments: {
+        action: "save",
         rulebookName: RULEBOOK_NAME,
         rulebook: {
           metadata: { title: GAME_NAME, version: "0.1.0-draft", lastUpdated: new Date().toISOString() },
@@ -176,7 +177,7 @@ test("E2E: game-critique iteration loop simulation", async (t) => {
     }
 
     // Promote and compile so critique can read latest.md
-    await client.callTool({ name: "promote_draft", arguments: { rulebookName: RULEBOOK_NAME } });
+    await client.callTool({ name: "manage_draft", arguments: { action: "promote", rulebookName: RULEBOOK_NAME } });
     await client.callTool({ name: "compile_markdown_rulebook", arguments: { rulebookName: RULEBOOK_NAME } });
   });
 

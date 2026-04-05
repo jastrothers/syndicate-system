@@ -9,32 +9,12 @@ import { RuleSection } from "../../types/index.js";
 
 export const compileMarkdownTool: ToolDefinition = {
   name: "compile_markdown_rulebook",
-  description: "Compiles the entire JSON rulebook into a clean, readable Markdown file.",
+  description: "Compiles the entire JSON rulebook into Markdown. By default writes the file to disk and returns a success message. Pass returnOnly: true to receive the Markdown text without writing a file. Pass section (dot-notation path) to return only that section's Markdown.",
   schema: z.object({
     rulebookName: z.string().optional().default("rulebook").describe("The name of the rulebook to compile. Defaults to 'rulebook'."),
     rulebookVersion: z.string().optional().describe("Optional version tag to compile a specific snapshot."),
-  }),
-  handler: async (args) => {
-    const rulebook = await getRulebook(args.rulebookName, args.rulebookVersion);
-    let md = `# ${rulebook.metadata.title}\n\n`;
-    md += `*Version: ${rulebook.metadata.version}*\n`;
-    md += `*Last Updated: ${new Date(rulebook.metadata.lastUpdated).toLocaleString()}*\n\n`;
-    md += `---\n\n`;
-    md += generateMarkdown(rulebook.sections, 2);
-
-    const mdFile = getRulebookMdPath(args.rulebookName, args.rulebookVersion);
-    await fs.writeFile(mdFile, md, "utf-8");
-    return textResponse(`Successfully compiled Markdown rulebook to ${mdFile}`);
-  },
-};
-
-export const getFullRulebookMarkdownTool: ToolDefinition = {
-  name: "get_full_rulebook_markdown",
-  description: "Returns the compiled rulebook in markdown text format. Can return 5K+ tokens for a full rulebook. Use section parameter for a specific section, or read_rule_section for structured JSON.",
-  schema: z.object({
-    rulebookName: z.string().optional().default("rulebook").describe("The rulebook name. Defaults to 'rulebook'."),
-    rulebookVersion: z.string().optional().describe("Optional version tag to read a specific snapshot."),
-    section: z.string().optional().describe("Dot-notation path to a specific section. If provided, returns only that section's markdown instead of the full rulebook."),
+    returnOnly: z.boolean().optional().default(false).describe("If true, returns the Markdown text without writing it to disk. Default: false."),
+    section: z.string().optional().describe("Dot-notation path to a specific section (e.g. 'combat.resolution'). If provided with returnOnly, returns only that section's Markdown."),
   }),
   handler: async (args) => {
     const rulebook = await getRulebook(args.rulebookName, args.rulebookVersion);
@@ -63,11 +43,16 @@ export const getFullRulebookMarkdownTool: ToolDefinition = {
     md += `---\n\n`;
     md += generateMarkdown(rulebook.sections, 2);
 
-    return textResponse(md);
+    if (args.returnOnly) {
+      return textResponse(md);
+    }
+
+    const mdFile = getRulebookMdPath(args.rulebookName, args.rulebookVersion);
+    await fs.writeFile(mdFile, md, "utf-8");
+    return textResponse(`Successfully compiled Markdown rulebook to ${mdFile}`);
   },
 };
 
 export const rulebookMarkdownTools = [
   compileMarkdownTool,
-  getFullRulebookMarkdownTool,
 ];

@@ -4,6 +4,7 @@ import * as ReferenceStore from "../../services/ReferenceStore.js";
 import { getReferenceFilePath, sanitizeFileName } from "../../config/paths.js";
 import { ToolDefinition } from "../types.js";
 import { jsonResponse, textResponse } from "../response.js";
+import { paginate } from "../pagination.js";
 
 export const saveReferenceTool: ToolDefinition = {
   name: "save_reference",
@@ -84,12 +85,7 @@ export const listReferencesTool: ToolDefinition = {
   }),
   handler: async (args) => {
     const allRefs = await ReferenceStore.queryReferences(args.game, args.version, args.type, args.tags);
-    const total = allRefs.length;
-    const offset = args.offset ?? 0;
-    const items = args.limit !== undefined
-      ? allRefs.slice(offset, offset + args.limit)
-      : allRefs.slice(offset);
-    return jsonResponse({ total, offset, count: items.length, items });
+    return jsonResponse(paginate(allRefs, args.offset, args.limit));
   },
 };
 

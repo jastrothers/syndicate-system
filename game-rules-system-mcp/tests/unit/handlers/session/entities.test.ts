@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert";
-import { drawFromDeckTool, shuffleDeckTool, moveEntityTool } from "../../../../src/handlers/session/entities.js";
+import { zoneActionTool } from "../../../../src/handlers/session/entities.js";
 import { initialize as initSessions, createSession, closeDb } from "../../../../src/services/SessionStore.js";
 
 test("session/entities handler tests", async (t) => {
@@ -16,16 +16,16 @@ test("session/entities handler tests", async (t) => {
     closeDb();
   });
 
-  await t.test("drawFromDeckTool: draws cards from deck to hand", async () => {
-    // Set up state: a deck with known cards
+  await t.test("zoneActionTool (draw): draws cards from deck to hand", async () => {
     const { updateGameStateTool } = await import("../../../../src/handlers/session/core.js");
     await updateGameStateTool.handler({
       sessionId,
       patch: { testDeck: ["A", "B", "C", "D", "E"], testHand: [] },
     } as any);
 
-    const result = await drawFromDeckTool.handler({
+    const result = await zoneActionTool.handler({
       sessionId,
+      action: "draw",
       deckId: "testDeck",
       targetHandId: "testHand",
       count: 2,
@@ -39,15 +39,16 @@ test("session/entities handler tests", async (t) => {
     assert.strictEqual(data.handSize, 2);
   });
 
-  await t.test("drawFromDeckTool: handles drawing more than available", async () => {
+  await t.test("zoneActionTool (draw): handles drawing more than available", async () => {
     const { updateGameStateTool } = await import("../../../../src/handlers/session/core.js");
     await updateGameStateTool.handler({
       sessionId,
       patch: { smallDeck: ["X"], emptyHand: [] },
     } as any);
 
-    const result = await drawFromDeckTool.handler({
+    const result = await zoneActionTool.handler({
       sessionId,
+      action: "draw",
       deckId: "smallDeck",
       targetHandId: "emptyHand",
       count: 5,
@@ -59,7 +60,7 @@ test("session/entities handler tests", async (t) => {
     assert.strictEqual(data.deckRemaining, 0);
   });
 
-  await t.test("shuffleDeckTool: shuffles deck and preserves elements", async () => {
+  await t.test("zoneActionTool (shuffle): shuffles deck and preserves elements", async () => {
     const { updateGameStateTool, getGameStateTool } = await import("../../../../src/handlers/session/core.js");
     const cards = Array.from({ length: 20 }, (_, i) => `card-${i}`);
     await updateGameStateTool.handler({
@@ -67,8 +68,9 @@ test("session/entities handler tests", async (t) => {
       patch: { shuffleTestDeck: [...cards] },
     } as any);
 
-    await shuffleDeckTool.handler({
+    await zoneActionTool.handler({
       sessionId,
+      action: "shuffle",
       deckId: "shuffleTestDeck",
     } as any);
 
@@ -81,7 +83,7 @@ test("session/entities handler tests", async (t) => {
     assert.deepStrictEqual([...state.shuffleTestDeck].sort(), cards.sort());
   });
 
-  await t.test("moveEntityTool: moves entity by id", async () => {
+  await t.test("zoneActionTool (move): moves entity by id", async () => {
     const { updateGameStateTool } = await import("../../../../src/handlers/session/core.js");
     await updateGameStateTool.handler({
       sessionId,
@@ -91,8 +93,9 @@ test("session/entities handler tests", async (t) => {
       },
     } as any);
 
-    const result = await moveEntityTool.handler({
+    const result = await zoneActionTool.handler({
       sessionId,
+      action: "move",
       entityId: "a1",
       sourceId: "moveSource",
       targetId: "moveTarget",
@@ -105,7 +108,7 @@ test("session/entities handler tests", async (t) => {
     assert.strictEqual(data.targetSize, 1);
   });
 
-  await t.test("moveEntityTool: moves entity by name", async () => {
+  await t.test("zoneActionTool (move): moves entity by name", async () => {
     const { updateGameStateTool } = await import("../../../../src/handlers/session/core.js");
     await updateGameStateTool.handler({
       sessionId,
@@ -115,8 +118,9 @@ test("session/entities handler tests", async (t) => {
       },
     } as any);
 
-    const result = await moveEntityTool.handler({
+    const result = await zoneActionTool.handler({
       sessionId,
+      action: "move",
       entityId: "Thief",
       sourceId: "nameSource",
       targetId: "nameTarget",
@@ -127,7 +131,7 @@ test("session/entities handler tests", async (t) => {
     assert.strictEqual(data.movedItem.name, "Thief");
   });
 
-  await t.test("moveEntityTool: throws when entity not found", async () => {
+  await t.test("zoneActionTool (move): throws when entity not found", async () => {
     const { updateGameStateTool } = await import("../../../../src/handlers/session/core.js");
     await updateGameStateTool.handler({
       sessionId,
@@ -135,8 +139,9 @@ test("session/entities handler tests", async (t) => {
     } as any);
 
     await assert.rejects(
-      () => moveEntityTool.handler({
+      () => zoneActionTool.handler({
         sessionId,
+        action: "move",
         entityId: "missing",
         sourceId: "srcZone",
         targetId: "tgtZone",
@@ -146,7 +151,7 @@ test("session/entities handler tests", async (t) => {
     );
   });
 
-  await t.test("moveEntityTool: throws when source is empty", async () => {
+  await t.test("zoneActionTool (move): throws when source is empty", async () => {
     const { updateGameStateTool } = await import("../../../../src/handlers/session/core.js");
     await updateGameStateTool.handler({
       sessionId,
@@ -154,8 +159,9 @@ test("session/entities handler tests", async (t) => {
     } as any);
 
     await assert.rejects(
-      () => moveEntityTool.handler({
+      () => zoneActionTool.handler({
         sessionId,
+        action: "move",
         entityId: "anything",
         sourceId: "emptySource",
         targetId: "emptyTarget",
@@ -163,5 +169,30 @@ test("session/entities handler tests", async (t) => {
       } as any),
       (err: Error) => err.message.includes("empty")
     );
+  });
+
+  await t.test("zoneActionTool (insert): inserts cards at top", async () => {
+    const { updateGameStateTool, getGameStateTool } = await import("../../../../src/handlers/session/core.js");
+    await updateGameStateTool.handler({
+      sessionId,
+      patch: { insertDeck: [{ id: "existing" }] },
+    } as any);
+
+    const result = await zoneActionTool.handler({
+      sessionId,
+      action: "insert",
+      deckId: "insertDeck",
+      cards: [{ id: "new-top" }],
+      position: "top",
+      actor: "Tester",
+    } as any);
+
+    const data = JSON.parse(result.content[0].text);
+    assert.strictEqual(data.inserted, 1);
+    assert.strictEqual(data.deckSize, 2);
+
+    const state = JSON.parse((await getGameStateTool.handler({ sessionId, fields: ["insertDeck"] } as any)).content[0].text);
+    assert.strictEqual(state.insertDeck[0].id, "new-top");
+    assert.strictEqual(state.insertDeck[1].id, "existing");
   });
 });

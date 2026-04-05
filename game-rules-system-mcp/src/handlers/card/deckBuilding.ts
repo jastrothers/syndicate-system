@@ -5,8 +5,7 @@
  */
 import { z } from "zod";
 import { getSession, saveSession } from "../../services/SessionStore.js";
-import { shuffleArray, matchesFilter, validateFilterClause, expandCardTemplates, FilterClause } from "../../services/DeckService.js";
-import { filterSchema } from "./deck.js";
+import { shuffleArray, expandCardTemplates } from "../../services/DeckService.js";
 import { defineTool, ToolDefinition } from "../types.js";
 import { jsonResponse } from "../response.js";
 
@@ -67,38 +66,6 @@ export const createDeckFromTemplateTool = defineTool({
   },
 });
 
-
-export const countZoneTool = defineTool({
-  name: "count_zone",
-  description:
-    "Return the count of items in a state array, optionally filtered by criteria. Useful for checking pile sizes, hand counts, and conditional checks.",
-  schema: z.object({
-    sessionId: z.string().describe("The ID of the playtest session."),
-    zoneId: z.string().describe("State key of the array to count."),
-    filter: filterSchema
-      .optional()
-      .describe("Optional filter to count only matching items."),
-  }),
-  handler: async (args) => {
-    const session = await getSession(args.sessionId);
-    const zone = session.state[args.zoneId];
-    if (!Array.isArray(zone)) {
-      throw new Error(`State key '${args.zoneId}' is not an array.`);
-    }
-
-    let count: number;
-    if (args.filter) {
-      validateFilterClause(args.filter as FilterClause);
-      count = zone.filter((item) =>
-        matchesFilter(item, args.filter as FilterClause)
-      ).length;
-    } else {
-      count = zone.length;
-    }
-
-    return jsonResponse({ zoneId: args.zoneId, count, filtered: !!args.filter });
-  },
-});
 
 export const revealCardsTool = defineTool({
   name: "reveal_cards",
@@ -216,6 +183,5 @@ export const createDeckFromReferenceTool = defineTool({
 export const deckBuildingTools: ToolDefinition[] = [
   createDeckFromTemplateTool,
   createDeckFromReferenceTool,
-  countZoneTool,
   revealCardsTool,
 ];

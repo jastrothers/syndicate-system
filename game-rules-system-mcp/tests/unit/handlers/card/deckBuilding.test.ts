@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert";
-import { createDeckFromTemplateTool, countZoneTool, revealCardsTool } from "../../../../src/handlers/card/deckBuilding.js";
+import { createDeckFromTemplateTool, revealCardsTool } from "../../../../src/handlers/card/deckBuilding.js";
 import { initialize as initSessions, createSession, closeDb } from "../../../../src/services/SessionStore.js";
 import { updateGameStateTool, getGameStateTool } from "../../../../src/handlers/session/core.js";
 
@@ -56,49 +56,6 @@ test("card/deckBuilding handler tests", async (t) => {
     assert.strictEqual(new Set(ids).size, 3, "All generated ids should be unique");
     // All ids should be present (non-null/undefined)
     assert.ok(ids.every((id: string) => typeof id === "string" && id.length > 0));
-  });
-
-  await t.test("countZoneTool: counts total items", async () => {
-    await updateGameStateTool.handler({
-      sessionId,
-      patch: { countZone: [{ type: "a" }, { type: "b" }, { type: "a" }] },
-    } as any);
-
-    const result = await countZoneTool.handler({
-      sessionId,
-      zoneId: "countZone",
-    } as any);
-
-    const data = JSON.parse(result.content[0].text);
-    assert.strictEqual(data.count, 3);
-    assert.strictEqual(data.filtered, false);
-  });
-
-  await t.test("countZoneTool: counts filtered items", async () => {
-    const result = await countZoneTool.handler({
-      sessionId,
-      zoneId: "countZone",
-      filter: { key: "type", op: "eq", value: "a" },
-    } as any);
-
-    const data = JSON.parse(result.content[0].text);
-    assert.strictEqual(data.count, 2);
-    assert.strictEqual(data.filtered, true);
-  });
-
-  await t.test("countZoneTool: throws for non-array zone", async () => {
-    await updateGameStateTool.handler({
-      sessionId,
-      patch: { notArray: 42 },
-    } as any);
-
-    await assert.rejects(
-      () => countZoneTool.handler({
-        sessionId,
-        zoneId: "notArray",
-      } as any),
-      (err: Error) => err.message.includes("not an array")
-    );
   });
 
   await t.test("revealCardsTool: reveals specific cards by id", async () => {

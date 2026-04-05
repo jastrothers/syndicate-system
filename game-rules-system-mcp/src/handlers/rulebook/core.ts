@@ -122,39 +122,26 @@ export const updateRuleTool = defineTool({
   },
 });
 
-export const getDraftTool = defineTool({
-  name: "get_draft",
-  description: "Returns the current draft rulebook for a game. Returns latest if no draft exists.",
+export const manageDraftTool = defineTool({
+  name: "manage_draft",
+  description: "Manages the draft lifecycle for a rulebook. action='get' returns the current draft (or latest if none); action='save' saves a complete rulebook object as a draft without touching latest; action='promote' promotes the draft to latest.",
   schema: z.object({
-    rulebookName: z.string().describe("The name of the rulebook to get the draft for."),
+    action: z.enum(["get", "save", "promote"]).describe("The draft operation to perform."),
+    rulebookName: z.string().describe("The name of the rulebook."),
+    rulebook: z.any().optional().describe("Required for action='save': the complete rulebook object to save as draft."),
   }),
   handler: async (args) => {
-    const draft = await getDraft(args.rulebookName);
-    const rulebook = draft || await getRulebook(args.rulebookName);
-    return jsonResponse(rulebook);
-  },
-});
-
-export const saveDraftTool = defineTool({
-  name: "save_draft",
-  description: "Saves a rulebook as a draft without overwriting the latest version.",
-  schema: z.object({
-    rulebookName: z.string().describe("The name of the rulebook to save as a draft."),
-    rulebook: z.any().describe("The complete rulebook object to save."),
-  }),
-  handler: async (args) => {
-    await saveDraft(args.rulebookName, args.rulebook);
-    return textResponse(`Successfully saved draft for rulebook: ${args.rulebookName}`);
-  },
-});
-
-export const promoteDraftTool = defineTool({
-  name: "promote_draft",
-  description: "Promotes the current draft rulebook to the latest version, overwriting it.",
-  schema: z.object({
-    rulebookName: z.string().describe("The name of the rulebook to promote."),
-  }),
-  handler: async (args) => {
+    if (args.action === "get") {
+      const draft = await getDraft(args.rulebookName);
+      const rulebook = draft || await getRulebook(args.rulebookName);
+      return jsonResponse(rulebook);
+    }
+    if (args.action === "save") {
+      if (!args.rulebook) throw new Error("action='save' requires a rulebook object.");
+      await saveDraft(args.rulebookName, args.rulebook);
+      return textResponse(`Successfully saved draft for rulebook: ${args.rulebookName}`);
+    }
+    // promote
     await promoteDraft(args.rulebookName);
     return textResponse(`Successfully promoted draft to latest for rulebook: ${args.rulebookName}`);
   },
@@ -197,7 +184,5 @@ export const rulebookCoreTools: ToolDefinition[] = [
   readRuleSectionTool,
   updateRuleTool,
   deleteRuleTool,
-  getDraftTool,
-  saveDraftTool,
-  promoteDraftTool,
+  manageDraftTool,
 ];
