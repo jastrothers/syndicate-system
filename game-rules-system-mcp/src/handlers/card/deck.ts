@@ -3,7 +3,7 @@
  * Phase 1 — Core Deck Primitives: query (peek/search/count).
  */
 import { z } from "zod";
-import { getSession, saveSession } from "../../services/SessionStore.js";
+import { getSession } from "../../services/SessionStore.js";
 import {
   peekCards,
   searchArray,
@@ -44,13 +44,6 @@ export const queryZoneTool = defineTool({
     if (args.action === "peek") {
       if (!args.count) throw new Error("action='peek' requires a count.");
       const peeked = peekCards(zone, args.count, args.from ?? "top");
-      session.ledger.push({
-        timestamp: new Date().toISOString(),
-        actionType: "peek_at_deck",
-        actor: "System",
-        data: { deckId: args.zoneId, count: args.count, from: args.from, cardsReturned: peeked.length },
-      });
-      await saveSession(args.sessionId, session);
       return jsonResponse(peeked);
     }
 

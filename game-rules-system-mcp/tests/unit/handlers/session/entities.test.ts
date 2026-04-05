@@ -171,6 +171,44 @@ test("session/entities handler tests", async (t) => {
     );
   });
 
+  await t.test("zoneActionTool (draw): throws when actor is missing", async () => {
+    const { updateGameStateTool } = await import("../../../../src/handlers/session/core.js");
+    await updateGameStateTool.handler({
+      sessionId,
+      patch: { needActorDeck: ["A"], needActorHand: [] },
+    } as any);
+
+    await assert.rejects(
+      () => zoneActionTool.handler({
+        sessionId,
+        action: "draw",
+        deckId: "needActorDeck",
+        targetHandId: "needActorHand",
+        count: 1,
+      } as any),
+      (err: Error) => err.message.includes("requires actor")
+    );
+  });
+
+  await t.test("zoneActionTool (move): throws when actor is missing", async () => {
+    const { updateGameStateTool } = await import("../../../../src/handlers/session/core.js");
+    await updateGameStateTool.handler({
+      sessionId,
+      patch: { needActorSrc: ["A"], needActorTgt: [] },
+    } as any);
+
+    await assert.rejects(
+      () => zoneActionTool.handler({
+        sessionId,
+        action: "move",
+        entityId: "A",
+        sourceId: "needActorSrc",
+        targetId: "needActorTgt",
+      } as any),
+      (err: Error) => err.message.includes("requires actor")
+    );
+  });
+
   await t.test("zoneActionTool (insert): inserts cards at top", async () => {
     const { updateGameStateTool, getGameStateTool } = await import("../../../../src/handlers/session/core.js");
     await updateGameStateTool.handler({

@@ -26,7 +26,7 @@ export const zoneActionTool: ToolDefinition = {
       .optional()
       .describe('(insert) Where to insert: "top", "bottom", or a numeric index.'),
     // shared
-    actor: z.string().optional().describe("The actor performing the action. Defaults to 'System' for shuffle."),
+    actor: z.string().optional().describe("The actor performing the action. Required for 'draw' and 'move'; optional for 'shuffle' and 'insert' (defaults to 'System')."),
   }),
   handler: async (args) => {
     const session = await getSession(args.sessionId);
@@ -34,6 +34,9 @@ export const zoneActionTool: ToolDefinition = {
     if (args.action === "draw") {
       if (!args.deckId || !args.targetHandId || !args.count) {
         throw new Error("action='draw' requires deckId, targetHandId, and count.");
+      }
+      if (!args.actor) {
+        throw new Error("action='draw' requires actor.");
       }
       if (!Array.isArray(session.state[args.deckId])) session.state[args.deckId] = [];
       if (!Array.isArray(session.state[args.targetHandId])) session.state[args.targetHandId] = [];
@@ -44,7 +47,7 @@ export const zoneActionTool: ToolDefinition = {
       session.ledger.push({
         timestamp: new Date().toISOString(),
         actionType: "draw_from_deck",
-        actor: args.actor ?? "System",
+        actor: args.actor,
         data: { deckId: args.deckId, handId: args.targetHandId, count: args.count, drawn },
       });
       await saveSession(args.sessionId, session);
@@ -73,6 +76,9 @@ export const zoneActionTool: ToolDefinition = {
       if (!args.entityId || !args.sourceId || !args.targetId) {
         throw new Error("action='move' requires entityId, sourceId, and targetId.");
       }
+      if (!args.actor) {
+        throw new Error("action='move' requires actor.");
+      }
       if (!Array.isArray(session.state[args.sourceId])) session.state[args.sourceId] = [];
       if (!Array.isArray(session.state[args.targetId])) session.state[args.targetId] = [];
 
@@ -97,7 +103,7 @@ export const zoneActionTool: ToolDefinition = {
       session.ledger.push({
         timestamp: new Date().toISOString(),
         actionType: "move_entity",
-        actor: args.actor ?? "System",
+        actor: args.actor,
         data: { entityId: args.entityId, sourceId: args.sourceId, targetId: args.targetId, item: movedItem },
       });
       await saveSession(args.sessionId, session);
