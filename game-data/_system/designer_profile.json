@@ -1,0 +1,12 @@
+{
+  "affinities": {
+    "hand_management": 0.30000000000000004,
+    "deck_building": 0.496,
+    "set_collection": 0.30000000000000004,
+    "tableau_building": 0.30000000000000004,
+    "income": 0.496
+  },
+  "complexityTolerance": 3,
+  "thematicPreferences": [],
+  "lastUpdated": "2026-04-06T01:06:50.348Z"
+}

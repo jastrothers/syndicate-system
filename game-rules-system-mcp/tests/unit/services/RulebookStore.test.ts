@@ -5,10 +5,8 @@ import * as path from "path";
 import { fileURLToPath } from "url";
 import { getRulebookPath, getRulebookDir } from "../../../src/config/paths.js";
 
-// Path to the real game-data directory (independent of TEST_DATA_DIR env var)
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const REAL_GAME_DATA = path.resolve(__dirname, "../../../../..", "game-data");
-import { ensureDataDirectory, getRulebook, saveRulebook, listRulebooks, listVersions, createVersion } from "../../../src/services/RulebookStore.js";
+import { ensureDataDirectory, getRulebook, saveRulebook, listRulebooks, listVersions, createVersion, saveDraft, promoteDraft, getDraft } from "../../../src/services/RulebookStore.js";
 import { Rulebook } from "../../../src/types/index.js";
 
 describe("RulebookStore Units", () => {
@@ -218,9 +216,106 @@ describe("RulebookStore - schema conformance", () => {
   });
 });
 
+describe("RulebookStore - promoteDraft version stamping", () => {
+  const draftTestName = "draft-promote-" + Date.now();
+
+  after(async () => {
+    await fs.rm(getRulebookDir(draftTestName), { recursive: true, force: true }).catch(() => {});
+  });
+
+  it("sets version to 'latest' when draft version is 'draft'", async () => {
+    const rb: Rulebook = {
+      metadata: { title: "Draft Game", version: "draft", lastUpdated: new Date().toISOString() },
+      sections: { setup: { title: "Setup", content: "Do the setup." } },
+    };
+    await saveDraft(draftTestName, rb);
+    await promoteDraft(draftTestName);
+    const promoted = await getRulebook(draftTestName);
+    assert.strictEqual(promoted.metadata.version, "latest");
+  });
+
+  it("preserves non-draft version on promote", async () => {
+    const name2 = draftTestName + "-v2";
+    const rb: Rulebook = {
+      metadata: { title: "Versioned Game", version: "1.0.0", lastUpdated: new Date().toISOString() },
+      sections: {},
+    };
+    await saveDraft(name2, rb);
+    await promoteDraft(name2);
+    const promoted = await getRulebook(name2);
+    assert.strictEqual(promoted.metadata.version, "1.0.0");
+    // Cleanup
+    await fs.rm(getRulebookDir(name2), { recursive: true, force: true }).catch(() => {});
+  });
+
+  it("updates lastUpdated timestamp on promote", async () => {
+    const name3 = draftTestName + "-ts";
+    const oldDate = "2020-01-01T00:00:00.000Z";
+    const rb: Rulebook = {
+      metadata: { title: "Timestamp Game", version: "1.0.0", lastUpdated: oldDate },
+      sections: {},
+    };
+    await saveDraft(name3, rb);
+    await promoteDraft(name3);
+    const promoted = await getRulebook(name3);
+    assert.notStrictEqual(promoted.metadata.lastUpdated, oldDate, "lastUpdated should be refreshed on promote");
+    // Cleanup
+    await fs.rm(getRulebookDir(name3), { recursive: true, force: true }).catch(() => {});
+  });
+
+  it("removes draft file after promoting", async () => {
+    const name4 = draftTestName + "-rm";
+    const rb: Rulebook = {
+      metadata: { title: "Remove Draft", version: "1.0.0", lastUpdated: new Date().toISOString() },
+      sections: {},
+    };
+    await saveDraft(name4, rb);
+    await promoteDraft(name4);
+    const draft = await getDraft(name4);
+    assert.strictEqual(draft, null, "Draft should be removed after promoting");
+    // Cleanup
+    await fs.rm(getRulebookDir(name4), { recursive: true, force: true }).catch(() => {});
+  });
+});
+
 describe("PokNursery-BlissfulBeginnings data integrity", () => {
+  const mockGameName = "PokNurseryBlissfulBeginnings";
+  let tempDir: string;
+
+  before(async () => {
+    tempDir = path.resolve(__dirname, "../../../../temp", "mock-game-" + Date.now());
+    await fs.mkdir(path.join(tempDir, "rulebooks"), { recursive: true });
+    await fs.writeFile(
+      path.join(tempDir, "rulebooks", "latest.json"),
+      JSON.stringify({
+        metadata: {
+          title: "PokéNursery: Blissful Beginnings",
+          version: "0.1.0-draft",
+          lastUpdated: new Date().toISOString(),
+        },
+        sections: {},
+      }),
+      "utf-8",
+    );
+    await fs.mkdir(path.join(tempDir, "design"), { recursive: true });
+    await fs.writeFile(
+      path.join(tempDir, "design", "session-1.json"),
+      JSON.stringify({ gameName: mockGameName, steps: [] }),
+      "utf-8",
+    );
+    await fs.writeFile(
+      path.join(tempDir, "design", "session-2.json"),
+      JSON.stringify({ gameName: mockGameName, steps: [] }),
+      "utf-8",
+    );
+  });
+
+  after(async () => {
+    await fs.rm(tempDir, { recursive: true, force: true }).catch(() => {});
+  });
+
   it("latest.json stores title and version inside metadata (not at root)", async () => {
-    const filePath = path.join(REAL_GAME_DATA, "PokNursery-BlissfulBeginnings", "rulebooks", "latest.json");
+    const filePath = path.join(tempDir, "rulebooks", "latest.json");
     const raw = JSON.parse(await fs.readFile(filePath, "utf-8"));
     assert.ok(raw.metadata?.title, "metadata.title must be present and non-empty");
     assert.ok(raw.metadata?.version, "metadata.version must be present and non-empty");
@@ -229,14 +324,14 @@ describe("PokNursery-BlissfulBeginnings data integrity", () => {
   });
 
   it("all design session JSON files use consistent gameName", async () => {
-    const designDir = path.join(REAL_GAME_DATA, "PokNursery-BlissfulBeginnings", "design");
+    const designDir = path.join(tempDir, "design");
     const files = (await fs.readdir(designDir)).filter((f: string) => f.endsWith(".json"));
     for (const file of files) {
       const raw = JSON.parse(await fs.readFile(path.join(designDir, file), "utf-8"));
       assert.strictEqual(
         raw.gameName,
-        "PokéNursery: Blissful Beginnings",
-        `${file}: expected gameName "PokéNursery: Blissful Beginnings", got "${raw.gameName}"`
+        mockGameName,
+        `${file}: expected gameName "${mockGameName}", got "${raw.gameName}"`,
       );
     }
   });

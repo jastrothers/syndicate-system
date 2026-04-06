@@ -93,11 +93,24 @@ async function checkConsistency(targetPath: string) {
 
     // 3. Look for "Mystery Components" in Rules
     const mysteryRegex = /(\d+)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/g;
-    const ignoreTerms = ['Step', 'Turn', 'Phase', 'Favor', 'AP', 'Baddie', 'Episode', 'Reputation'];
+    const ignoreTerms = [
+        'Step', 'Turn', 'Phase', 'Favor', 'AP', 'Baddie', 'Episode', 'Reputation',
+        'Victory', 'Point', 'Points', 'Round', 'Action', 'Player', 'Players',
+        'Card', 'Cards', 'Tile', 'Tiles', 'Token', 'Tokens', 'Die', 'Dice',
+        'Space', 'Spaces', 'Level', 'Levels', 'Score', 'Scores', 'Resource',
+        'Icon', 'Icons', 'Slot', 'Slots', 'Day', 'Days', 'Week', 'Weeks',
+        'Market', 'Crib', 'Cribs', 'Berry', 'Medicine', 'Song', 'Toy',
+        'Pok', 'Pokemon', 'Baby', 'Evolved', 'Basic', 'Care',
+    ];
     while ((match = mysteryRegex.exec(rulesText)) !== null) {
         const count = match[1];
         const name = match[2];
-        const alreadyKnown = components.some(c => name.toLowerCase().includes(c.name.toLowerCase().replace(/s$/, '').trim()));
+        if (parseInt(count) === 0) continue;
+        const alreadyKnown = components.some(c => {
+            const compWords = c.name.toLowerCase().replace(/s$/, '').trim();
+            const mysteryWords = name.toLowerCase();
+            return mysteryWords.includes(compWords) || compWords.includes(mysteryWords.replace(/s$/, ''));
+        });
 
         if (!alreadyKnown && !ignoreTerms.some(term => name.toLowerCase().includes(term.toLowerCase().replace(/s$/, '')))) {
             warnings.push(`Rules mention "${count} ${name}", but this is not clearly defined in the Components section.`);

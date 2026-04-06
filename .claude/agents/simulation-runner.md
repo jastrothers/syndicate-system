@@ -41,7 +41,7 @@ Run 3 sequential games — one per strategy profile. **Do not parallelize.** Eac
 ### Game Setup (for each game)
 
 1. Call `create_session(gameSlug)` — one MCP session per game.
-2. Use `update_game_state` to reconstruct the initial state from the Setup Manifest.
+2. **IMPORTANT**: `create_session` creates an empty session shell. You MUST call `update_game_state` immediately after to populate the initial game state from the Setup Manifest (board layout, player resources, deck contents, token pools). Sessions without populated state cannot produce meaningful simulation data.
 3. Build decks via `create_deck_from_template` or `create_deck_from_reference` if the game uses decks.
 4. Tag the session metadata with the strategy name (e.g., "Random", "Greedy", "Strategic").
 

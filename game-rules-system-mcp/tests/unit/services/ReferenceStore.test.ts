@@ -20,7 +20,13 @@ describe("ReferenceStore Units", () => {
 
   after(async () => {
     closeDb();
-    await fs.rm(tmpDir, { recursive: true, force: true });
+    try {
+      await fs.rm(tmpDir, { recursive: true, force: true });
+    } catch (e: any) {
+      // On Windows, native SQLite addons release file handles only after GC;
+      // the uniquely-named temp dir will be reclaimed by the OS.
+      if (e.code !== "EBUSY") throw e;
+    }
     delete process.env.TEST_DATA_DIR;
   });
 

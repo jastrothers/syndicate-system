@@ -37,11 +37,18 @@ export const compileMarkdownTool: ToolDefinition = {
       return textResponse(md);
     }
 
-    let md = `# ${rulebook.metadata.title}\n\n`;
-    md += `*Version: ${rulebook.metadata.version}*\n`;
-    md += `*Last Updated: ${new Date(rulebook.metadata.lastUpdated).toLocaleString()}*\n\n`;
+    const title = rulebook.metadata?.title || (rulebook as any).name || args.rulebookName || "Untitled";
+    const version = rulebook.metadata?.version || "0.1.0";
+    const lastUpdated = rulebook.metadata?.lastUpdated || new Date().toISOString();
+    let md = `# ${title}\n\n`;
+    md += `*Version: ${version}*\n`;
+    md += `*Last Updated: ${new Date(lastUpdated).toLocaleString()}*\n\n`;
     md += `---\n\n`;
-    md += generateMarkdown(rulebook.sections, 2);
+    // Filter out internal "metadata" section from visible output
+    const visibleSections = Object.fromEntries(
+      Object.entries(rulebook.sections).filter(([key]) => key !== "metadata")
+    );
+    md += generateMarkdown(visibleSections, 2);
 
     if (args.returnOnly) {
       return textResponse(md);

@@ -127,6 +127,10 @@ export async function promoteDraft(name: string): Promise<void> {
 
   try {
     const draft = await StorageService.readJson<Rulebook>(draftPath);
+    if (!draft.metadata.version || draft.metadata.version === "draft") {
+      draft.metadata.version = "latest";
+    }
+    draft.metadata.lastUpdated = new Date().toISOString();
     await StorageService.saveJson(latestPath, draft);
     await fs.unlink(draftPath);
     invalidateCache(name);

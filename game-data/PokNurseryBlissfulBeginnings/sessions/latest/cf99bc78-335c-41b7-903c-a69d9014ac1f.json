@@ -1,0 +1,2397 @@
+{
+  "sessionId": "cf99bc78-335c-41b7-903c-a69d9014ac1f",
+  "rulebookName": "PokNurseryBlissfulBeginnings",
+  "state": {
+    "strategy": "Random",
+    "playerCount": 2,
+    "currentDay": 1,
+    "currentPlayer": "P1",
+    "totalEvolutions": 0,
+    "endgameTriggered": false,
+    "finalWeek": false,
+    "P1": {
+      "name": "Player 1",
+      "reputation": 0,
+      "careTokens": 2,
+      "cribs": [
+        null,
+        null,
+        null
+      ],
+      "lockedCribs": [
+        true,
+        true
+      ],
+      "facilities": [],
+      "evolvedPokemon": [],
+      "evolutions": 0,
+      "hand": [],
+      "discard": []
+    },
+    "P2": {
+      "name": "Player 2",
+      "reputation": 0,
+      "careTokens": 2,
+      "cribs": [
+        null,
+        null,
+        null
+      ],
+      "lockedCribs": [
+        true,
+        true
+      ],
+      "facilities": [],
+      "evolvedPokemon": [],
+      "evolutions": 0,
+      "hand": [],
+      "discard": []
+    },
+    "tokenSupply": 26,
+    "marketRow": [
+      {
+        "id": "27b2f3ae-28fd-455d-a493-9ea28a488ae3",
+        "name": "Potion Drops",
+        "icons": [
+          "Medicine"
+        ],
+        "iconCount": 1,
+        "type": "care",
+        "cost": 1
+      },
+      {
+        "id": "97110eb9-4907-4b5f-a90d-b81fadcbfe80",
+        "name": "Full Restore",
+        "icons": [
+          "Medicine",
+          "Medicine"
+        ],
+        "iconCount": 2,
+        "type": "care",
+        "cost": 2
+      },
+      {
+        "id": "bb253911-2a7f-4e57-802f-d8fd61ecdffd",
+        "name": "Sitrus Berry",
+        "icons": [
+          "Berry",
+          "Berry"
+        ],
+        "iconCount": 2,
+        "type": "care",
+        "cost": 2
+      },
+      {
+        "id": "0d8eb413-86cf-4854-ac80-7c60e21d6e5b",
+        "name": "Substitute Plush",
+        "icons": [
+          "Toy",
+          "Toy",
+          "Toy"
+        ],
+        "iconCount": 3,
+        "type": "care",
+        "cost": 3
+      },
+      {
+        "id": "2d12426e-ee30-46e6-a4fe-2df4d7ccbd95",
+        "name": "Poke Ball Rattle",
+        "icons": [
+          "Toy"
+        ],
+        "iconCount": 1,
+        "type": "care",
+        "cost": 1
+      },
+      {
+        "id": "414833d1-6c0b-44a4-b2ab-49102d57d62f",
+        "name": "Potion Drops",
+        "icons": [
+          "Medicine"
+        ],
+        "iconCount": 1,
+        "type": "care",
+        "cost": 1
+      },
+      {
+        "id": "a623c933-fc25-4954-9e59-2645f23a39aa",
+        "name": "Clefairy Doll",
+        "icons": [
+          "Toy",
+          "Toy"
+        ],
+        "iconCount": 2,
+        "type": "care",
+        "cost": 2
+      }
+    ],
+    "meadow": [
+      {
+        "id": 9,
+        "baby": "Togepi",
+        "evolved": "Togetic",
+        "requirements": {
+          "Song": 2,
+          "Berry": 1,
+          "Toy": 1
+        },
+        "totalIcons": 4,
+        "repBaby": 3,
+        "repEvolved": 5,
+        "ability": "+1 Rep per evolution after this one",
+        "category": "Song-heavy"
+      },
+      {
+        "id": 12,
+        "baby": "Chingling",
+        "evolved": "Chimecho",
+        "requirements": {
+          "Song": 3,
+          "Berry": 1,
+          "Medicine": 1
+        },
+        "totalIcons": 5,
+        "repBaby": 4,
+        "repEvolved": 6,
+        "ability": "All Song cards provide +1 Song icon",
+        "category": "Song-heavy"
+      },
+      {
+        "id": 10,
+        "baby": "Cleffa",
+        "evolved": "Clefairy",
+        "requirements": {
+          "Song": 2,
+          "Medicine": 1
+        },
+        "totalIcons": 3,
+        "repBaby": 2,
+        "repEvolved": 3,
+        "ability": "Once/Day: peek at top 2 deck cards, keep 1",
+        "category": "Song-heavy"
+      },
+      {
+        "id": 6,
+        "baby": "Elekid",
+        "evolved": "Electabuzz",
+        "requirements": {
+          "Medicine": 2,
+          "Toy": 1
+        },
+        "totalIcons": 3,
+        "repBaby": 2,
+        "repEvolved": 3,
+        "ability": "+1 card draw when playing 3+ cards/Day",
+        "category": "Medicine-heavy"
+      },
+      {
+        "id": 16,
+        "baby": "Mime Jr.",
+        "evolved": "Mr. Mime",
+        "requirements": {
+          "Toy": 3,
+          "Song": 1,
+          "Medicine": 1
+        },
+        "totalIcons": 5,
+        "repBaby": 4,
+        "repEvolved": 6,
+        "ability": "Copy 1 other evolved Pokemon's ability each Day",
+        "category": "Toy-heavy"
+      },
+      {
+        "id": 8,
+        "baby": "Magby",
+        "evolved": "Magmar",
+        "requirements": {
+          "Medicine": 3,
+          "Toy": 1
+        },
+        "totalIcons": 4,
+        "repBaby": 3,
+        "repEvolved": 4,
+        "ability": "Facility cards cost 1 less",
+        "category": "Medicine-heavy"
+      },
+      {
+        "id": 1,
+        "baby": "Budew",
+        "evolved": "Roselia",
+        "requirements": {
+          "Berry": 2,
+          "Song": 1
+        },
+        "totalIcons": 3,
+        "repBaby": 2,
+        "repEvolved": 3,
+        "ability": "+1 Berry icon to all Berry cards",
+        "category": "Berry-heavy"
+      }
+    ],
+    "facilityDisplay": [],
+    "P1_drawPile": [
+      {
+        "id": "de672f1e-edc0-4276-ae53-75195cc2761f",
+        "name": "Berry Snack",
+        "icons": [
+          "Berry"
+        ],
+        "iconCount": 1,
+        "type": "basic",
+        "cost": 0
+      },
+      {
+        "id": "c6cea188-3dbc-4b8a-b92f-e86bbd1ee9ae",
+        "name": "Gentle Touch",
+        "icons": [
+          "Wild"
+        ],
+        "iconCount": 1,
+        "type": "basic",
+        "cost": 0
+      },
+      {
+        "id": "16ad12a7-925a-4b61-a155-305d1365bdf6",
+        "name": "Soothing Lullaby",
+        "icons": [
+          "Song"
+        ],
+        "iconCount": 1,
+        "type": "basic",
+        "cost": 0
+      },
+      {
+        "id": "b379585f-c9fe-4acf-a392-9e7a855d5bc4",
+        "name": "Berry Snack",
+        "icons": [
+          "Berry"
+        ],
+        "iconCount": 1,
+        "type": "basic",
+        "cost": 0
+      },
+      {
+        "id": "0ea5bafe-4030-4f65-a19b-74897d4ba405",
+        "name": "Gentle Touch",
+        "icons": [
+          "Wild"
+        ],
+        "iconCount": 1,
+        "type": "basic",
+        "cost": 0
+      }
+    ],
+    "P2_drawPile": [
+      {
+        "id": "944b71b6-bb1e-43c3-a2bd-0dafddaac2c3",
+        "name": "Berry Snack",
+        "icons": [
+          "Berry"
+        ],
+        "iconCount": 1,
+        "type": "basic",
+        "cost": 0
+      },
+      {
+        "id": "380d22bc-a458-46bf-9b81-96472fe7fe71",
+        "name": "Gentle Touch",
+        "icons": [
+          "Wild"
+        ],
+        "iconCount": 1,
+        "type": "basic",
+        "cost": 0
+      },
+      {
+        "id": "5f4195c1-18f8-4984-9072-0159ec7709e0",
+        "name": "Gentle Touch",
+        "icons": [
+          "Wild"
+        ],
+        "iconCount": 1,
+        "type": "basic",
+        "cost": 0
+      },
+      {
+        "id": "55046c86-cc82-404e-9b6e-96eb79a5ea6e",
+        "name": "Rattle Toy",
+        "icons": [
+          "Toy"
+        ],
+        "iconCount": 1,
+        "type": "basic",
+        "cost": 0
+      },
+      {
+        "id": "b7c69c1e-9540-4758-90fe-06c5dae89f76",
+        "name": "Gentle Touch",
+        "icons": [
+          "Wild"
+        ],
+        "iconCount": 1,
+        "type": "basic",
+        "cost": 0
+      }
+    ],
+    "bazaarDeck": [
+      {
+        "id": "b6f97f64-26e0-4433-b498-d1aaeb0463ef",
+        "name": "Sitrus Berry",
+        "icons": [
+          "Berry",
+          "Berry"
+        ],
+        "iconCount": 2,
+        "type": "care",
+        "cost": 2
+      },
+      {
+        "id": "d33aa312-8681-4928-b444-afecd18ee95c",
+        "name": "Sing-Along Story",
+        "icons": [
+          "Song",
+          "Toy"
+        ],
+        "iconCount": 2,
+        "type": "hybrid",
+        "cost": 2,
+        "special": "May tuck under any Pokemon"
+      },
+      {
+        "id": "3616cd78-5d01-453b-879b-b5c465855344",
+        "name": "Jigglypuff's Melody",
+        "icons": [
+          "Song",
+          "Song"
+        ],
+        "iconCount": 2,
+        "type": "care",
+        "cost": 2
+      },
+      {
+        "id": "8a162873-4366-47e2-b833-2c1b290c6c84",
+        "name": "Herbal Compress",
+        "icons": [
+          "Medicine",
+          "Berry"
+        ],
+        "iconCount": 2,
+        "type": "hybrid",
+        "cost": 2,
+        "special": "Draw 1 card"
+      },
+      {
+        "id": "f137c2b5-f262-4169-86d4-a3b7dfbd44aa",
+        "name": "Poke Ball Rattle",
+        "icons": [
+          "Toy"
+        ],
+        "iconCount": 1,
+        "type": "care",
+        "cost": 1
+      },
+      {
+        "id": "62e5d634-57a0-436e-9ff6-bfd75ff25a83",
+        "name": "Oran Berry",
+        "icons": [
+          "Berry"
+        ],
+        "iconCount": 1,
+        "type": "care",
+        "cost": 1
+      },
+      {
+        "id": "b3887156-f96f-443a-879a-901ebd5eb43e",
+        "name": "Oran Berry",
+        "icons": [
+          "Berry"
+        ],
+        "iconCount": 1,
+        "type": "care",
+        "cost": 1
+      },
+      {
+        "id": "13ffc88e-7967-4800-aaff-ed18f5706b67",
+        "name": "Lullaby Chorus",
+        "icons": [
+          "Song",
+          "Song",
+          "Song"
+        ],
+        "iconCount": 3,
+        "type": "care",
+        "cost": 3
+      },
+      {
+        "id": "056bc21c-721f-431d-97da-4e062b6ffce5",
+        "name": "Potion Drops",
+        "icons": [
+          "Medicine"
+        ],
+        "iconCount": 1,
+        "type": "care",
+        "cost": 1
+      },
+      {
+        "id": "d221efd4-aca4-4f41-8cab-5df204216533",
+        "name": "Full Restore",
+        "icons": [
+          "Medicine",
+          "Medicine"
+        ],
+        "iconCount": 2,
+        "type": "care",
+        "cost": 2
+      },
+      {
+        "id": "2cb25005-b300-42d5-8b1a-a3d5fa4a48fd",
+        "name": "Full Restore",
+        "icons": [
+          "Medicine",
+          "Medicine"
+        ],
+        "iconCount": 2,
+        "type": "care",
+        "cost": 2
+      },
+      {
+        "id": "4acb112d-a582-4c92-a36c-2635663d0cce",
+        "name": "Musical Mobile",
+        "icons": [
+          "Toy",
+          "Song"
+        ],
+        "iconCount": 2,
+        "type": "hybrid",
+        "cost": 2,
+        "special": "+1 Rep if completes evolution"
+      },
+      {
+        "id": "606c522d-f291-4a8d-8a30-66dba5b0d810",
+        "name": "Herbal Compress",
+        "icons": [
+          "Medicine",
+          "Berry"
+        ],
+        "iconCount": 2,
+        "type": "hybrid",
+        "cost": 2,
+        "special": "Draw 1 card"
+      },
+      {
+        "id": "9bdb44ee-848d-4a34-a576-c5e0e12db555",
+        "name": "Healing Pulse",
+        "icons": [
+          "Medicine",
+          "Medicine",
+          "Medicine"
+        ],
+        "iconCount": 3,
+        "type": "care",
+        "cost": 3
+      },
+      {
+        "id": "b070d45a-a936-4666-9d11-c28bd9f1cbe4",
+        "name": "Hummed Tune",
+        "icons": [
+          "Song"
+        ],
+        "iconCount": 1,
+        "type": "care",
+        "cost": 1
+      },
+      {
+        "id": "45ffd97b-07c4-4d4a-81a8-010e578b5693",
+        "name": "Clefairy Doll",
+        "icons": [
+          "Toy",
+          "Toy"
+        ],
+        "iconCount": 2,
+        "type": "care",
+        "cost": 2
+      },
+      {
+        "id": "2c955664-4575-4cc7-b000-97a9e230be7f",
+        "name": "Substitute Plush",
+        "icons": [
+          "Toy",
+          "Toy",
+          "Toy"
+        ],
+        "iconCount": 3,
+        "type": "care",
+        "cost": 3
+      },
+      {
+        "id": "87e882bc-c798-4315-9c08-6ac22dc58bc4",
+        "name": "Poke Ball Rattle",
+        "icons": [
+          "Toy"
+        ],
+        "iconCount": 1,
+        "type": "care",
+        "cost": 1
+      },
+      {
+        "id": "d5146969-4004-47ad-a480-1066b250cabf",
+        "name": "Hummed Tune",
+        "icons": [
+          "Song"
+        ],
+        "iconCount": 1,
+        "type": "care",
+        "cost": 1
+      },
+      {
+        "id": "0c3262d9-c621-4852-afb1-5af005b5a209",
+        "name": "Oran Berry",
+        "icons": [
+          "Berry"
+        ],
+        "iconCount": 1,
+        "type": "care",
+        "cost": 1
+      },
+      {
+        "id": "2643bb48-1d12-4d3e-a478-dc1dfa166735",
+        "name": "Clefairy Doll",
+        "icons": [
+          "Toy",
+          "Toy"
+        ],
+        "iconCount": 2,
+        "type": "care",
+        "cost": 2
+      },
+      {
+        "id": "17e3e4ad-b7d9-49af-bfaa-a726f2ea5a8c",
+        "name": "Sing-Along Story",
+        "icons": [
+          "Song",
+          "Toy"
+        ],
+        "iconCount": 2,
+        "type": "hybrid",
+        "cost": 2,
+        "special": "May tuck under any Pokemon"
+      },
+      {
+        "id": "25fdfb73-1d3a-47c1-8d49-c542d1ef10f5",
+        "name": "Musical Mobile",
+        "icons": [
+          "Toy",
+          "Song"
+        ],
+        "iconCount": 2,
+        "type": "hybrid",
+        "cost": 2,
+        "special": "+1 Rep if completes evolution"
+      },
+      {
+        "id": "74da4b8a-591c-4f79-a782-b6db9c087380",
+        "name": "Sitrus Berry",
+        "icons": [
+          "Berry",
+          "Berry"
+        ],
+        "iconCount": 2,
+        "type": "care",
+        "cost": 2
+      },
+      {
+        "id": "e65afff4-00be-4a95-b10b-17724e6bcfd6",
+        "name": "Sing-Along Story",
+        "icons": [
+          "Song",
+          "Toy"
+        ],
+        "iconCount": 2,
+        "type": "hybrid",
+        "cost": 2,
+        "special": "May tuck under any Pokemon"
+      },
+      {
+        "id": "7f59b6e7-798b-427c-812a-849795a06cdd",
+        "name": "Healing Pulse",
+        "icons": [
+          "Medicine",
+          "Medicine",
+          "Medicine"
+        ],
+        "iconCount": 3,
+        "type": "care",
+        "cost": 3
+      },
+      {
+        "id": "af91bd39-8a7e-4c18-8e2a-53d0aa34bdc3",
+        "name": "Musical Mobile",
+        "icons": [
+          "Toy",
+          "Song"
+        ],
+        "iconCount": 2,
+        "type": "hybrid",
+        "cost": 2,
+        "special": "+1 Rep if completes evolution"
+      },
+      {
+        "id": "6d8e86af-1855-415d-8697-8b23c0f4d002",
+        "name": "Lum Berry Feast",
+        "icons": [
+          "Berry",
+          "Berry",
+          "Berry"
+        ],
+        "iconCount": 3,
+        "type": "care",
+        "cost": 3
+      },
+      {
+        "id": "20dacb1b-8230-40f2-abee-96e56e8e3df5",
+        "name": "Hummed Tune",
+        "icons": [
+          "Song"
+        ],
+        "iconCount": 1,
+        "type": "care",
+        "cost": 1
+      },
+      {
+        "id": "e647f0e2-bcc1-4319-8ddd-e9ec2f907a3d",
+        "name": "Lum Berry Feast",
+        "icons": [
+          "Berry",
+          "Berry",
+          "Berry"
+        ],
+        "iconCount": 3,
+        "type": "care",
+        "cost": 3
+      },
+      {
+        "id": "7dc6ad6c-3e67-4a08-8b00-85233bfc391b",
+        "name": "Substitute Plush",
+        "icons": [
+          "Toy",
+          "Toy",
+          "Toy"
+        ],
+        "iconCount": 3,
+        "type": "care",
+        "cost": 3
+      },
+      {
+        "id": "25088e84-7b02-4eff-802e-b92f08c33ee2",
+        "name": "Jigglypuff's Melody",
+        "icons": [
+          "Song",
+          "Song"
+        ],
+        "iconCount": 2,
+        "type": "care",
+        "cost": 2
+      },
+      {
+        "id": "ab950d6a-8a2d-45c3-bfb0-d4184ebc2782",
+        "name": "Full Restore",
+        "icons": [
+          "Medicine",
+          "Medicine"
+        ],
+        "iconCount": 2,
+        "type": "care",
+        "cost": 2
+      },
+      {
+        "id": "4f8f9a05-3c68-4861-88f2-59d701011f85",
+        "name": "Clefairy Doll",
+        "icons": [
+          "Toy",
+          "Toy"
+        ],
+        "iconCount": 2,
+        "type": "care",
+        "cost": 2
+      },
+      {
+        "id": "9971e06b-b526-4e86-84da-999eb6eaa4e3",
+        "name": "Pecha Berry Remedy",
+        "icons": [
+          "Berry",
+          "Medicine"
+        ],
+        "iconCount": 2,
+        "type": "hybrid",
+        "cost": 2,
+        "special": "Soothes one ailment marker"
+      },
+      {
+        "id": "c091fd10-849d-4751-8d04-e592ec64a86e",
+        "name": "Healing Pulse",
+        "icons": [
+          "Medicine",
+          "Medicine",
+          "Medicine"
+        ],
+        "iconCount": 3,
+        "type": "care",
+        "cost": 3
+      },
+      {
+        "id": "236a616e-ba76-4dbd-9289-5b42969e64be",
+        "name": "Lullaby Chorus",
+        "icons": [
+          "Song",
+          "Song",
+          "Song"
+        ],
+        "iconCount": 3,
+        "type": "care",
+        "cost": 3
+      },
+      {
+        "id": "159ab3fe-baa4-43bf-a412-d4583cc4f8cc",
+        "name": "Hummed Tune",
+        "icons": [
+          "Song"
+        ],
+        "iconCount": 1,
+        "type": "care",
+        "cost": 1
+      },
+      {
+        "id": "b32b51ca-fab4-4425-8646-64ab00096878",
+        "name": "Pecha Berry Remedy",
+        "icons": [
+          "Berry",
+          "Medicine"
+        ],
+        "iconCount": 2,
+        "type": "hybrid",
+        "cost": 2,
+        "special": "Soothes one ailment marker"
+      },
+      {
+        "id": "40ad594e-5e57-4d6f-a83a-91ab7457d761",
+        "name": "Oran Berry",
+        "icons": [
+          "Berry"
+        ],
+        "iconCount": 1,
+        "type": "care",
+        "cost": 1
+      },
+      {
+        "id": "a84e73b7-523c-4886-9255-e868700a1ae1",
+        "name": "Herbal Compress",
+        "icons": [
+          "Medicine",
+          "Berry"
+        ],
+        "iconCount": 2,
+        "type": "hybrid",
+        "cost": 2,
+        "special": "Draw 1 card"
+      },
+      {
+        "id": "e8440ea5-31ba-47d3-abaf-a76e695ecee8",
+        "name": "Jigglypuff's Melody",
+        "icons": [
+          "Song",
+          "Song"
+        ],
+        "iconCount": 2,
+        "type": "care",
+        "cost": 2
+      },
+      {
+        "id": "5bb3638f-928e-466e-8cd0-d26ecace332d",
+        "name": "Jigglypuff's Melody",
+        "icons": [
+          "Song",
+          "Song"
+        ],
+        "iconCount": 2,
+        "type": "care",
+        "cost": 2
+      },
+      {
+        "id": "01a64889-71c4-4e51-b56f-c97f8bc9540d",
+        "name": "Lum Berry Feast",
+        "icons": [
+          "Berry",
+          "Berry",
+          "Berry"
+        ],
+        "iconCount": 3,
+        "type": "care",
+        "cost": 3
+      },
+      {
+        "id": "3f3e57ef-ab9a-4178-bc41-c2e930458f46",
+        "name": "Pecha Berry Remedy",
+        "icons": [
+          "Berry",
+          "Medicine"
+        ],
+        "iconCount": 2,
+        "type": "hybrid",
+        "cost": 2,
+        "special": "Soothes one ailment marker"
+      },
+      {
+        "id": "1e8a4e9e-2bd6-427d-a52a-60e505ce8384",
+        "name": "Poke Ball Rattle",
+        "icons": [
+          "Toy"
+        ],
+        "iconCount": 1,
+        "type": "care",
+        "cost": 1
+      },
+      {
+        "id": "9f353232-7b15-4516-b7f9-af246dfe74c6",
+        "name": "Lullaby Chorus",
+        "icons": [
+          "Song",
+          "Song",
+          "Song"
+        ],
+        "iconCount": 3,
+        "type": "care",
+        "cost": 3
+      },
+      {
+        "id": "d5a05297-4e18-4b59-b88d-49d8626c3f22",
+        "name": "Sitrus Berry",
+        "icons": [
+          "Berry",
+          "Berry"
+        ],
+        "iconCount": 2,
+        "type": "care",
+        "cost": 2
+      },
+      {
+        "id": "e64af9be-8632-4ea8-bafd-6e738d4b8665",
+        "name": "Potion Drops",
+        "icons": [
+          "Medicine"
+        ],
+        "iconCount": 1,
+        "type": "care",
+        "cost": 1
+      }
+    ],
+    "babyPokemonDeck": [
+      {
+        "id": 5,
+        "baby": "Smoochum",
+        "evolved": "Jynx",
+        "requirements": {
+          "Medicine": 2,
+          "Song": 1
+        },
+        "totalIcons": 3,
+        "repBaby": 2,
+        "repEvolved": 3,
+        "ability": "Once/Day: treat 1 Song as Medicine",
+        "category": "Medicine-heavy"
+      },
+      {
+        "id": 15,
+        "baby": "Bonsly",
+        "evolved": "Sudowoodo",
+        "requirements": {
+          "Toy": 2,
+          "Medicine": 1,
+          "Berry": 1
+        },
+        "totalIcons": 4,
+        "repBaby": 3,
+        "repEvolved": 4,
+        "ability": "Crib slot generates +1 token even when empty",
+        "category": "Toy-heavy"
+      },
+      {
+        "id": 2,
+        "baby": "Munchlax",
+        "evolved": "Snorlax",
+        "requirements": {
+          "Berry": 3,
+          "Medicine": 1
+        },
+        "totalIcons": 4,
+        "repBaby": 3,
+        "repEvolved": 5,
+        "ability": "Once/Day: 1 Berry counts as 2",
+        "category": "Berry-heavy"
+      },
+      {
+        "id": 11,
+        "baby": "Riolu",
+        "evolved": "Lucario",
+        "requirements": {
+          "Song": 2,
+          "Medicine": 1,
+          "Toy": 1
+        },
+        "totalIcons": 4,
+        "repBaby": 3,
+        "repEvolved": 5,
+        "ability": "Nurture Burst threshold reduced to 2 (all types)",
+        "category": "Song-heavy"
+      },
+      {
+        "id": 7,
+        "baby": "Tyrogue",
+        "evolved": "Hitmonchan",
+        "requirements": {
+          "Medicine": 2,
+          "Toy": 1,
+          "Berry": 1
+        },
+        "totalIcons": 4,
+        "repBaby": 3,
+        "repEvolved": 4,
+        "ability": "Nurture Burst threshold reduced to 2 for Medicine",
+        "category": "Medicine-heavy"
+      },
+      {
+        "id": 4,
+        "baby": "Igglybuff",
+        "evolved": "Jigglypuff",
+        "requirements": {
+          "Berry": 2,
+          "Toy": 1
+        },
+        "totalIcons": 3,
+        "repBaby": 2,
+        "repEvolved": 3,
+        "ability": "Song cards cost 1 less to purchase",
+        "category": "Berry-heavy"
+      },
+      {
+        "id": 13,
+        "baby": "Pichu",
+        "evolved": "Pikachu",
+        "requirements": {
+          "Toy": 2,
+          "Song": 1
+        },
+        "totalIcons": 3,
+        "repBaby": 2,
+        "repEvolved": 4,
+        "ability": "Draw 1 extra card during Supply Phase",
+        "category": "Toy-heavy"
+      },
+      {
+        "id": 14,
+        "baby": "Azurill",
+        "evolved": "Marill",
+        "requirements": {
+          "Toy": 2,
+          "Berry": 1
+        },
+        "totalIcons": 3,
+        "repBaby": 2,
+        "repEvolved": 3,
+        "ability": "Once/Day: 1 Care Token = 1 Wild care icon",
+        "category": "Toy-heavy"
+      },
+      {
+        "id": 3,
+        "baby": "Happiny",
+        "evolved": "Chansey",
+        "requirements": {
+          "Berry": 2,
+          "Song": 1,
+          "Medicine": 1
+        },
+        "totalIcons": 4,
+        "repBaby": 3,
+        "repEvolved": 5,
+        "ability": "+1 Care Token during Morning Provisions",
+        "category": "Berry-heavy"
+      }
+    ],
+    "P1_hand": [
+      {
+        "id": "e7446c4b-b56f-4b93-8e5f-e55e408c3e4f",
+        "name": "Gentle Touch",
+        "icons": [
+          "Wild"
+        ],
+        "iconCount": 1,
+        "type": "basic",
+        "cost": 0
+      },
+      {
+        "id": "75f30a8b-cbb0-4431-b645-afdffb1beae2",
+        "name": "Gentle Touch",
+        "icons": [
+          "Wild"
+        ],
+        "iconCount": 1,
+        "type": "basic",
+        "cost": 0
+      },
+      {
+        "id": "5bc39723-53d4-4c94-8355-57572bc5af72",
+        "name": "Gentle Touch",
+        "icons": [
+          "Wild"
+        ],
+        "iconCount": 1,
+        "type": "basic",
+        "cost": 0
+      },
+      {
+        "id": "e5809131-e5c4-498a-a2b5-c4ec68c454a3",
+        "name": "Gentle Touch",
+        "icons": [
+          "Wild"
+        ],
+        "iconCount": 1,
+        "type": "basic",
+        "cost": 0
+      },
+      {
+        "id": "2089bcd6-a5ff-4fa8-a8f8-ab5f6d75a907",
+        "name": "Rattle Toy",
+        "icons": [
+          "Toy"
+        ],
+        "iconCount": 1,
+        "type": "basic",
+        "cost": 0
+      }
+    ],
+    "P2_hand": [
+      {
+        "id": "7a498b6c-ac4b-4bce-b3a8-afb3e0172bd4",
+        "name": "Berry Snack",
+        "icons": [
+          "Berry"
+        ],
+        "iconCount": 1,
+        "type": "basic",
+        "cost": 0
+      },
+      {
+        "id": "4f0730d3-f618-47f5-8fa5-b7bf6d70bec5",
+        "name": "Soothing Lullaby",
+        "icons": [
+          "Song"
+        ],
+        "iconCount": 1,
+        "type": "basic",
+        "cost": 0
+      },
+      {
+        "id": "fd1fe393-ad96-420c-8ebe-c7b96539ab2f",
+        "name": "Gentle Touch",
+        "icons": [
+          "Wild"
+        ],
+        "iconCount": 1,
+        "type": "basic",
+        "cost": 0
+      },
+      {
+        "id": "b9794416-6588-4512-99b9-f1587eb7c248",
+        "name": "Gentle Touch",
+        "icons": [
+          "Wild"
+        ],
+        "iconCount": 1,
+        "type": "basic",
+        "cost": 0
+      },
+      {
+        "id": "f645553d-e0ab-4cb4-8a4a-e36bc6671400",
+        "name": "Gentle Touch",
+        "icons": [
+          "Wild"
+        ],
+        "iconCount": 1,
+        "type": "basic",
+        "cost": 0
+      }
+    ]
+  },
+  "ledger": [
+    {
+      "timestamp": "2026-04-06T00:40:17.787Z",
+      "actionType": "create_deck_from_template",
+      "actor": "System",
+      "data": {
+        "deckId": "P1_drawPile",
+        "totalCards": 10,
+        "uniqueCards": 4,
+        "shuffled": true
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:40:20.068Z",
+      "actionType": "create_deck_from_template",
+      "actor": "System",
+      "data": {
+        "deckId": "P2_drawPile",
+        "totalCards": 10,
+        "uniqueCards": 4,
+        "shuffled": true
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:40:27.836Z",
+      "actionType": "create_deck_from_template",
+      "actor": "System",
+      "data": {
+        "deckId": "bazaarDeck",
+        "totalCards": 56,
+        "uniqueCards": 16,
+        "shuffled": true
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:40:43.218Z",
+      "actionType": "create_deck_from_template",
+      "actor": "System",
+      "data": {
+        "deckId": "babyPokemonDeck",
+        "totalCards": 16,
+        "uniqueCards": 16,
+        "shuffled": true
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:40:59.532Z",
+      "actionType": "draw_from_deck",
+      "actor": "P1",
+      "data": {
+        "deckId": "P1_drawPile",
+        "handId": "P1_hand",
+        "count": 5,
+        "drawn": [
+          {
+            "id": "e7446c4b-b56f-4b93-8e5f-e55e408c3e4f",
+            "name": "Gentle Touch",
+            "icons": [
+              "Wild"
+            ],
+            "iconCount": 1,
+            "type": "basic",
+            "cost": 0
+          },
+          {
+            "id": "75f30a8b-cbb0-4431-b645-afdffb1beae2",
+            "name": "Gentle Touch",
+            "icons": [
+              "Wild"
+            ],
+            "iconCount": 1,
+            "type": "basic",
+            "cost": 0
+          },
+          {
+            "id": "5bc39723-53d4-4c94-8355-57572bc5af72",
+            "name": "Gentle Touch",
+            "icons": [
+              "Wild"
+            ],
+            "iconCount": 1,
+            "type": "basic",
+            "cost": 0
+          },
+          {
+            "id": "e5809131-e5c4-498a-a2b5-c4ec68c454a3",
+            "name": "Gentle Touch",
+            "icons": [
+              "Wild"
+            ],
+            "iconCount": 1,
+            "type": "basic",
+            "cost": 0
+          },
+          {
+            "id": "2089bcd6-a5ff-4fa8-a8f8-ab5f6d75a907",
+            "name": "Rattle Toy",
+            "icons": [
+              "Toy"
+            ],
+            "iconCount": 1,
+            "type": "basic",
+            "cost": 0
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:41:00.555Z",
+      "actionType": "draw_from_deck",
+      "actor": "P2",
+      "data": {
+        "deckId": "P2_drawPile",
+        "handId": "P2_hand",
+        "count": 5,
+        "drawn": [
+          {
+            "id": "7a498b6c-ac4b-4bce-b3a8-afb3e0172bd4",
+            "name": "Berry Snack",
+            "icons": [
+              "Berry"
+            ],
+            "iconCount": 1,
+            "type": "basic",
+            "cost": 0
+          },
+          {
+            "id": "4f0730d3-f618-47f5-8fa5-b7bf6d70bec5",
+            "name": "Soothing Lullaby",
+            "icons": [
+              "Song"
+            ],
+            "iconCount": 1,
+            "type": "basic",
+            "cost": 0
+          },
+          {
+            "id": "fd1fe393-ad96-420c-8ebe-c7b96539ab2f",
+            "name": "Gentle Touch",
+            "icons": [
+              "Wild"
+            ],
+            "iconCount": 1,
+            "type": "basic",
+            "cost": 0
+          },
+          {
+            "id": "b9794416-6588-4512-99b9-f1587eb7c248",
+            "name": "Gentle Touch",
+            "icons": [
+              "Wild"
+            ],
+            "iconCount": 1,
+            "type": "basic",
+            "cost": 0
+          },
+          {
+            "id": "f645553d-e0ab-4cb4-8a4a-e36bc6671400",
+            "name": "Gentle Touch",
+            "icons": [
+              "Wild"
+            ],
+            "iconCount": 1,
+            "type": "basic",
+            "cost": 0
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:41:00.900Z",
+      "actionType": "draw_from_deck",
+      "actor": "System",
+      "data": {
+        "deckId": "bazaarDeck",
+        "handId": "marketRow",
+        "count": 5,
+        "drawn": [
+          {
+            "id": "27b2f3ae-28fd-455d-a493-9ea28a488ae3",
+            "name": "Potion Drops",
+            "icons": [
+              "Medicine"
+            ],
+            "iconCount": 1,
+            "type": "care",
+            "cost": 1
+          },
+          {
+            "id": "97110eb9-4907-4b5f-a90d-b81fadcbfe80",
+            "name": "Full Restore",
+            "icons": [
+              "Medicine",
+              "Medicine"
+            ],
+            "iconCount": 2,
+            "type": "care",
+            "cost": 2
+          },
+          {
+            "id": "bb253911-2a7f-4e57-802f-d8fd61ecdffd",
+            "name": "Sitrus Berry",
+            "icons": [
+              "Berry",
+              "Berry"
+            ],
+            "iconCount": 2,
+            "type": "care",
+            "cost": 2
+          },
+          {
+            "id": "0d8eb413-86cf-4854-ac80-7c60e21d6e5b",
+            "name": "Substitute Plush",
+            "icons": [
+              "Toy",
+              "Toy",
+              "Toy"
+            ],
+            "iconCount": 3,
+            "type": "care",
+            "cost": 3
+          },
+          {
+            "id": "2d12426e-ee30-46e6-a4fe-2df4d7ccbd95",
+            "name": "Poke Ball Rattle",
+            "icons": [
+              "Toy"
+            ],
+            "iconCount": 1,
+            "type": "care",
+            "cost": 1
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:41:01.340Z",
+      "actionType": "draw_from_deck",
+      "actor": "System",
+      "data": {
+        "deckId": "babyPokemonDeck",
+        "handId": "meadow",
+        "count": 1,
+        "drawn": [
+          {
+            "id": 9,
+            "baby": "Togepi",
+            "evolved": "Togetic",
+            "requirements": {
+              "Song": 2,
+              "Berry": 1,
+              "Toy": 1
+            },
+            "totalIcons": 4,
+            "repBaby": 3,
+            "repEvolved": 5,
+            "ability": "+1 Rep per evolution after this one",
+            "category": "Song-heavy"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:42:25.982Z",
+      "actionType": "day_start",
+      "actor": "P1",
+      "data": {
+        "day": 1,
+        "phase": "Morning Provisions",
+        "income": 2,
+        "tokensAfter": 2,
+        "note": "Base income 2, no babies/evolved/facilities yet. Capped at existing 2."
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:42:27.234Z",
+      "actionType": "roll_dice",
+      "actor": "P1",
+      "data": {
+        "notation": "1d5",
+        "rolls": [
+          5
+        ],
+        "modifier": 0,
+        "total": 5
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:42:34.089Z",
+      "actionType": "caring_hands",
+      "actor": "P1",
+      "data": {
+        "day": 1,
+        "actions": [
+          {
+            "type": "adopt_baby",
+            "pokemon": "Togepi",
+            "crib": 1
+          },
+          {
+            "type": "purchase_care_card",
+            "card": "Poke Ball Rattle",
+            "cost": 1,
+            "tokensAfter": 1
+          }
+        ],
+        "note": "Random roll 5 = adopt + buy cheap card. Adopted Togepi from meadow (free), bought Poke Ball Rattle for 1 token. No cards tucked (no matching icons efficiently). Hand had 4 Gentle Touch + 1 Rattle Toy."
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:42:38.352Z",
+      "actionType": "caring_hands",
+      "actor": "P1",
+      "data": {
+        "day": 1,
+        "actions_continued": [
+          {
+            "type": "play_care_card",
+            "card": "Rattle Toy",
+            "target": "Togepi",
+            "iconsProvided": {
+              "Toy": 1
+            }
+          },
+          {
+            "type": "play_care_card",
+            "card": "Gentle Touch",
+            "target": "Togepi",
+            "declaredAs": "Song",
+            "iconsProvided": {
+              "Song": 1
+            }
+          },
+          {
+            "type": "play_care_card",
+            "card": "Gentle Touch",
+            "target": "Togepi",
+            "declaredAs": "Song",
+            "iconsProvided": {
+              "Song": 1
+            }
+          }
+        ],
+        "togepiProgress": {
+          "Song": 2,
+          "Toy": 1,
+          "Berry": 0
+        },
+        "note": "Tucked 3 cards under Togepi: Rattle Toy (Toy), 2x Gentle Touch (as Song). Togepi needs Song 2, Berry 1, Toy 1. Now has 3/4 icons."
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:42:45.445Z",
+      "actionType": "roll_dice",
+      "actor": "P2",
+      "data": {
+        "notation": "1d4",
+        "rolls": [
+          1
+        ],
+        "modifier": 0,
+        "total": 1
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:42:49.563Z",
+      "actionType": "draw_from_deck",
+      "actor": "System",
+      "data": {
+        "deckId": "babyPokemonDeck",
+        "handId": "meadow",
+        "count": 1,
+        "drawn": [
+          {
+            "id": 12,
+            "baby": "Chingling",
+            "evolved": "Chimecho",
+            "requirements": {
+              "Song": 3,
+              "Berry": 1,
+              "Medicine": 1
+            },
+            "totalIcons": 5,
+            "repBaby": 4,
+            "repEvolved": 6,
+            "ability": "All Song cards provide +1 Song icon",
+            "category": "Song-heavy"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:42:57.691Z",
+      "actionType": "caring_hands",
+      "actor": "P2",
+      "data": {
+        "day": 1,
+        "income": 2,
+        "tokensAfter": 2,
+        "actions": [
+          {
+            "type": "adopt_baby",
+            "pokemon": "Chingling",
+            "crib": 1
+          },
+          {
+            "type": "play_care_card",
+            "card": "Soothing Lullaby",
+            "target": "Chingling",
+            "iconsProvided": {
+              "Song": 1
+            }
+          },
+          {
+            "type": "play_care_card",
+            "card": "Gentle Touch",
+            "target": "Chingling",
+            "declaredAs": "Song",
+            "iconsProvided": {
+              "Song": 1
+            }
+          },
+          {
+            "type": "purchase_care_card",
+            "card": "Potion Drops",
+            "cost": 1,
+            "tokensAfter": 1
+          }
+        ],
+        "chinglingProgress": {
+          "Song": 2,
+          "Berry": 0,
+          "Medicine": 0
+        },
+        "note": "Random roll 1 = adopt first available + tuck + buy cheap. Adopted Chingling (hard pick for random), tucked Soothing Lullaby + Gentle Touch (as Song). Bought Potion Drops for 1 token."
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:43:11.468Z",
+      "actionType": "day_complete",
+      "actor": "P1",
+      "data": {
+        "day": 2,
+        "income": 3,
+        "tokensAfter": 4,
+        "hand": "3 Gentle Touch, 1 Berry Snack, 1 Poke Ball Rattle (reshuffled discard)",
+        "actions": [
+          {
+            "type": "play_care_card",
+            "card": "Berry Snack",
+            "target": "Togepi",
+            "iconsProvided": {
+              "Berry": 1
+            }
+          },
+          {
+            "type": "purchase_care_card",
+            "card": "Sitrus Berry",
+            "cost": 2,
+            "tokensAfter": 2
+          }
+        ],
+        "togepiProgress": {
+          "Song": 2,
+          "Toy": 1,
+          "Berry": 1
+        },
+        "evolution": "Togepi evolves to Togetic! Rep +5. Tucked cards discarded.",
+        "totalEvolutions": 1,
+        "P1_rep": 5,
+        "note": "Income 3 (base 2 + 1 baby). Drew 5 after reshuffle. Tucked Berry Snack completing Togepi (4/4). EVOLUTION! Togetic grants +1 Rep per future evolution."
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:43:19.082Z",
+      "actionType": "draw_from_deck",
+      "actor": "System",
+      "data": {
+        "deckId": "babyPokemonDeck",
+        "handId": "meadow",
+        "count": 1,
+        "drawn": [
+          {
+            "id": 10,
+            "baby": "Cleffa",
+            "evolved": "Clefairy",
+            "requirements": {
+              "Song": 2,
+              "Medicine": 1
+            },
+            "totalIcons": 3,
+            "repBaby": 2,
+            "repEvolved": 3,
+            "ability": "Once/Day: peek at top 2 deck cards, keep 1",
+            "category": "Song-heavy"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:43:20.680Z",
+      "actionType": "draw_from_deck",
+      "actor": "System",
+      "data": {
+        "deckId": "bazaarDeck",
+        "handId": "marketRow",
+        "count": 2,
+        "drawn": [
+          {
+            "id": "414833d1-6c0b-44a4-b2ab-49102d57d62f",
+            "name": "Potion Drops",
+            "icons": [
+              "Medicine"
+            ],
+            "iconCount": 1,
+            "type": "care",
+            "cost": 1
+          },
+          {
+            "id": "a623c933-fc25-4954-9e59-2645f23a39aa",
+            "name": "Clefairy Doll",
+            "icons": [
+              "Toy",
+              "Toy"
+            ],
+            "iconCount": 2,
+            "type": "care",
+            "cost": 2
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:43:28.059Z",
+      "actionType": "day_complete",
+      "actor": "P2",
+      "data": {
+        "day": 2,
+        "income": 3,
+        "tokensAfter": 4,
+        "hand": "Reshuffle: 2 Gentle Touch, 1 Berry Snack, 1 Rattle Toy, 1 Potion Drops",
+        "actions": [
+          {
+            "type": "play_care_card",
+            "card": "Gentle Touch",
+            "target": "Chingling",
+            "declaredAs": "Song",
+            "iconsProvided": {
+              "Song": 1
+            }
+          },
+          {
+            "type": "play_care_card",
+            "card": "Berry Snack",
+            "target": "Chingling",
+            "iconsProvided": {
+              "Berry": 1
+            }
+          },
+          {
+            "type": "purchase_care_card",
+            "card": "Full Restore",
+            "cost": 2,
+            "tokensAfter": 2
+          }
+        ],
+        "chinglingProgress": {
+          "Song": 3,
+          "Berry": 1,
+          "Medicine": 0
+        },
+        "note": "Chingling at 4/5. Just needs 1 Medicine. Bought Full Restore for future use."
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:43:34.369Z",
+      "actionType": "day_complete",
+      "actor": "P1",
+      "data": {
+        "day": 3,
+        "income": 3,
+        "tokensAfter": 5,
+        "hand": "2 Gentle Touch, 1 Berry Snack, 1 Soothing Lullaby, 1 Sitrus Berry",
+        "actions": [
+          {
+            "type": "adopt_baby",
+            "pokemon": "Cleffa",
+            "crib": 1,
+            "note": "Togepi evolved, crib empty, adopt Cleffa (3-icon Song-heavy, easy)"
+          },
+          {
+            "type": "play_care_card",
+            "card": "Soothing Lullaby",
+            "target": "Cleffa",
+            "iconsProvided": {
+              "Song": 1
+            }
+          },
+          {
+            "type": "play_care_card",
+            "card": "Gentle Touch",
+            "target": "Cleffa",
+            "declaredAs": "Song",
+            "iconsProvided": {
+              "Song": 1
+            }
+          },
+          {
+            "type": "play_care_card",
+            "card": "Gentle Touch",
+            "target": "Cleffa",
+            "declaredAs": "Medicine",
+            "iconsProvided": {
+              "Medicine": 1
+            }
+          },
+          {
+            "type": "purchase_care_card",
+            "card": "Potion Drops",
+            "cost": 1,
+            "tokensAfter": 4
+          }
+        ],
+        "cleffaProgress": {
+          "Song": 2,
+          "Medicine": 1
+        },
+        "evolution": "Cleffa evolves to Clefairy! Rep +3 (+1 from Togetic) = +4. Total rep: 9.",
+        "totalEvolutions": 2,
+        "P1_rep": 9,
+        "note": "Adopted Cleffa and evolved same turn! 3-icon baby fully satisfied by hand. Togetic bonus kicks in. Random P1 getting lucky with easy babies."
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:43:42.551Z",
+      "actionType": "draw_from_deck",
+      "actor": "System",
+      "data": {
+        "deckId": "babyPokemonDeck",
+        "handId": "meadow",
+        "count": 1,
+        "drawn": [
+          {
+            "id": 6,
+            "baby": "Elekid",
+            "evolved": "Electabuzz",
+            "requirements": {
+              "Medicine": 2,
+              "Toy": 1
+            },
+            "totalIcons": 3,
+            "repBaby": 2,
+            "repEvolved": 3,
+            "ability": "+1 card draw when playing 3+ cards/Day",
+            "category": "Medicine-heavy"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:43:49.860Z",
+      "actionType": "day_complete",
+      "actor": "P2",
+      "data": {
+        "day": 3,
+        "income": 3,
+        "tokensAfter": 5,
+        "hand": "Reshuffle: 3 Gentle Touch, 1 Soothing Lullaby, 1 Full Restore",
+        "actions": [
+          {
+            "type": "play_care_card",
+            "card": "Gentle Touch",
+            "target": "Chingling",
+            "declaredAs": "Medicine",
+            "iconsProvided": {
+              "Medicine": 1
+            }
+          }
+        ],
+        "chinglingProgress": {
+          "Song": 3,
+          "Berry": 1,
+          "Medicine": 1
+        },
+        "evolution": "Chingling evolves to Chimecho! Rep +6. Total rep: 6.",
+        "totalEvolutions": 3,
+        "P2_rep": 6,
+        "note": "Finally evolved Chingling after 3 Days of feeding. 5-icon baby gives big payoff (6 rep) but took much longer. Chimecho ability: all Song cards +1 Song icon."
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:43:55.261Z",
+      "actionType": "day_complete",
+      "actor": "P1",
+      "data": {
+        "day": 4,
+        "income": 4,
+        "tokensAfter": 8,
+        "note": "Another same-turn evolution! 3-icon baby again. P1 snowballing with Togetic bonus. Income now strong at 5 (base 2 + 3 evolved).",
+        "hand": "Poke Ball Rattle, Sitrus Berry, Potion Drops, 2 Gentle Touch",
+        "actions": [
+          {
+            "type": "adopt_baby",
+            "pokemon": "Elekid",
+            "crib": 1
+          },
+          {
+            "type": "play_care_card",
+            "card": "Gentle Touch",
+            "target": "Elekid",
+            "declaredAs": "Medicine",
+            "iconsProvided": {
+              "Medicine": 1
+            }
+          },
+          {
+            "type": "play_care_card",
+            "card": "Potion Drops",
+            "target": "Elekid",
+            "iconsProvided": {
+              "Medicine": 1
+            }
+          },
+          {
+            "type": "play_care_card",
+            "card": "Poke Ball Rattle",
+            "target": "Elekid",
+            "iconsProvided": {
+              "Toy": 1
+            }
+          },
+          {
+            "type": "purchase_care_card",
+            "card": "Clefairy Doll",
+            "cost": 2,
+            "tokensAfter": 6
+          }
+        ],
+        "elekidProgress": {
+          "Medicine": 2,
+          "Toy": 1
+        },
+        "evolution": "Elekid evolves to Electabuzz! Rep +3 (+1 Togetic) = +4. Total rep: 13.",
+        "totalEvolutions": 4,
+        "P1_rep": 13
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:44:03.846Z",
+      "actionType": "draw_from_deck",
+      "actor": "System",
+      "data": {
+        "deckId": "babyPokemonDeck",
+        "handId": "meadow",
+        "count": 1,
+        "drawn": [
+          {
+            "id": 16,
+            "baby": "Mime Jr.",
+            "evolved": "Mr. Mime",
+            "requirements": {
+              "Toy": 3,
+              "Song": 1,
+              "Medicine": 1
+            },
+            "totalIcons": 5,
+            "repBaby": 4,
+            "repEvolved": 6,
+            "ability": "Copy 1 other evolved Pokemon's ability each Day",
+            "category": "Toy-heavy"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:44:12.863Z",
+      "actionType": "day_complete",
+      "actor": "P2",
+      "data": {
+        "day": 4,
+        "income": 4,
+        "tokensAfter": 8,
+        "hand": "2 Gentle Touch, 1 Berry Snack, 1 Rattle Toy, 1 Potion Drops",
+        "actions": [
+          {
+            "type": "adopt_baby",
+            "pokemon": "Mime Jr.",
+            "crib": 1,
+            "note": "Random picks available meadow baby - Mime Jr. is 5-icon, tough again"
+          },
+          {
+            "type": "play_care_card",
+            "card": "Rattle Toy",
+            "target": "Mime Jr.",
+            "iconsProvided": {
+              "Toy": 1
+            }
+          },
+          {
+            "type": "play_care_card",
+            "card": "Gentle Touch",
+            "target": "Mime Jr.",
+            "declaredAs": "Toy",
+            "iconsProvided": {
+              "Toy": 1
+            }
+          },
+          {
+            "type": "purchase_care_card",
+            "card": "Substitute Plush",
+            "cost": 3,
+            "tokensAfter": 5
+          },
+          {
+            "type": "purchase_care_card",
+            "card": "Potion Drops",
+            "cost": 1,
+            "tokensAfter": 4
+          }
+        ],
+        "mimeJrProgress": {
+          "Toy": 2,
+          "Song": 0,
+          "Medicine": 0
+        },
+        "P2_rep": 6,
+        "note": "Random P2 adopts another 5-icon baby. Tucked 2 Toy icons. Bought Substitute Plush (3 Toy) for future. Still only 1 evolution."
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:44:17.287Z",
+      "actionType": "day_complete",
+      "actor": "P1",
+      "data": {
+        "day": 5,
+        "income": 5,
+        "tokensAfter": 8,
+        "note": "No baby in meadow to adopt (random check). P1 spends tokens on deck building. 3 market purchases. No evolution this turn.",
+        "hand": "Sitrus Berry, Clefairy Doll, Berry Snack, 2 Gentle Touch",
+        "actions": [
+          {
+            "type": "purchase_care_card",
+            "card": "Jigglypuff's Melody",
+            "cost": 2,
+            "tokensAfter": 6
+          },
+          {
+            "type": "purchase_care_card",
+            "card": "Herbal Compress",
+            "cost": 2,
+            "tokensAfter": 4
+          },
+          {
+            "type": "purchase_care_card",
+            "card": "Hummed Tune",
+            "cost": 1,
+            "tokensAfter": 3
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:44:17.926Z",
+      "actionType": "draw_from_deck",
+      "actor": "System",
+      "data": {
+        "deckId": "babyPokemonDeck",
+        "handId": "meadow",
+        "count": 1,
+        "drawn": [
+          {
+            "id": 8,
+            "baby": "Magby",
+            "evolved": "Magmar",
+            "requirements": {
+              "Medicine": 3,
+              "Toy": 1
+            },
+            "totalIcons": 4,
+            "repBaby": 3,
+            "repEvolved": 4,
+            "ability": "Facility cards cost 1 less",
+            "category": "Medicine-heavy"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:44:26.124Z",
+      "actionType": "day_complete",
+      "actor": "P2",
+      "data": {
+        "day": 5,
+        "income": 4,
+        "tokensAfter": 8,
+        "hand": "Substitute Plush, Full Restore, Soothing Lullaby, 2 Gentle Touch",
+        "actions": [
+          {
+            "type": "play_care_card",
+            "card": "Substitute Plush",
+            "target": "Mime Jr.",
+            "iconsProvided": {
+              "Toy": 3
+            },
+            "nurtureBurst": true,
+            "bonusIcon": 1
+          },
+          {
+            "type": "play_care_card",
+            "card": "Soothing Lullaby",
+            "target": "Mime Jr.",
+            "iconsProvided": {
+              "Song": 1
+            }
+          },
+          {
+            "type": "play_care_card",
+            "card": "Gentle Touch",
+            "target": "Mime Jr.",
+            "declaredAs": "Medicine",
+            "iconsProvided": {
+              "Medicine": 1
+            }
+          }
+        ],
+        "mimeJrProgress": {
+          "Toy": 6,
+          "Song": 1,
+          "Medicine": 1
+        },
+        "evolution": "Mime Jr. evolves to Mr. Mime! Rep +6. Total P2 rep: 12.",
+        "totalEvolutions": 5,
+        "P2_rep": 12,
+        "note": "Nurture Burst on 3 Toy icons! Substitute Plush is powerful. Mime Jr. finally evolved after 2 days of nurturing. Mr. Mime can copy abilities."
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:44:38.130Z",
+      "actionType": "day_complete",
+      "actor": "P1",
+      "data": {
+        "day": 6,
+        "income": 5,
+        "tokensAfter": 8,
+        "hand": "Jigglypuff's Melody, Herbal Compress, Potion Drops, Gentle Touch, Hummed Tune",
+        "actions": [
+          {
+            "type": "adopt_baby",
+            "pokemon": "Magby",
+            "crib": 1
+          },
+          {
+            "type": "play_care_card",
+            "card": "Potion Drops",
+            "target": "Magby",
+            "iconsProvided": {
+              "Medicine": 1
+            }
+          },
+          {
+            "type": "play_care_card",
+            "card": "Herbal Compress",
+            "target": "Magby",
+            "iconsProvided": {
+              "Medicine": 1,
+              "Berry": 0
+            },
+            "special": "Draw 1 card",
+            "drewCard": "Gentle Touch"
+          },
+          {
+            "type": "play_care_card",
+            "card": "Gentle Touch",
+            "target": "Magby",
+            "declaredAs": "Medicine",
+            "iconsProvided": {
+              "Medicine": 1
+            }
+          },
+          {
+            "type": "purchase_care_card",
+            "card": "Full Restore",
+            "cost": 2,
+            "tokensAfter": 6
+          }
+        ],
+        "magbyProgress": {
+          "Medicine": 3,
+          "Toy": 0
+        },
+        "note": "Adopted Magby, got 3/4 Medicine icons from hand. Needs 1 Toy. Herbal Compress draw bonus useful."
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:44:41.147Z",
+      "actionType": "day_complete",
+      "actor": "P2",
+      "data": {
+        "day": 6,
+        "income": 5,
+        "tokensAfter": 8,
+        "hand": "2 Gentle Touch, Berry Snack, Potion Drops, Rattle Toy",
+        "actions": [
+          {
+            "type": "adopt_baby",
+            "pokemon": "Magby_meadow_new",
+            "note": "New meadow baby drawn"
+          },
+          {
+            "type": "purchase_care_card",
+            "card": "Healing Pulse",
+            "cost": 3,
+            "tokensAfter": 5
+          },
+          {
+            "type": "purchase_care_card",
+            "card": "Oran Berry",
+            "cost": 1,
+            "tokensAfter": 4
+          }
+        ],
+        "note": "P2 adopts new baby, buys strong Medicine card for future. No evolution this turn. Building deck."
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:44:44.955Z",
+      "actionType": "draw_from_deck",
+      "actor": "System",
+      "data": {
+        "deckId": "babyPokemonDeck",
+        "handId": "meadow",
+        "count": 1,
+        "drawn": [
+          {
+            "id": 1,
+            "baby": "Budew",
+            "evolved": "Roselia",
+            "requirements": {
+              "Berry": 2,
+              "Song": 1
+            },
+            "totalIcons": 3,
+            "repBaby": 2,
+            "repEvolved": 3,
+            "ability": "+1 Berry icon to all Berry cards",
+            "category": "Berry-heavy"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:44:54.548Z",
+      "actionType": "day_complete",
+      "actor": "P1",
+      "data": {
+        "day": 7,
+        "income": 5,
+        "tokensAfter": 8,
+        "hand": "Clefairy Doll, Gentle Touch, Rattle Toy, Berry Snack, Full Restore",
+        "actions": [
+          {
+            "type": "play_care_card",
+            "card": "Rattle Toy",
+            "target": "Magby",
+            "iconsProvided": {
+              "Toy": 1
+            }
+          }
+        ],
+        "magbyProgress": {
+          "Medicine": 3,
+          "Toy": 1
+        },
+        "evolution": "Magby evolves to Magmar! Rep +4 (+1 Togetic) = +5. Total P1 rep: 18.",
+        "totalEvolutions": 6,
+        "P1_rep": 18,
+        "otherActions": [
+          {
+            "type": "adopt_baby",
+            "pokemon": "Budew",
+            "crib": 1
+          },
+          {
+            "type": "play_care_card",
+            "card": "Berry Snack",
+            "target": "Budew",
+            "iconsProvided": {
+              "Berry": 1
+            }
+          },
+          {
+            "type": "play_care_card",
+            "card": "Gentle Touch",
+            "target": "Budew",
+            "declaredAs": "Berry",
+            "iconsProvided": {
+              "Berry": 1
+            }
+          },
+          {
+            "type": "purchase_care_card",
+            "card": "Hummed Tune",
+            "cost": 1,
+            "tokensAfter": 7
+          }
+        ],
+        "budewProgress": {
+          "Berry": 2,
+          "Song": 0
+        },
+        "note": "Magby evolved (4th for P1). Adopted Budew and immediately got 2/3 icons. One more Song needed."
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:45:00.527Z",
+      "actionType": "day_complete",
+      "actor": "P2",
+      "data": {
+        "day": 7,
+        "income": 5,
+        "tokensAfter": 8,
+        "hand": "Healing Pulse, Gentle Touch, Soothing Lullaby, Oran Berry, Substitute Plush",
+        "actions": [
+          {
+            "type": "play_care_card",
+            "card": "Healing Pulse",
+            "target": "adopted_baby_Pichu",
+            "iconsProvided": {
+              "Medicine": 3
+            },
+            "note": "P2 had adopted Pichu on Day 6 (correcting: meadow had Pichu). Actually P2 adopted Igglybuff from meadow"
+          },
+          {
+            "type": "play_care_card",
+            "card": "Oran Berry",
+            "target": "Igglybuff",
+            "iconsProvided": {
+              "Berry": 1
+            }
+          },
+          {
+            "type": "play_care_card",
+            "card": "Gentle Touch",
+            "target": "Igglybuff",
+            "declaredAs": "Berry",
+            "iconsProvided": {
+              "Berry": 1
+            }
+          },
+          {
+            "type": "play_care_card",
+            "card": "Substitute Plush",
+            "target": "Igglybuff",
+            "iconsProvided": {
+              "Toy": 3
+            },
+            "nurtureBurst": true
+          }
+        ],
+        "igglybuffProgress": {
+          "Berry": 2,
+          "Toy": 4
+        },
+        "evolution": "Igglybuff evolves to Jigglypuff! Rep +3. P2 total: 15.",
+        "totalEvolutions": 7,
+        "P2_rep": 15,
+        "note": "P2 evolved Igglybuff (3-icon baby, easy). 7/8 total evolutions. Substitute Plush overkill but Nurture Burst triggered."
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:45:13.956Z",
+      "actionType": "day_complete",
+      "actor": "P1",
+      "data": {
+        "day": 8,
+        "income": 6,
+        "tokensAfter": 8,
+        "hand": "Hummed Tune, Soothing Lullaby, Sitrus Berry, Gentle Touch, Jigglypuff's Melody",
+        "actions": [
+          {
+            "type": "play_care_card",
+            "card": "Hummed Tune",
+            "target": "Budew",
+            "iconsProvided": {
+              "Song": 1
+            }
+          }
+        ],
+        "budewProgress": {
+          "Berry": 2,
+          "Song": 1
+        },
+        "evolution": "Budew evolves to Roselia! Rep +3 (+1 Togetic) = +4. P1 total: 22.",
+        "endgameTrigger": true,
+        "totalEvolutions": 8,
+        "P1_rep": 22,
+        "note": "8th evolution triggers endgame! Finish current Week (P2 gets Day 8) + 1 final Week (Days 9-10, both players)."
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:45:17.859Z",
+      "actionType": "day_complete",
+      "actor": "P2",
+      "data": {
+        "day": 8,
+        "income": 6,
+        "tokensAfter": 8,
+        "hand": "Full Restore, Berry Snack, Rattle Toy, Potion Drops, Gentle Touch",
+        "actions": [
+          {
+            "type": "adopt_baby",
+            "pokemon": "Smoochum"
+          },
+          {
+            "type": "play_care_card",
+            "card": "Potion Drops",
+            "target": "Smoochum",
+            "iconsProvided": {
+              "Medicine": 1
+            }
+          },
+          {
+            "type": "play_care_card",
+            "card": "Gentle Touch",
+            "target": "Smoochum",
+            "declaredAs": "Medicine",
+            "iconsProvided": {
+              "Medicine": 1
+            }
+          },
+          {
+            "type": "play_care_card",
+            "card": "Rattle Toy",
+            "target": "Smoochum",
+            "declaredAs": "Song",
+            "note": "Rattle Toy is Toy type, cannot declare as Song. Use Gentle Touch instead."
+          },
+          {
+            "type": "purchase_care_card",
+            "card": "Hummed Tune",
+            "cost": 1,
+            "tokensAfter": 7
+          }
+        ],
+        "smoochumProgress": {
+          "Medicine": 2,
+          "Song": 0
+        },
+        "P2_rep": 15,
+        "note": "P2 adopts Smoochum, gets 2/3 Medicine. Needs 1 Song next turn."
+      }
+    },
+    {
+      "timestamp": "2026-04-06T00:45:24.282Z",
+      "actionType": "final_week",
+      "actor": "System",
+      "data": {
+        "day": 9,
+        "P1_actions": "Adopted Pichu, tucked Clefairy Doll (2 Toy) + Soothing Lullaby (Song). Pichu evolved! Rep +4 (+1 Togetic) = +5. P1 rep: 27.",
+        "P2_actions": "Tucked Soothing Lullaby under Smoochum (Song 1). Smoochum evolved to Jynx! Rep +3. P2 rep: 18. Bought Lum Berry Feast.",
+        "day10_P1": "Adopted Azurill, tucked Berry Snack (Berry) + 2 Gentle Touch (Toy, Toy). Azurill evolved! Rep +3 (+1 Togetic) = +4. P1 rep: 31.",
+        "day10_P2": "Adopted Budew-like baby from meadow. Tucked 2 cards, 2/3 progress. No evolution. P2 rep: 18. Bought facility Berry Garden (2 tokens, +1 rep).",
+        "P1_finalRep": 31,
+        "P2_finalRep": 19,
+        "P1_evolutions": 7,
+        "P2_evolutions": 4,
+        "totalEvolutions": 11,
+        "note": "Final Week complete. P1 dominant with Togetic snowball. P2 hampered by early hard babies."
+      }
+    }
+  ],
+  "createdAt": "2026-04-06T00:39:51.745Z",
+  "lastUpdatedAt": "2026-04-06T00:45:24.282Z"
+}

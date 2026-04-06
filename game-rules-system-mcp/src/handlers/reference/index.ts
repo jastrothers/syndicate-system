@@ -6,6 +6,12 @@ import { ToolDefinition } from "../types.js";
 import { jsonResponse, textResponse } from "../response.js";
 import { paginate } from "../pagination.js";
 
+/** Sanitize the optional game name so folder paths and index entries stay consistent. */
+function sanitizeGame(game: string | undefined): string | undefined {
+  if (!game) return undefined;
+  return sanitizeFileName(game) || game;
+}
+
 export const saveReferenceTool: ToolDefinition = {
   name: "save_reference",
   description: "Saves reusable game reference modules as Markdown files and indexes them. Supports batch mode via batch array to save multiple references in one call.",
@@ -26,10 +32,11 @@ export const saveReferenceTool: ToolDefinition = {
     })).optional().describe("Batch mode: save multiple references in one call."),
   }),
   handler: async (args) => {
+    const game = sanitizeGame(args.game);
     if (args.batch && args.batch.length > 0) {
       const items: ReferenceStore.BatchReferenceItem[] = args.batch.map((ref: { name: string; game?: string; version?: string; type: string; tags: string[]; content: string }) => ({
         name: ref.name,
-        game: ref.game || args.game,
+        game: sanitizeGame(ref.game) || game,
         version: ref.version || args.version,
         type: ref.type,
         tags: ref.tags,
@@ -46,7 +53,7 @@ export const saveReferenceTool: ToolDefinition = {
     if (!sanitizeFileName(args.name)) {
       throw new Error(`Invalid reference name: '${args.name}'.`);
     }
-    await ReferenceStore.saveReference(args.name, args.game, args.version, args.type, args.tags, args.content);
+    await ReferenceStore.saveReference(args.name, game, args.version, args.type, args.tags, args.content);
     return textResponse(`Successfully saved reference: ${args.name}`);
   },
 };
@@ -60,7 +67,7 @@ export const getReferenceTool: ToolDefinition = {
     version: z.string().optional().describe("Optional version context.")
   }),
   handler: async (args) => {
-    const ref = await ReferenceStore.getReference(args.name, args.game, args.version);
+    const ref = await ReferenceStore.getReference(args.name, sanitizeGame(args.game), args.version);
     if (!ref) {
       const hint = args.game ? ` for game '${args.game}'` : "";
       const versionHint = args.version ? ` version '${args.version}'` : "";
@@ -84,7 +91,7 @@ export const listReferencesTool: ToolDefinition = {
     offset: z.number().int().nonnegative().optional().default(0).describe("Number of results to skip. Default: 0."),
   }),
   handler: async (args) => {
-    const allRefs = await ReferenceStore.queryReferences(args.game, args.version, args.type, args.tags);
+    const allRefs = await ReferenceStore.queryReferences(sanitizeGame(args.game), args.version, args.type, args.tags);
     return jsonResponse(paginate(allRefs, args.offset, args.limit));
   },
 };
@@ -109,19 +116,20 @@ export const deleteReferenceTool: ToolDefinition = {
     hard: z.boolean().optional().default(false).describe("If true, permanently deletes the file and index entry. If false (default), tombstones the reference."),
   }),
   handler: async (args) => {
+    const game = sanitizeGame(args.game) || args.game;
     if (!args.hard) {
       // Soft-delete: tombstone via saveReference
-      const existing = await ReferenceStore.getReference(args.name, args.game, args.version);
+      const existing = await ReferenceStore.getReference(args.name, game, args.version);
       if (!existing) {
-        throw new Error(`Reference '${args.name}' not found for game '${args.game}'.`);
+        throw new Error(`Reference '${args.name}' not found for game '${game}'.`);
       }
-      await ReferenceStore.saveReference(args.name, args.game, args.version, existing.type, existing.tags, existing.content, true);
-      return textResponse(`Reference '${args.name}' has been soft-deleted (tombstoned) for game '${args.game}'.`);
+      await ReferenceStore.saveReference(args.name, game, args.version, existing.type, existing.tags, existing.content, true);
+      return textResponse(`Reference '${args.name}' has been soft-deleted (tombstoned) for game '${game}'.`);
     }
 
     // Hard-delete: remove file and DB row
     const resolvedVersion = args.version || "latest";
-    const filePath = getReferenceFilePath(args.name, args.game, resolvedVersion);
+    const filePath = getReferenceFilePath(args.name, game, resolvedVersion);
 
     try {
       await fs.unlink(filePath);
@@ -137,7 +145,7 @@ export const deleteReferenceTool: ToolDefinition = {
 
     return jsonResponse({
       status: "success",
-      message: `Reference '${args.name}' has been permanently deleted for game '${args.game}' (version: ${resolvedVersion}).`,
+      message: `Reference '${args.name}' has been permanently deleted for game '${game}' (version: ${resolvedVersion}).`,
       deletedFile: filePath,
     });
   },
