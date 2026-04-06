@@ -5,9 +5,7 @@ import * as path from "path";
 import { fileURLToPath } from "url";
 import { getRulebookPath, getRulebookDir } from "../../../src/config/paths.js";
 
-// Path to the real game-data directory (independent of TEST_DATA_DIR env var)
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const REAL_GAME_DATA = path.resolve(__dirname, "../../../../..", "game-data");
 import { ensureDataDirectory, getRulebook, saveRulebook, listRulebooks, listVersions, createVersion, saveDraft, promoteDraft, getDraft } from "../../../src/services/RulebookStore.js";
 import { Rulebook } from "../../../src/types/index.js";
 
@@ -281,13 +279,43 @@ describe("RulebookStore - promoteDraft version stamping", () => {
 });
 
 describe("PokNursery-BlissfulBeginnings data integrity", () => {
-  it("latest.json stores title and version inside metadata (not at root)", async () => {
-    const filePath = path.join(
-      REAL_GAME_DATA,
-      "PokNurseryBlissfulBeginningss",
-      "rulebooks",
-      "latest.json",
+  const mockGameName = "PokNurseryBlissfulBeginnings";
+  let tempDir: string;
+
+  before(async () => {
+    tempDir = path.resolve(__dirname, "../../../../temp", "mock-game-" + Date.now());
+    await fs.mkdir(path.join(tempDir, "rulebooks"), { recursive: true });
+    await fs.writeFile(
+      path.join(tempDir, "rulebooks", "latest.json"),
+      JSON.stringify({
+        metadata: {
+          title: "PokéNursery: Blissful Beginnings",
+          version: "0.1.0-draft",
+          lastUpdated: new Date().toISOString(),
+        },
+        sections: {},
+      }),
+      "utf-8",
     );
+    await fs.mkdir(path.join(tempDir, "design"), { recursive: true });
+    await fs.writeFile(
+      path.join(tempDir, "design", "session-1.json"),
+      JSON.stringify({ gameName: mockGameName, steps: [] }),
+      "utf-8",
+    );
+    await fs.writeFile(
+      path.join(tempDir, "design", "session-2.json"),
+      JSON.stringify({ gameName: mockGameName, steps: [] }),
+      "utf-8",
+    );
+  });
+
+  after(async () => {
+    await fs.rm(tempDir, { recursive: true, force: true }).catch(() => {});
+  });
+
+  it("latest.json stores title and version inside metadata (not at root)", async () => {
+    const filePath = path.join(tempDir, "rulebooks", "latest.json");
     const raw = JSON.parse(await fs.readFile(filePath, "utf-8"));
     assert.ok(raw.metadata?.title, "metadata.title must be present and non-empty");
     assert.ok(raw.metadata?.version, "metadata.version must be present and non-empty");
@@ -296,14 +324,14 @@ describe("PokNursery-BlissfulBeginnings data integrity", () => {
   });
 
   it("all design session JSON files use consistent gameName", async () => {
-    const designDir = path.join(REAL_GAME_DATA, "PokNursery-BlissfulBeginnings", "design");
+    const designDir = path.join(tempDir, "design");
     const files = (await fs.readdir(designDir)).filter((f: string) => f.endsWith(".json"));
     for (const file of files) {
       const raw = JSON.parse(await fs.readFile(path.join(designDir, file), "utf-8"));
       assert.strictEqual(
         raw.gameName,
-        "PokNurseryBlissfulBeginnings",
-        `${file}: expected gameName "PokNurseryBlissfulBeginnings", got "${raw.gameName}"`,
+        mockGameName,
+        `${file}: expected gameName "${mockGameName}", got "${raw.gameName}"`,
       );
     }
   });
