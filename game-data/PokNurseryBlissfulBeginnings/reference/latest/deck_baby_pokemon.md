@@ -7,7 +7,7 @@ tags:
   - double-sided
   - core
 lastUpdated: '2026-04-06T00:16:32.280Z'
-game: pokenursery-blissful-beginnings
+game: PokNurseryBlissfulBeginnings
 version: latest
 ---
 # Baby Pokemon Deck

@@ -7,7 +7,7 @@ tags:
   - balance
   - step5
 lastUpdated: '2026-04-06T00:52:33.205Z'
-game: pokenursery-blissful-beginnings
+game: PokNurseryBlissfulBeginnings
 version: latest
 ---
 # Simulation Report — PokéNursery: Blissful Beginnings

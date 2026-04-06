@@ -1,6 +1,12 @@
 {
-  "name": "PokéNursery: Blissful Beginnings",
-  "version": "draft",
+  "metadata": {
+    "title": "PokéNursery: Blissful Beginnings",
+    "version": "0.1.0",
+    "theme": "Chansey and Blissey manage a nursery for baby Pokemon and must nurture them to evolution.",
+    "playerCount": "1-4",
+    "designSession": "46af55fd-d5c8-4e7d-9562-1c16e0568e85",
+    "lastUpdated": "2026-04-06T01:01:01.856Z"
+  },
   "sections": {
     "mechanics": {
       "title": "Core Mechanics",
@@ -51,11 +57,5 @@
       "title": "Quick Reference Card",
       "content": "**Day Summary:**\n1. Morning Provisions — Collect tokens (2 + babies + evolved + facilities, cap 12). Trailing bonus: +1/deficit if 2+ behind leader (max +3).\n2. Supply Run — Draw to 5 cards\n3. Caring Hands — Play cards, buy cards/facilities, adopt babies, spring clean (any order/number)\n4. Growth Check — Evolve ready Pokémon, score Rep, check end trigger\n5. Dusk Cleanup — Discard hand, check Greenhouse (3+ cards = +1 token), refill Meadow, pass turn\n\n**Costs:** Common 1 token/1 icon | Midrange 2/2 | Premium 3/3 | Hybrid 2/2 split + effect | Facility 2-4 | Spring Clean 2 tokens\n\n**Nurture Burst:** 3+ same type on 1 Pokémon in 1 Day = +1 icon (threshold 2 with Lucario/Toy Workshop)\n\n**End:** Final Week after 8 evolutions (2-3P) or 6 evolutions (4P) or 12 Days (solo)\n\n**Income:** 2 + babies + evolved + facilities (cap 12) + trailing bonus\n\n**Meadow:** 2 slots (1-3P) / 3 slots (4P). Refills on adopt + at Dusk Cleanup."
     }
-  },
-  "metadata": {
-    "theme": "Chansey and Blissey manage a nursery for baby Pokemon and must nurture them to evolution.",
-    "playerCount": "1-4",
-    "designSession": "46af55fd-d5c8-4e7d-9562-1c16e0568e85",
-    "lastUpdated": "2026-04-06T01:01:01.856Z"
   }
 }

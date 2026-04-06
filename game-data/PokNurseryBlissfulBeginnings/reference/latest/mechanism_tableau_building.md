@@ -5,7 +5,7 @@ tags:
   - tableau_building
   - nursery
 lastUpdated: '2026-04-06T00:07:34.126Z'
-game: pokenursery-blissful-beginnings
+game: PokNurseryBlissfulBeginnings
 ---
 # Tableau Building
 

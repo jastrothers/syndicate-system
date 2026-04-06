@@ -1,6 +1,6 @@
-# undefined
+# PokéNursery: Blissful Beginnings
 
-*Version: undefined*
+*Version: 0.1.0*
 *Last Updated: 4/5/2026, 9:01:01 PM*
 
 ---
@@ -18,12 +18,6 @@ Welcome to Blossom Grove Nursery, where Chansey caretakers tend to baby Pokémon
 - **Playtime**: 35-70 minutes (scales with player count)
 - **Complexity**: Medium
 - **Core Mechanisms**: Daily Schedule (Hand Management), Blossom Bazaar (Deck Building), Care Combos (Set Collection), Nursery Wing (Tableau Building), Morning Provisions (Income)
-
-## metadata
-
-### Thematic Brief
-
-**Setting**: Blossom Grove Nursery -- a warm, sun-dappled Pokemon nursery at the edge of a small town where Chansey caretakers raise baby Pokemon to evolution.\n\n**Player Identity**: Each player is a Chansey caretaker running their own wing of the nursery. Motivation: earn the most Reputation by nurturing baby Pokemon through Evolution Glows, building Facilities, and growing a thriving Nursery Wing. Stakes: baby Pokemon are counting on you; a neglected nursery loses its reputation and sits empty.\n\n**Tone**: Warm, wholesome, non-combative. Competition is friendly rivalry between colleagues, not conflict. The emotional arc moves from humble quiet beginnings (First Light) through bustling industrious growth (Growing Pains) to a climactic celebration of evolution and care (The Grand Blossom).\n\n**Core Terminology**: Day (turn), Week (round), Daily Schedule (hand), Supply (card), Stockroom (deck), Used Supplies (discard), Blossom Bazaar (market), Growth Chart (set collection), Nursery Wing (tableau), Crib (slot), Morning Provisions (income), Provision Token (currency), Nurture Burst (set bonus), Evolution Glow (evolution trigger), Reputation (victory points), Facility (upgrade), Helper (evolved Pokemon ability).\n\n**Signature Moment**: The Evolution Glow -- when a baby Pokemon's Growth Chart is complete, its Supply cards are fanned out to reveal the full care history, and the baby Pokemon card flips to its evolved side. This is the game's emotional and mechanical climax fused into one instant.\n\n**Aesthetic Direction**: Soft watercolor art style with pastel palette (warm pinks, gentle greens, sky blues, creamy yellows). Rounded card borders. Illustrated Growth Charts that fill in visually as care is provided. Components should feel tactile and gentle -- wooden Provision Tokens, linen-finish cards. The box art depicts a Chansey in an apron surrounded by happy baby Pokemon in a sunlit nursery.
 
 ## Component Manifest
 

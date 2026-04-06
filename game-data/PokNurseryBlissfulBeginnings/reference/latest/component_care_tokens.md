@@ -6,7 +6,7 @@ tags:
   - resource
   - income
 lastUpdated: '2026-04-06T00:16:32.295Z'
-game: pokenursery-blissful-beginnings
+game: PokNurseryBlissfulBeginnings
 version: latest
 ---
 # Care Tokens

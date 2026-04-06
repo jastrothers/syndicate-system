@@ -7,7 +7,7 @@ tags:
   - initial-state
   - machine-readable
 lastUpdated: '2026-04-06T00:33:12.025Z'
-game: pokenursery-blissful-beginnings
+game: PokNurseryBlissfulBeginnings
 version: latest
 ---
 # Setup Manifest — PokéNursery: Blissful Beginnings

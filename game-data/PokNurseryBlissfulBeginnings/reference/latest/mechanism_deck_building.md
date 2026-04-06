@@ -5,7 +5,7 @@ tags:
   - deck_building
   - core
 lastUpdated: '2026-04-06T00:07:34.107Z'
-game: pokenursery-blissful-beginnings
+game: PokNurseryBlissfulBeginnings
 ---
 # Deck Building
 

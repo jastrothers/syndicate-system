@@ -10,7 +10,7 @@ tags:
   - toy
   - bazaar
 lastUpdated: '2026-04-06T00:16:32.285Z'
-game: pokenursery-blissful-beginnings
+game: PokNurseryBlissfulBeginnings
 version: latest
 ---
 # Blossom Bazaar Care Cards

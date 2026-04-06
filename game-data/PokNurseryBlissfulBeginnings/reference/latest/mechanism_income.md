@@ -5,7 +5,7 @@ tags:
   - income
   - engine
 lastUpdated: '2026-04-06T00:07:34.132Z'
-game: pokenursery-blissful-beginnings
+game: PokNurseryBlissfulBeginnings
 ---
 # Income
 

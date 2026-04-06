@@ -5,7 +5,7 @@ tags:
   - set_collection
   - evolution
 lastUpdated: '2026-04-06T00:07:34.115Z'
-game: pokenursery-blissful-beginnings
+game: PokNurseryBlissfulBeginnings
 ---
 # Set Collection
 

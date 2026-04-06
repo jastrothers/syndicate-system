@@ -125,7 +125,7 @@ describe("validateGameName", () => {
   });
 
   it("preserves already-safe names", () => {
-    assert.equal(validateGameName("pokenursery-blissful-beginnings"), "pokenursery-blissful-beginnings");
+    assert.equal(validateGameName("PokNurseryBlissfulBeginnings"), "PokNurseryBlissfulBeginnings");
   });
 
   it("preserves underscores and dashes", () => {

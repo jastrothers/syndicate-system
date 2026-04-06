@@ -6,7 +6,7 @@ tags:
   - player-board
   - tableau
 lastUpdated: '2026-04-06T00:16:32.297Z'
-game: pokenursery-blissful-beginnings
+game: PokNurseryBlissfulBeginnings
 version: latest
 ---
 # Nursery Wing (Player Board)

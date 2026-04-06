@@ -6,7 +6,7 @@ tags:
   - upgrade
   - tableau
 lastUpdated: '2026-04-06T00:16:32.291Z'
-game: pokenursery-blissful-beginnings
+game: PokNurseryBlissfulBeginnings
 version: latest
 ---
 # Facility Cards

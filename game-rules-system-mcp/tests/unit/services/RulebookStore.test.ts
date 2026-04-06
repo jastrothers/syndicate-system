@@ -282,7 +282,12 @@ describe("RulebookStore - promoteDraft version stamping", () => {
 
 describe("PokNursery-BlissfulBeginnings data integrity", () => {
   it("latest.json stores title and version inside metadata (not at root)", async () => {
-    const filePath = path.join(REAL_GAME_DATA, "PokNursery-BlissfulBeginnings", "rulebooks", "latest.json");
+    const filePath = path.join(
+      REAL_GAME_DATA,
+      "PokNurseryBlissfulBeginningss",
+      "rulebooks",
+      "latest.json",
+    );
     const raw = JSON.parse(await fs.readFile(filePath, "utf-8"));
     assert.ok(raw.metadata?.title, "metadata.title must be present and non-empty");
     assert.ok(raw.metadata?.version, "metadata.version must be present and non-empty");
@@ -297,8 +302,8 @@ describe("PokNursery-BlissfulBeginnings data integrity", () => {
       const raw = JSON.parse(await fs.readFile(path.join(designDir, file), "utf-8"));
       assert.strictEqual(
         raw.gameName,
-        "PokéNursery: Blissful Beginnings",
-        `${file}: expected gameName "PokéNursery: Blissful Beginnings", got "${raw.gameName}"`
+        "PokNurseryBlissfulBeginnings",
+        `${file}: expected gameName "PokNurseryBlissfulBeginnings", got "${raw.gameName}"`,
       );
     }
   });

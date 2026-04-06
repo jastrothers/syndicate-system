@@ -8,7 +8,7 @@ tags:
   - pokemon
   - nursery
 lastUpdated: '2026-04-06T01:07:24.228Z'
-game: pokenursery-blissful-beginnings
+game: PokNurseryBlissfulBeginnings
 ---
 # PokéNursery: Blissful Beginnings — Game Brief
 

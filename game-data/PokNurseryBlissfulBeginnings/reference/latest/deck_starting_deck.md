@@ -6,7 +6,7 @@ tags:
   - basic
   - per-player
 lastUpdated: '2026-04-06T00:16:32.288Z'
-game: pokenursery-blissful-beginnings
+game: PokNurseryBlissfulBeginnings
 version: latest
 ---
 # Starting Deck

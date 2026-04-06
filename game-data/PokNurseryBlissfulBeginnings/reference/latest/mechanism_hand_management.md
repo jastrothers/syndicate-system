@@ -5,7 +5,7 @@ tags:
   - hand_management
   - core
 lastUpdated: '2026-04-06T00:07:34.089Z'
-game: pokenursery-blissful-beginnings
+game: PokNurseryBlissfulBeginnings
 ---
 # Hand Management
 
