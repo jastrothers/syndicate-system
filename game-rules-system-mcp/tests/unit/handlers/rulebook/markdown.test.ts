@@ -41,7 +41,7 @@ describe("compileMarkdownTool", () => {
 // ── compile_markdown_rulebook handler output ──────────────────────────────────
 
 describe("compileMarkdownTool handler - file write mode", () => {
-  it("produces '# undefined' header when JSON stores name at root (non-conformant schema)", async () => {
+  it("falls back to root name when metadata.title is missing (no longer produces # undefined)", async () => {
     const brokenName = "broken-md-" + Date.now();
     await fs.mkdir(getRulebookDir(brokenName), { recursive: true });
     await fs.writeFile(getRulebookPath(brokenName), JSON.stringify({
@@ -53,7 +53,8 @@ describe("compileMarkdownTool handler - file write mode", () => {
     try {
       await compileMarkdownTool.handler({ rulebookName: brokenName });
       const md = await fs.readFile(getRulebookMdPath(brokenName), "utf-8");
-      assert.ok(md.startsWith("# undefined\n"), `Expected '# undefined' header, got: ${md.slice(0, 80)}`);
+      assert.ok(!md.startsWith("# undefined"), `Should NOT produce '# undefined', got: ${md.slice(0, 80)}`);
+      assert.ok(md.startsWith("# PokéNursery: Blissful Beginnings"), `Should fall back to root name, got: ${md.slice(0, 80)}`);
     } finally {
       await fs.rm(getRulebookDir(brokenName), { recursive: true, force: true }).catch(() => {});
     }
@@ -137,6 +138,109 @@ describe("compileMarkdownTool handler - returnOnly mode", () => {
         () => compileMarkdownTool.handler({ rulebookName: name, returnOnly: true, section: "nonexistent" }),
         (err: Error) => err.message.includes("not found")
       );
+    } finally {
+      await fs.rm(getRulebookDir(name), { recursive: true, force: true }).catch(() => {});
+    }
+  });
+});
+
+// ── compile_markdown_rulebook - metadata fallback ────────────────────────────
+
+describe("compileMarkdownTool handler - metadata fallback", () => {
+  it("uses fallback title when metadata.title is undefined (no # undefined)", async () => {
+    const name = "fallback-title-" + Date.now();
+    await fs.mkdir(getRulebookDir(name), { recursive: true });
+    await fs.writeFile(getRulebookPath(name), JSON.stringify({
+      name: "PokéNursery: Blissful Beginnings",
+      metadata: { lastUpdated: new Date().toISOString() },
+      sections: {}
+    }), "utf-8");
+    try {
+      const result = await compileMarkdownTool.handler({ rulebookName: name, returnOnly: true });
+      const md = result.content[0].text;
+      assert.ok(!md.includes("# undefined"), `Should not contain '# undefined', got: ${md.slice(0, 100)}`);
+      assert.ok(md.startsWith("# PokéNursery: Blissful Beginnings"), `Should fall back to root name, got: ${md.slice(0, 100)}`);
+    } finally {
+      await fs.rm(getRulebookDir(name), { recursive: true, force: true }).catch(() => {});
+    }
+  });
+
+  it("uses fallback version when metadata.version is undefined (no Version: undefined)", async () => {
+    const name = "fallback-version-" + Date.now();
+    await fs.mkdir(getRulebookDir(name), { recursive: true });
+    await fs.writeFile(getRulebookPath(name), JSON.stringify({
+      metadata: { title: "Test Game", lastUpdated: new Date().toISOString() },
+      sections: {}
+    }), "utf-8");
+    try {
+      const result = await compileMarkdownTool.handler({ rulebookName: name, returnOnly: true });
+      const md = result.content[0].text;
+      assert.ok(!md.includes("Version: undefined"), `Should not contain 'Version: undefined', got: ${md.slice(0, 200)}`);
+      assert.ok(md.includes("Version: 0.1.0"), `Should fall back to 0.1.0, got: ${md.slice(0, 200)}`);
+    } finally {
+      await fs.rm(getRulebookDir(name), { recursive: true, force: true }).catch(() => {});
+    }
+  });
+
+  it("falls back to rulebookName when both metadata.title and root name are missing", async () => {
+    const name = "fallback-rbname-" + Date.now();
+    await fs.mkdir(getRulebookDir(name), { recursive: true });
+    await fs.writeFile(getRulebookPath(name), JSON.stringify({
+      metadata: { lastUpdated: new Date().toISOString() },
+      sections: {}
+    }), "utf-8");
+    try {
+      const result = await compileMarkdownTool.handler({ rulebookName: name, returnOnly: true });
+      const md = result.content[0].text;
+      assert.ok(!md.includes("# undefined"), "Should not contain '# undefined'");
+      assert.ok(md.startsWith(`# ${name}`), `Should fall back to rulebookName, got: ${md.slice(0, 100)}`);
+    } finally {
+      await fs.rm(getRulebookDir(name), { recursive: true, force: true }).catch(() => {});
+    }
+  });
+});
+
+// ── compile_markdown_rulebook - metadata section filtering ──────────────────
+
+describe("compileMarkdownTool handler - metadata section filtering", () => {
+  it("filters out metadata section from compiled markdown", async () => {
+    const name = "meta-filter-" + Date.now();
+    await fs.mkdir(getRulebookDir(name), { recursive: true });
+    await fs.writeFile(getRulebookPath(name), JSON.stringify({
+      metadata: { title: "Test Game", version: "1.0", lastUpdated: new Date().toISOString() },
+      sections: {
+        metadata: { title: "Metadata", content: "Internal metadata section.", subsections: {
+          thematicBrief: { title: "Thematic Brief", content: "Theme stuff." }
+        }},
+        setup: { title: "Setup", content: "Setup the game." }
+      }
+    }), "utf-8");
+    try {
+      const result = await compileMarkdownTool.handler({ rulebookName: name, returnOnly: true });
+      const md = result.content[0].text;
+      assert.ok(!md.includes("## Metadata"), `Should not render metadata section heading, got: ${md}`);
+      assert.ok(!md.includes("Thematic Brief"), `Should not render metadata subsections, got: ${md}`);
+      assert.ok(md.includes("## Setup"), `Should still render non-metadata sections, got: ${md}`);
+    } finally {
+      await fs.rm(getRulebookDir(name), { recursive: true, force: true }).catch(() => {});
+    }
+  });
+
+  it("renders all non-metadata sections normally", async () => {
+    const name = "meta-filter2-" + Date.now();
+    await fs.mkdir(getRulebookDir(name), { recursive: true });
+    await fs.writeFile(getRulebookPath(name), JSON.stringify({
+      metadata: { title: "Test Game", version: "1.0", lastUpdated: new Date().toISOString() },
+      sections: {
+        setup: { title: "Setup", content: "Setup the game." },
+        rules: { title: "Rules", content: "Play the game." }
+      }
+    }), "utf-8");
+    try {
+      const result = await compileMarkdownTool.handler({ rulebookName: name, returnOnly: true });
+      const md = result.content[0].text;
+      assert.ok(md.includes("## Setup"), "Should render setup section");
+      assert.ok(md.includes("## Rules"), "Should render rules section");
     } finally {
       await fs.rm(getRulebookDir(name), { recursive: true, force: true }).catch(() => {});
     }

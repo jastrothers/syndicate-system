@@ -181,6 +181,11 @@ Run the `/game-critique` skill against the `gameSlug` with `sessionId` and `game
 5. If HIGH issues exist:
    - Propose targeted fixes
    - Dispatch to the responsible agent (MechanicsArchitect for economy issues, DetailsArchitect for rule gaps, ComponentDesigner for missing pieces)
+   - **Section Completeness Check**: After applying fixes, verify ALL rulebook sections reflect the changes. Sections commonly missed:
+     - `mechanics` — update if parameters, costs, resource flows, or token caps changed
+     - `overview` — update if theme, player count, or win condition changed
+     - `quick-reference` — must always reflect the latest parameters
+   Use batch mode `update_rule` with `updates` array to update all affected sections in one call.
    - Re-run critique (up to 1 additional iteration, max 2 total)
 6. Exit when no HIGH issues remain AND fun score ≥ 7/10
 

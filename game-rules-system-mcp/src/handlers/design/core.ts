@@ -6,7 +6,7 @@ import { defineTool } from "../types.js";
 import { jsonResponse, textResponse } from "../response.js";
 import { paginate } from "../pagination.js";
 
-function validateGameName(gameName: string): string {
+export function validateGameName(gameName: string): string {
   const safe = sanitizeFileName(gameName);
   if (!safe) throw new Error(`Invalid game name: '${gameName}'.`);
   return safe;
@@ -22,8 +22,8 @@ export const createDesignSessionTool = defineTool({
     prePickedMechanics: z.array(z.string()).optional().describe("Optional list of mechanism IDs pre-selected by the user (max 6). IDs use underscores (e.g. hand_management, deck_building)."),
   }),
   handler: async (args) => {
-    validateGameName(args.gameName);
-    const session = await createDesignSession(args.gameName, args.theme, args.initialPrompt, args.prePickedMechanics);
+    const gameName = validateGameName(args.gameName);
+    const session = await createDesignSession(gameName, args.theme, args.initialPrompt, args.prePickedMechanics);
     return jsonResponse(session);
   },
 });
@@ -46,8 +46,8 @@ export const addDesignStepTool = defineTool({
     }).optional().describe("Forensic trace block linking this step to its evidence trail (Nova Loop format)."),
   }),
   handler: async (args) => {
-    validateGameName(args.gameName);
-    await addDesignStep(args.gameName, args.sessionId, {
+    const gameName = validateGameName(args.gameName);
+    await addDesignStep(gameName, args.sessionId, {
       stepNumber: args.stepNumber,
       persona: args.persona,
       output: args.output,
@@ -74,8 +74,8 @@ export const getDesignSessionTool = defineTool({
     offset: z.number().int().nonnegative().optional().default(0).describe("Number of steps to skip. Default: 0."),
   }),
   handler: async (args) => {
-    validateGameName(args.gameName);
-    const session = await getDesignSession(args.gameName, args.sessionId);
+    const gameName = validateGameName(args.gameName);
+    const session = await getDesignSession(gameName, args.sessionId);
     const page = paginate(session.steps, args.offset, args.limit);
     const steps = args.includeFull
       ? page.items
@@ -104,8 +104,8 @@ export const listDesignSessionsTool = defineTool({
     gameName: z.string().describe("The name of the game."),
   }),
   handler: async (args) => {
-    validateGameName(args.gameName);
-    const sessions = await listDesignSessions(args.gameName);
+    const gameName = validateGameName(args.gameName);
+    const sessions = await listDesignSessions(gameName);
     return jsonResponse(sessions);
   },
 });
@@ -119,8 +119,8 @@ export const deleteDesignSessionTool = defineTool({
     confirm: z.literal(true).describe("Must be explicitly set to true to confirm permanent deletion."),
   }),
   handler: async (args) => {
-    validateGameName(args.gameName);
-    const filePath = getDesignSessionPath(args.gameName, args.sessionId);
+    const gameName = validateGameName(args.gameName);
+    const filePath = getDesignSessionPath(gameName, args.sessionId);
     try {
       await fs.unlink(filePath);
     } catch (err: any) {

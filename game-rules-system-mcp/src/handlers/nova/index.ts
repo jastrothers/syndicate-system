@@ -1,6 +1,7 @@
 import { z } from "zod";
 import * as NovaService from "../../services/NovaService.js";
 import * as ProfileService from "../../services/ProfileService.js";
+import { sanitizeFileName } from "../../config/paths.js";
 import { jsonResponse, textResponse } from "../response.js";
 import { defineTool } from "../types.js";
 
@@ -17,8 +18,9 @@ export const novaTools = [
       impactedMechanisms: z.array(z.string()).describe("List of mechanism IDs targeted by this decision.")
     }),
     handler: async (args) => {
+      const gameName = sanitizeFileName(args.gameName) || args.gameName;
       await NovaService.processDecision(
-        args.gameName,
+        gameName,
         args.sessionId,
         args.stepId,
         args.decision,

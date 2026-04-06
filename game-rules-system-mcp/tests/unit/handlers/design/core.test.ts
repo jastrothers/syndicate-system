@@ -4,6 +4,7 @@ import {
   createDesignSessionTool,
   deleteDesignSessionTool,
   designCoreTools,
+  validateGameName,
 } from "../../../../src/handlers/design/core.js";
 
 // ── Tool registration ─────────────────────────────────────────────────────────
@@ -113,5 +114,29 @@ describe("deleteDesignSessionTool", () => {
   it("schema rejects missing sessionId", () => {
     const result = deleteDesignSessionTool.schema.safeParse({ gameName: "heist" });
     assert.ok(!result.success, "Missing sessionId should fail");
+  });
+});
+
+// ── validateGameName (sanitization) ──────────────────────────────────────────
+
+describe("validateGameName", () => {
+  it("strips special characters and returns sanitized name", () => {
+    assert.equal(validateGameName("PokéNursery: Blissful Beginnings"), "PokNurseryBlissfulBeginnings");
+  });
+
+  it("preserves already-safe names", () => {
+    assert.equal(validateGameName("pokenursery-blissful-beginnings"), "pokenursery-blissful-beginnings");
+  });
+
+  it("preserves underscores and dashes", () => {
+    assert.equal(validateGameName("my_game-v2"), "my_game-v2");
+  });
+
+  it("throws on empty result after sanitization", () => {
+    assert.throws(() => validateGameName(":::"), /Invalid game name/);
+  });
+
+  it("strips spaces, colons, accented characters", () => {
+    assert.equal(validateGameName("Café: Le Jeu!"), "CafLeJeu");
   });
 });

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { getRulebook, saveRulebook, getDraft, saveDraft, promoteDraft } from "../../services/RulebookStore.js";
 import { extractStructure } from "../../services/MarkdownFormatter.js";
-import { RuleSection } from "../../types/index.js";
+import { RuleSection, Rulebook } from "../../types/index.js";
 import { defineTool, ToolDefinition } from "../types.js";
 import { jsonResponse, textResponse } from "../response.js";
 
@@ -48,6 +48,11 @@ export const readRuleSectionTool = defineTool({
   },
 });
 
+/** Replace literal escaped newlines (\\n) with actual newline characters. */
+function normalizeContent(text: string): string {
+  return text.replace(/\\n/g, "\n");
+}
+
 function applyRuleUpdate(sections: Record<string, RuleSection>, update: { path: string; title: string; content?: string; examples?: string[] }) {
   const parts = update.path.split(".");
   let currentMap = sections;
@@ -69,8 +74,8 @@ function applyRuleUpdate(sections: Record<string, RuleSection>, update: { path: 
   currentMap[target] = {
     ...existing,
     title: update.title,
-    ...(update.content !== undefined ? { content: update.content } : {}),
-    ...(update.examples !== undefined ? { examples: update.examples } : {}),
+    ...(update.content !== undefined ? { content: normalizeContent(update.content) } : {}),
+    ...(update.examples !== undefined ? { examples: update.examples.map(normalizeContent) } : {}),
   };
 }
 
@@ -138,7 +143,20 @@ export const manageDraftTool = defineTool({
     }
     if (args.action === "save") {
       if (!args.rulebook) throw new Error("action='save' requires a rulebook object.");
-      await saveDraft(args.rulebookName, args.rulebook);
+      const rb = args.rulebook as Rulebook;
+      if (!rb.metadata) {
+        rb.metadata = { title: "", version: "0.1.0", lastUpdated: new Date().toISOString() };
+      }
+      if (!rb.metadata.title) {
+        rb.metadata.title = (rb as any).name || args.rulebookName || "Untitled Board Game";
+      }
+      if (!rb.metadata.version) {
+        rb.metadata.version = "0.1.0";
+      }
+      if (!rb.metadata.lastUpdated) {
+        rb.metadata.lastUpdated = new Date().toISOString();
+      }
+      await saveDraft(args.rulebookName, rb);
       return textResponse(`Successfully saved draft for rulebook: ${args.rulebookName}`);
     }
     // promote
