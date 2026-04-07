@@ -26,10 +26,10 @@ version: latest
 
 | Resource | Per Player | Shared Supply | Total in Game |
 |---|---|---|---|
-| Care Tokens (1-value) | 2 (from supply) | 30 minus (2 x player count) | 30 |
-| Care Tokens (5-value) | 0 | 10 | 10 |
 | Reputation Tracker (meeple) | 1 (position 0 on track) | 0 | 4 |
 | Start Caretaker Egg | 0 or 1 (first player) | 0 | 1 (not used solo) |
+
+Note: No Care Tokens needed. Cards serve as currency (dual-use: tuck for icons or spend for Care Value).
 
 ## Board State
 
@@ -45,11 +45,10 @@ version: latest
 
 | Player Component | Qty/Player | Contents |
 |---|---|---|
-| Personal Draw Pile | 10 cards | 6 Gentle Touch + 2 Berry Snack + 1 Soothing Lullaby + 1 Rattle Toy (shuffled) |
+| Personal Draw Pile | 10 cards | 3 Gentle Touch + 2 Berry Snack + 2 Soothing Lullaby + 2 Rattle Toy + 1 Potion Drops (shuffled) |
 | Daily Schedule (hand) | 5 cards | Top 5 of shuffled draw pile |
 | Nursery Wing Cribs | 3 unlocked + 2 locked | All empty |
 | Facility Slots | 3 slots | All empty |
-| Care Token Reserve | 2 tokens | 2 x 1-value from supply |
 
 ## First Player
 
@@ -64,6 +63,5 @@ version: latest
 | Caretaker Egg | No | Yes | Yes | Yes |
 | Season Clock | Yes | No | No | No |
 | End Trigger | 12 Days | 8 evolutions | 8 evolutions | 6 evolutions |
-| Starting Tokens/Player | 2 | 2 | 2 | 2 |
 | Nursery Wings | 1 | 2 | 3 | 4 |
 | Starting Decks | 1 (10 cards) | 2 (20 cards) | 3 (30 cards) | 4 (40 cards) |

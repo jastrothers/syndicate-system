@@ -9,4 +9,4 @@ game: PokNurseryBlissfulBeginnings
 ---
 # Hand Management
 
-Hand size: 5 cards. Draw up to 5 at start of Supply Phase. All unplayed cards discard at end of turn (no carry-over). No hard limit on cards playable per turn, but care token costs constrain to ~3-4 effective plays. Core decision: which care cards to play on which Pokémon, and when to hold for better combinations next turn.
+Base hand: 5 cards, plus draw bonuses (+1 per evolved Pokémon, facility/ability bonuses, trailing caretaker bonus). All unplayed cards discard at end of turn (no carry-over). Each card is dual-use: tuck under a Pokémon (use icons) or spend as currency (use Care Value). Core decision: balance tucking cards for evolution progress vs. spending them to acquire better cards from the Blossom Bazaar.

@@ -9,4 +9,4 @@ game: PokNurseryBlissfulBeginnings
 ---
 # Deck Building
 
-Starting deck: 10 cards (6 Basic Care, 2 Berry, 1 Song, 1 Toy). Market row: 5 face-up cards + 1 baby Pokémon slot. Purchase currency: care tokens (1-4 per card). Standard shuffle-when-empty cycling. No trash/thin mechanic in base game. Deck represents the nursery's growing repertoire of care techniques.
+Starting deck: 10 cards (3 Gentle Touch, 2 Berry Snack, 2 Soothing Lullaby, 2 Rattle Toy, 1 Potion Drops). Market row: 5 face-up cards + baby Pokémon Meadow. Purchase currency: cards from hand (spend Care Value). Standard shuffle-when-empty cycling. Spring Cleaning: spend 1 card to permanently remove 1 other card (deck thinning). Deck represents the nursery's growing repertoire of care techniques.

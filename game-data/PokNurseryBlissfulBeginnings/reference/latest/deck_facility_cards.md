@@ -13,13 +13,13 @@ version: latest
 
 **12 cards (6 types x 2 copies), standard poker 63x88mm**
 
-| Name | Cost | Effect | Reputation | Count |
-|------|------|--------|-----------|-------|
+| Name | Cost (Cards) | Effect | Reputation | Count |
+|------|-------------|--------|-----------|-------|
 | Crib Expansion | 3 | Unlock 1 additional Crib slot on Nursery Wing | 1 | 2 |
-| Berry Garden | 2 | +1 Care Token during Morning Provisions | 1 | 2 |
-| Melody Room | 2 | Draw +1 card during Supply Phase | 1 | 2 |
+| Berry Garden | 2 | Your Berry cards have +1 Care Value when spent as currency | 1 | 2 |
+| Melody Room | 2 | Draw +1 card during Supply Run | 1 | 2 |
 | Toy Workshop | 3 | Nurture Burst threshold reduced to 2 for Toy cards | 2 | 2 |
-| Healing Ward | 3 | Once per Day, treat 1 Basic Care card as Medicine | 1 | 2 |
-| Blossom Greenhouse | 4 | End of Day: if you played 4+ cards, gain 1 Care Token | 2 | 2 |
+| Healing Ward | 3 | Once per Day, when you tuck a Medicine card, also add +1 Medicine icon | 1 | 2 |
+| Blossom Greenhouse | 3 | If you tucked 3+ cards this Day, your next purchase this Day costs 1 less (min 0) | 2 | 2 |
 
-Facility cards are purchased from a shared display (all 12 face-up) using Care Tokens. Max 3 facilities per player.
+Facility cards are purchased from a shared display (top 2 face-up) by spending cards from hand whose Care Values total the printed cost. Spent cards go to personal discard. Max 3 facilities per player.
