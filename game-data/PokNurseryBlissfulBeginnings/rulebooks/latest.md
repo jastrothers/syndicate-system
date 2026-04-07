@@ -1,7 +1,7 @@
 # PokéNursery: Blissful Beginnings
 
 *Version: 0.1.0*
-*Last Updated: 4/5/2026, 9:01:01 PM*
+*Last Updated: 4/6/2026, 10:21:19 PM*
 
 ---
 
@@ -70,7 +70,12 @@ Each Baby Pokemon card shows: Care Requirement (3-5 icons from Berry/Medicine/So
    b. 1 **Starting Deck** of 10 cards: 3 Gentle Touch, 2 Berry Snack, 2 Soothing Lullaby, 2 Rattle Toy, 1 Potion Drops. Shuffle and place face-down on the Deck Zone.
    c. 1 **Reputation Tracker** meeple on the 0 space of the Reputation Track.
    d. 1 **Quick Reference Card**.
-9. Each player takes **2 Care Tokens** (1-value each) from the shared supply.
+9. Players take starting **Care Tokens** based on seat order (position relative to the Start Caretaker Egg holder):
+   - 1st player (Start Caretaker Egg): **2 tokens**
+   - 2nd player: **3 tokens**
+   - 3rd player: **4 tokens**
+   - 4th player: **5 tokens**
+   - Solo: **2 tokens**
 10. Draw **5 cards** from your personal draw pile. This is your first **Daily Schedule**.
 
 **Solo Setup (additional steps):**
@@ -89,7 +94,8 @@ Most recently cared for a pet or child receives the Start Caretaker Egg. Fallbac
 | Start Caretaker Egg | Not used | Yes | Yes | Yes |
 | Season Clock Deck | Yes (12 cards) | No | No | No |
 | Round Tracker | Active | Not used | Not used | Not used |
-| End-Game Trigger | 12 Days | 8 evolutions | 8 evolutions | 6 evolutions |
+| End-Game Trigger | 12 Days | 8 evolutions | 8 evolutions | 8 evolutions |
+| Starting Tokens | 2 | 2 / 3 by seat | 2 / 3 / 4 by seat | 2 / 3 / 4 / 5 by seat |
 
 ## Turn Structure
 
@@ -97,7 +103,8 @@ A game is played over **Weeks** (rounds). Each Week, every player takes one **Da
 
 **Phase 1: Morning Provisions (Income)**
 Income = 2 (base) + 1 per Baby Pokémon in Cribs + 1 per Evolved Pokémon in Cribs + Facility bonuses.
-**Trailing Caretaker Bonus**: If you have 2+ fewer evolutions than the leader, gain +1 Care Token per evolution deficit (max +3 bonus).
+**Trailing Caretaker Bonus**: If you have 2+ fewer evolutions than the leader, gain +1 Care Token per evolution deficit (max +2 bonus). This bonus cannot trigger on consecutive Days — if you received it last Day, place a **5-value Care Token** face-down on your board as a cooldown marker; you cannot receive the bonus again until you remove it at the start of your following Day (before Phase 1).
+**One-Behind Consolation**: If you have exactly 1 fewer evolution than the leader, gain +1 Care Token. This consolation has no consecutive-Day restriction and is separate from the Trailing Caretaker Bonus.
 Take tokens from supply. Reserve cap: 12 tokens. Excess income is lost.
 
 **Phase 2: Supply Run (Draw)**
@@ -107,18 +114,19 @@ If personal draw pile is empty, shuffle discard pile into a new draw pile. Draw 
 Perform any number of actions in any order:
 - **Play a Care Card**: Tuck a card from hand under a Baby Pokémon. Icons count toward evolution. Gentle Touch = 1 wild icon (declare type when tucked).
 - **Purchase a Care Card**: Pay printed cost (1-3 tokens). Take from Market Row to personal discard. Refill Market Row from draw pile.
-- **Adopt a Baby Pokémon**: Take from Meadow to an empty unlocked Crib (free). Refill Meadow from Baby Pokémon Draw Pile.
+- **Adopt a Baby Pokémon**: Take from Meadow (or the Nursery Arrival) to an empty unlocked Crib (free). Refill Meadow from Baby Pokémon Draw Pile on adoption.
+- **Advanced Care**: Pay 2 Care Tokens to place **up to 2** bonus icons (any care types, split freely) on one Baby Pokémon in your Cribs. Track each icon with a **1-value Care Token** placed on the Pokémon card. May only target 1 Baby Pokémon per Day. These icons count toward evolution.
 - **Purchase a Facility**: Pay printed cost (2-4 tokens). Place in empty Facility slot (max 3). Refill display.
-- **Spring Cleaning** (new): Pay 2 Care Tokens to remove 1 card from your hand permanently (out of the game). This thins your deck.
+- **Spring Cleaning**: Pay 3 Care Tokens to remove 1 card from your hand permanently (out of the game). This thins your deck.
 - **Pass**: Stop taking actions voluntarily.
 
 **Phase 4: Growth Check (Evolution)**
-Check each Baby Pokémon: if tucked icons meet or exceed ALL printed requirements, it evolves. Flip card to evolved side (Evolution Glow). Discard all tucked cards to personal discard. Gain Reputation equal to printed value. Evolved ability activates next Day. Check end-game trigger after all evolutions resolve.
+Check each Baby Pokémon: if tucked icons plus Advanced Care bonus icons meet or exceed ALL printed requirements, it evolves. Flip card to evolved side (Evolution Glow). Discard all tucked cards to personal discard; return Advanced Care reminder tokens to supply. Gain Reputation equal to printed value. Evolved ability activates next Day. Check end-game trigger after all evolutions resolve.
 
 **Phase 5: Dusk Cleanup**
-Discard all remaining hand cards. Check Blossom Greenhouse (3+ cards played = gain 1 token). Refill Meadow to full if any slots are empty. Pass turn clockwise.
+Discard all remaining hand cards. Check Blossom Greenhouse (3+ cards played = gain 1 token; 5+ cards played = gain 2 tokens instead). Pass turn clockwise.
 
-**End of Week**: After all players complete a Day, pass Start Caretaker Egg clockwise. New Week begins.
+**End of Week**: After all players complete a Day, pass Start Caretaker Egg clockwise. Refill Meadow to full from the Baby Pokémon Draw Pile. Then reveal 1 additional Baby Pokémon face-up beside the Meadow as the **Nursery Arrival**. The player with the **fewest Evolved Pokémon** has first claim on adoption; ties are broken by reverse turn order (latest seat first). If unclaimed at the next End of Week, discard it and reveal a new one. New Week begins.
 
 ## Action Catalog
 
@@ -128,9 +136,10 @@ All actions occur during the Caring Hands phase unless otherwise noted.
 |---|---|---|---|---|
 | Play a Care Card | 0 tokens (card from hand) | Tuck under Baby Pokémon; icons count toward evolution | Must target Baby Pokémon (not Evolved). Card must be in Daily Schedule. | Caring Hands |
 | Purchase a Care Card | 1-3 tokens | Take from Market Row to personal discard; refill row | Sufficient tokens required. Cannot buy from draw pile. | Caring Hands |
-| Adopt a Baby Pokémon | 0 tokens | Take from Meadow to empty Crib; refill Meadow | Must have empty unlocked Crib. Meadow must have a baby available. | Caring Hands |
+| Adopt a Baby Pokémon | 0 tokens | Take from Meadow or Nursery Arrival to empty Crib; Meadow refills immediately on adoption | Must have empty unlocked Crib. Source must have a baby available. Nursery Arrival: trailing player has priority (see Special Rules). | Caring Hands |
+| Advanced Care | 2 tokens | Place **up to 2** bonus icons (any types, split freely) on 1 Baby Pokémon; track with 1-value Care Token reminders | Must target Baby Pokémon. 1 Baby per Day limit. Total icons (tucked + bonus) cannot exceed printed requirement. | Caring Hands |
 | Purchase a Facility | 2-4 tokens | Place in empty Facility slot; active immediately | Must have empty Facility slot (max 3). | Caring Hands |
-| Spring Cleaning | 2 tokens | Remove 1 card from your hand permanently (out of game) | Must have a card in hand. Cannot remove the last card in hand. | Caring Hands |
+| Spring Cleaning | 3 tokens | Remove 1 card from your hand permanently (out of game) | Must have a card in hand. Cannot remove the last card in hand. | Caring Hands |
 | Declare Gentle Touch Type | 0 (part of Play) | Choose care type for wild icon | Declare at time of tucking; permanent. | During Play action |
 | Pass | 0 | End Caring Hands voluntarily | Unspent tokens remain in reserve. | Caring Hands |
 
@@ -143,9 +152,10 @@ All actions occur during the Caring Hands phase unless otherwise noted.
 ## Scoring & Endgame
 
 **Game End Trigger:**
-- 2-3P: 8 total Evolved Pokémon across all players. Complete current Week, then play 1 final complete Week.
-- 4P: 6 total Evolved Pokémon (same procedure).
+- 2-4P: 8 total Evolved Pokémon across all players. Complete current Week, then play 1 final complete Week.
 - Solo: After 12 Days (Season Clock).
+
+**Final-Week Adoption Window**: When the end-game trigger fires, immediately reveal the top 2 Baby Pokémon from the Draw Pile face-up beside the board. During the final Week only, any player who has **0 Evolved Pokémon** may adopt one of these two for free (no Meadow slot required; still requires an empty Crib). Players who adopted then evolved are not eligible — they already gained evolution value. Remove unclaimed cards at game end — they do not score.
 
 **Scoring Sources:**
 1. Evolution Reputation (during play): Printed value per Evolved Pokémon (2-5 Rep).
@@ -173,13 +183,19 @@ All actions occur during the Caring Hands phase unless otherwise noted.
 
 ## Special Rules & Keywords
 
-**Nurture Burst**: Tuck 3+ cards of the same care type under 1 Baby Pokémon in 1 Day = +1 bonus icon of that type. Checked per Pokémon, per type, per Day. Gentle Touch counts for declared type. Lucario reduces threshold to 2 (all types). Toy Workshop reduces threshold to 2 (Toy only). Reductions do not stack below 2.
+**Nurture Burst**: Tuck 3+ cards of the same care type under 1 Baby Pokémon in 1 Day = +1 bonus icon of that type. **Announce Nurture Burst aloud and reveal the triggering cards before tucking** — this is a public event all players observe. Checked per Pokémon, per type, per Day. Gentle Touch counts for declared type. Lucario reduces threshold to 2 (all types). Toy Workshop reduces threshold to 2 (Toy only). Reductions do not stack below 2.
 
-**Evolution Glow**: When a Baby Pokémon's care requirements are fully met during Growth Check, flip to evolved side. Remove all tucked cards to personal discard. Gain printed Reputation. Evolved ability active next Day.
+**Evolution Glow**: When a Baby Pokémon's care requirements are fully met during Growth Check, flip to evolved side. Remove all tucked cards to personal discard; return any Advanced Care reminder tokens to supply. Gain printed Reputation. Evolved ability active next Day.
 
-**Trailing Caretaker Bonus**: During Morning Provisions, if you have 2+ fewer evolutions than the player with the most evolutions, gain +1 Care Token per evolution deficit (max +3 bonus tokens). This is in addition to normal income.
+**Trailing Caretaker Bonus**: During Morning Provisions, if you have 2+ fewer evolutions than the player with the most evolutions, gain +1 Care Token per evolution deficit (max +2 bonus tokens). This is in addition to normal income. **This bonus cannot trigger on consecutive Days** — when you receive it, place a **5-value Care Token** face-down on your board as a cooldown marker; remove it at the start of your following Day (before Phase 1). If the cooldown marker is present when Morning Provisions begins, you do not receive the Trailing Bonus this Day.
 
-**Spring Cleaning**: Pay 2 Care Tokens during Caring Hands to permanently remove 1 card from your hand (out of game, not to discard). Thins your deck for future draws. Cannot remove your last card in hand.
+**One-Behind Consolation**: If you have exactly 1 fewer evolution than the leader, gain +1 Care Token during Morning Provisions. This consolation has no consecutive-Day restriction and is tracked separately from the Trailing Caretaker Bonus.
+
+**Advanced Care**: Pay 2 Care Tokens during Caring Hands to place **up to 2** bonus icons (any care types, split freely between types as you choose) on one Baby Pokémon in your Cribs. Track each bonus icon with a **1-value Care Token** placed on the Pokémon card. You may only use Advanced Care on 1 Baby Pokémon per Day. These icons count toward evolution requirements in Phase 4. Advanced Care icons do not count as tucked cards for Nurture Burst thresholds, Blossom Greenhouse card counts, or abilities referencing "tucked cards." Tokens are returned to supply when the Pokémon evolves.
+
+**Spring Cleaning**: Pay 3 Care Tokens during Caring Hands to permanently remove 1 card from your hand (out of game, not to discard). Thins your deck for future draws. Cannot remove your last card in hand.
+
+**Nursery Arrival**: At the End of each Week, 1 Baby Pokémon is revealed beside the Meadow. The player with the **fewest Evolved Pokémon** has priority claim — they may adopt it on their next turn at no token cost before other players may claim it. Ties in Evolved Pokémon count are broken by reverse turn order (latest seat first). Only one Nursery Arrival is in play at a time; it is not a Meadow slot. If unclaimed at next Week's end, discard it and reveal a new one.
 
 **Evolved Pokémon Abilities (16):**
 - Togetic: +1 Rep per subsequent evolution (maximum 3 bonus Rep total from this ability).
@@ -188,10 +204,10 @@ All actions occur during the Caring Hands phase unless otherwise noted.
 - Jigglypuff: When tucking Song card, also tuck top card of draw pile face-down (counts as 1 wild icon).
 - Hitmonchan: 1/Day, pay 1 token to tuck a card from discard pile instead of hand.
 - Jynx: 1/Day, look at top 3 of Care Card Draw Pile, put 1 on top.
-- Electabuzz: 1/Day, 1 Medicine card provides +1 Medicine icon.
+- Electabuzz: 1/Day, 1 Medicine card provides +1 Medicine icon. **Cannot combine with Healing Ward on the same card on the same Day.**
 - Magmar: Your Pokémon requiring 4+ icons need 1 fewer (minimum 3).
 - Chansey: +1 Care Token during Morning Provisions.
-- Roselia: 1/Day, gain 1 token when tucking a Berry card.
+- Roselia: Once per Day (not once per Berry-card-tuck), gain 1 Care Token when you tuck a Berry card. Triggers at most once per Day regardless of how many Berry cards you tuck.
 - Lucario: Nurture Burst threshold = 2 for all Pokémon.
 - Snorlax: 1/Day, 1 Berry icon counts as 2.
 - Marill: 1/Day, swap 1 hand card with top of draw pile.
@@ -204,8 +220,8 @@ All actions occur during the Caring Hands phase unless otherwise noted.
 - Berry Garden (cost 2): +1 income during Morning Provisions. 1 Rep.
 - Melody Room (cost 2): Draw +1 card during Supply Run. 1 Rep.
 - Toy Workshop (cost 3): Nurture Burst threshold = 2 for Toy. 2 Rep.
-- Healing Ward (cost 3): 1/Day, when you tuck a Medicine card, also add +1 Medicine icon. 1 Rep.
-- Blossom Greenhouse (cost 4): If 3+ cards played in Caring Hands, gain 1 token at Dusk Cleanup. 2 Rep.
+- Healing Ward (cost 3): 1/Day, treat 1 Medicine card you tuck as both a Berry and a Medicine icon (counts as 2 icons of 2 different types). **Cannot combine with Electabuzz on the same card on the same Day.** 1 Rep.
+- Blossom Greenhouse (cost 3): If 3+ cards were played in Caring Hands this Day, gain 1 token at Dusk Cleanup; if 5+ cards were played, gain 2 tokens instead. All cards count toward this threshold — including Gentle Touch and hybrid cards. 2 Rep.
 
 **Wild Icons**: Gentle Touch = 1 icon of any type. Declare when tucked; permanent.
 
@@ -213,14 +229,16 @@ All actions occur during the Caring Hands phase unless otherwise noted.
 
 **Solo Season Clock**: Days 1-4 (First Light): no removal. Days 5-8 (Growing Pains): remove 1 Market Row card after refill. Days 9-12 (Grand Blossom): remove 2 cards after refill.
 
+**Solo Clarifications**: The Trailing Caretaker Bonus, One-Behind Consolation, and Nursery Arrival priority claim do not apply in solo mode (no opponent to trail). The Final-Week Adoption Window does not apply in solo mode (replaced by the Season Clock end condition).
+
 ## Edge Cases & Clarifications
 
 | # | Situation | Resolution |
 |---|---|---|
 | 1 | Care Card Draw Pile empty | Market Row not refilled. Empty slots remain. Players may still buy remaining face-up cards. |
-| 2 | Baby Pokémon Draw Pile empty | Meadow not refilled. Adopt action unavailable when Meadow empty. |
-| 3 | Personal draw + discard both empty | Draw 0 cards. Play Day with 0 hand cards. May still use token-based actions (Purchase, Adopt). |
-| 4 | All Cribs occupied | Cannot adopt. Evolved Pokémon still occupy Cribs. Must buy Crib Expansion for new slots. |
+| 2 | Baby Pokémon Draw Pile empty | Meadow not refilled on adoption. Nursery Arrival and Final-Week Adoption Window cannot be revealed. Adopt action unavailable when Meadow and Nursery Arrival are both empty. |
+| 3 | Personal draw + discard both empty | Draw 0 cards. Play Day with 0 hand cards. May still use token-based actions (Purchase, Adopt, Advanced Care). |
+| 4 | All Cribs occupied | Cannot adopt from Meadow, Nursery Arrival, or Final-Week Window. Evolved Pokémon still occupy Cribs. Must buy Crib Expansion for new slots. |
 | 5 | No legal actions in Caring Hands | Pass. Day continues to Growth Check and Dusk Cleanup. |
 | 6 | Simultaneous ability triggers | Player chooses resolution order. Resolve each fully before next. |
 | 7 | Sing-Along Story usage | Provides Song + Toy icons. May tuck under any Pokémon. Non-matching icons still count. |
@@ -228,27 +246,45 @@ All actions occur during the Caring Hands phase unless otherwise noted.
 | 9 | Multiple purchases per Day | Yes, unlimited Purchase actions per Day. Each resolved individually. |
 | 10 | Facility deck empty | No refill. Buy remaining face-up cards only. |
 | 11 | Reputation exceeds 30 | Game continues. Track above 30 with reminder token. |
-| 12 | Magmar + 3-icon Pokémon | Warmth only reduces 4+ icon requirements. 3-icon Pokémon unaffected. |
+| 12 | Magmar + 3-icon Pokémon | Ability only reduces 4+ icon requirements. 3-icon Pokémon unaffected. |
 | 13 | Spring Cleaning on last card | Cannot Spring Clean if it would leave you with 0 cards in hand. |
 | 14 | Trailing Caretaker Bonus tie | Only triggers if you are 2+ behind the leader. If tied for most evolutions, no bonus. |
-| 15 | Meadow refill timing | Meadow refills immediately when a baby is adopted AND at Dusk Cleanup if any slots empty. |
+| 15 | Meadow refill timing | Meadow refills immediately when a baby is adopted (from Draw Pile). Meadow also refills to full at End of Week. It does NOT refill during Dusk Cleanup. |
+| 16 | Trailing Caretaker Bonus consecutive Days | When you receive the bonus, place a 5-value Care Token face-down on your board as a cooldown marker. Remove it at the start of your following Day (before Phase 1). If present when Morning Provisions begins, you do not receive the Trailing Bonus this Day. The One-Behind Consolation (+1 token for exactly 1 deficit) has no cooldown marker and is unaffected. |
+| 17 | Advanced Care icons at evolution | Advanced Care bonus icons count toward evolution in Phase 4. Reminder tokens return to supply (not discarded to deck) when the Pokémon evolves. They do not count as tucked cards for Nurture Burst, Greenhouse card counts, or abilities referencing tucked cards. |
+| 18 | Advanced Care icon limit | Total icons on a Pokémon (tucked + Advanced Care) cannot exceed its printed requirement. You may place 1 icon using the 2-token Advanced Care action if only 1 slot remains — the second icon is simply not placed. |
+| 19 | Nursery Arrival unclaimed | If no player adopts the Nursery Arrival during a Week, discard it at End of Week and reveal a new one. Only one Nursery Arrival is in play at a time. |
+| 20 | Final-Week Adoption Window eligibility | Only players with 0 Evolved Pokémon may use the Final-Week free adoption. Players who adopted a baby that later evolved are not eligible — they already gained evolution value. Players who adopted but whose baby has not yet evolved are eligible. |
+| 21 | Healing Ward + Electabuzz on same card | These abilities cannot both apply to the same Medicine card on the same Day. You may use one or the other, not both. Declare which ability applies before tucking. |
+| 22 | Advanced Care 1-per-Day cap | You may only target 1 Baby Pokémon with Advanced Care per Day. You may pay 2 tokens twice on the same Day, but both uses must target the same Pokémon (up to its icon cap). |
+| 23 | Nursery Arrival priority tie | If multiple players are tied for fewest Evolved Pokémon, the player with the latest seat position (closest to last in turn order) has priority. At end of Week this resolves before any new Caring Hands phase begins. |
+| 24 | Blossom Greenhouse card count | All cards played during Caring Hands count toward the 3+/5+ threshold: tucked Care Cards, Gentle Touch wilds, and hybrid cards all count. Cards purchased but not played (sent to discard) do not count. |
+| 25 | Solo mode — Trailing rules and Final-Week Window | The Trailing Caretaker Bonus, One-Behind Consolation, Nursery Arrival priority claim, and Final-Week Adoption Window do not apply in solo mode. Solo end condition is determined solely by the Season Clock (12 Days). |
 
 ## Quick Reference Card
 
 **Day Summary:**
-1. Morning Provisions — Collect tokens (2 + babies + evolved + facilities, cap 12). Trailing bonus: +1/deficit if 2+ behind leader (max +3).
+1. Morning Provisions — Collect tokens (2 + babies + evolved + facilities, cap 12). Trailing bonus: +1/deficit if 2+ behind leader (max +2, cooldown: 5-value token, no consecutive Days). One-Behind Consolation: +1 token if exactly 1 behind (no cooldown).
 2. Supply Run — Draw to 5 cards
-3. Caring Hands — Play cards, buy cards/facilities, adopt babies, spring clean (any order/number)
-4. Growth Check — Evolve ready Pokémon, score Rep, check end trigger
-5. Dusk Cleanup — Discard hand, check Greenhouse (3+ cards = +1 token), refill Meadow, pass turn
+3. Caring Hands — Play cards, buy cards/facilities, adopt babies, advanced care (2 tokens = up to 2 icons on 1 baby/Day), spring clean (3 tokens) — any order, any number
+4. Growth Check — Evolve ready Pokémon (tucked + Advanced Care icons), score Rep, check end trigger
+5. Dusk Cleanup — Discard hand, check Greenhouse (3+ cards played = +1 token; 5+ = +2 tokens; all card types count), pass turn
 
-**Costs:** Common 1 token/1 icon | Midrange 2/2 | Premium 3/3 | Hybrid 2/2 split + effect | Facility 2-4 | Spring Clean 2 tokens
+**Week End:** Pass Caretaker Egg → Refill Meadow → Reveal Nursery Arrival (trailing player has priority claim; free adoption for them this Week).
 
-**Nurture Burst:** 3+ same type on 1 Pokémon in 1 Day = +1 icon (threshold 2 with Lucario/Toy Workshop)
+**Costs:** Common 1 token/1 icon | Midrange 2/2 | Premium 3/3 | Hybrid 2/2 split + effect | Facility 2-4 | Spring Clean 3 tokens | Advanced Care 2 tokens (up to 2 bonus icons; 1 baby/Day)
 
-**End:** Final Week after 8 evolutions (2-3P) or 6 evolutions (4P) or 12 Days (solo)
+**Nurture Burst:** 3+ same type on 1 Pokémon in 1 Day = +1 icon (threshold 2 with Lucario/Toy Workshop). Announce aloud and reveal cards before tucking.
 
-**Income:** 2 + babies + evolved + facilities (cap 12) + trailing bonus
+**End:** Final Week after 8 evolutions (all player counts) or 12 Days (solo). Final-Week Window: reveal top 2 babies; players with 0 evolved Pokémon may take 1 free.
 
-**Meadow:** 2 slots (1-3P) / 3 slots (4P). Refills on adopt + at Dusk Cleanup.
+**Income:** 2 + babies + evolved + facilities (cap 12) + trailing bonus (max +2) + one-behind consolation (+1)
+
+**Seat Tokens:** 1st=2 | 2nd=3 | 3rd=4 | 4th=5
+
+**Meadow:** 2 slots (1-3P) / 3 slots (4P). Refills on adopt + at Week end. Plus 1 Nursery Arrival each Week (trailing player priority).
+
+**Reminders:** Trailing Bonus cooldown = 5-value token on board | Advanced Care icons = 1-value tokens on Pokémon card
+
+**Combo Restrictions:** Healing Ward + Electabuzz cannot both apply to the same Medicine card on the same Day.
 
