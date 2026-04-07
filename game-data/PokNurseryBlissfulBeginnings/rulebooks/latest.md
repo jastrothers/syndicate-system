@@ -104,7 +104,7 @@ A game is played over **Weeks** (rounds). Each Week, every player takes one **Da
 
 **Phase 1: Morning Provisions (Draw Bonuses)**
 Calculate your draw total: 5 (base) + 1 per Evolved Pokémon in Cribs + facility/ability draw bonuses (Melody Room: +1, Pikachu: +1).
-**Trailing Caretaker Bonus**: If you have 2+ fewer evolutions than the leader, draw +1 card per evolution deficit (max +3 bonus cards).
+**Trailing Caretaker Bonus**: If you have 2+ fewer evolutions than the leader, draw bonus cards equal to your evolution deficit minus 1 (max +3 bonus cards).
 
 **Phase 2: Supply Run (Draw)**
 If personal draw pile is empty, shuffle discard pile into a new draw pile. Draw cards equal to your Morning Provisions total. If draw pile and discard are both empty, play with however many cards you have.
@@ -185,7 +185,7 @@ All actions occur during the Caring Hands phase unless otherwise noted.
 
 **Evolution Glow**: When a Baby Pokémon's care requirements are fully met during Growth Check, flip to evolved side. Remove all tucked cards to personal discard. Gain printed Reputation. Evolved ability active next Day.
 
-**Trailing Caretaker Bonus**: During Morning Provisions, if you have 2+ fewer evolutions than the player with the most evolutions, draw +1 card per evolution deficit (max +3 bonus cards). This is in addition to normal draw.
+**Trailing Caretaker Bonus**: During Morning Provisions, if you have 2+ fewer evolutions than the player with the most evolutions, draw bonus cards equal to your evolution deficit minus 1 (max +3 bonus cards). This is in addition to normal draw.
 
 **Spring Cleaning**: During Caring Hands, spend 1 card from hand to permanently remove 1 other card from your hand (out of game, not to discard). The spent card goes to your personal discard pile. Thins your deck for future draws. Must have 2+ cards in hand.
 
