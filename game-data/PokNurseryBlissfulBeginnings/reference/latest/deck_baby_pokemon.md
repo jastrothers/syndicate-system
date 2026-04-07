@@ -37,7 +37,7 @@ version: latest
 | 13 | Pichu | Pikachu | 2 Toy, 1 Song | 2 | 4 | Draw 1 extra card during Supply Phase | Toy-heavy |
 | 14 | Azurill | Marill | 2 Toy, 1 Berry | 2 | 3 | Once/Day: 1 Care Token = 1 Wild care icon | Toy-heavy |
 | 15 | Bonsly | Sudowoodo | 2 Toy, 1 Medicine, 1 Berry | 3 | 4 | Crib slot generates +1 token even when empty | Toy-heavy |
-| 16 | Mime Jr. | Mr. Mime | 3 Toy, 1 Song, 1 Medicine | 4 | 6 | Copy 1 other evolved Pokemon's ability each Day | Toy-heavy |
+| 16 | Mime Jr. | Mr. Mime | 3 Toy, 1 Song, 1 Medicine | 4 | 6 | 1/Day, copy another evolved Pokémon's ability; if none, peek top 2 Baby Pokémon and rearrange | Toy-heavy |
 
 ## Distribution
 - 4 Berry-heavy (majority Berry in requirements)

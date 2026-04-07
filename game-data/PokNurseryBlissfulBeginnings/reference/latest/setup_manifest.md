@@ -35,7 +35,7 @@ version: latest
 
 - Blossom Bazaar board: center of table
 - Market Row: 5 face-up Care Cards (6 at 4P)
-- Meadow: 1 face-up Baby Pokémon
+- Meadow: 2 face-up Baby Pokémon (Solo) / 3 face-up Baby Pokémon (2-4P)
 - Facility Display: 2 face-up Facility Cards
 - Reputation Track: all meeples on 0
 - Round Tracker: empty (solo: Season Clock deck)

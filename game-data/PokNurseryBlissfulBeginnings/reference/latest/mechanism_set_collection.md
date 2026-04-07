@@ -9,4 +9,4 @@ game: PokNurseryBlissfulBeginnings
 ---
 # Set Collection
 
-4 care types: Berry, Medicine, Song, Toy. Each baby Pokémon specifies 3-5 care icons in a specific combination for evolution. Cards played are tucked under the Pokémon (partial progress preserved). Playing 3+ of same type in one turn triggers Nurture Burst (+1 bonus care icon).
+4 care types: Berry, Medicine, Song, Toy. Each baby Pokémon specifies 3-5 care icons in a specific combination for evolution. Cards played are tucked under the Pokémon (partial progress preserved). Playing 3+ of same type in one turn triggers Nurture Burst (+1 bonus care icon) — declare when your third matching card is tucked.
