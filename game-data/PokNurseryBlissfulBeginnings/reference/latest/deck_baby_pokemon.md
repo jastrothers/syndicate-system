@@ -6,7 +6,7 @@ tags:
   - evolution
   - double-sided
   - core
-lastUpdated: '2026-04-06T00:16:32.280Z'
+lastUpdated: '2026-04-08T00:00:00.000Z'
 game: PokNurseryBlissfulBeginnings
 version: latest
 ---
@@ -30,7 +30,7 @@ version: latest
 | 6 | Elekid | Electabuzz | 2 Medicine, 1 Toy | 2 | 3 | +1 card draw when playing 3+ cards/Day | Medicine-heavy |
 | 7 | Tyrogue | Hitmonchan | 2 Medicine, 1 Toy, 1 Berry | 3 | 4 | Nurture Burst threshold reduced to 2 for Medicine | Medicine-heavy |
 | 8 | Magby | Magmar | 3 Medicine, 1 Toy | 3 | 4 | Facility cards cost 1 less | Medicine-heavy |
-| 9 | Togepi | Togetic | 2 Song, 1 Berry, 1 Toy | 3 | 5 | +1 Reputation per evolution after this one | Song-heavy |
+| 9 | Togepi | Togetic | 2 Song, 1 Berry, 1 Toy | 3 | 5 | Harmony Bloom: Once per Day, when you trigger a Nurture Burst, gain +1 Reputation immediately | Song-heavy |
 | 10 | Cleffa | Clefairy | 2 Song, 1 Medicine | 2 | 3 | Once/Day: peek at top 2 deck cards, keep 1 | Song-heavy |
 | 11 | Riolu | Lucario | 2 Song, 1 Medicine, 1 Toy | 3 | 5 | Nurture Burst threshold reduced to 2 (all types) | Song-heavy |
 | 12 | Chingling | Chimecho | 3 Song, 1 Berry, 1 Medicine | 4 | 6 | All Song cards provide +1 Song icon | Song-heavy |
