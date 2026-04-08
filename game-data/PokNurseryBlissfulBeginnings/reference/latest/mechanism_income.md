@@ -1,12 +1,14 @@
 ---
-title: mechanism_income
+title: mechanism_draw_engine
 type: mechanism
 tags:
-  - income
+  - draw_engine
   - engine
-lastUpdated: '2026-04-06T00:07:34.132Z'
+lastUpdated: '2026-04-07T00:00:00.000Z'
 game: PokNurseryBlissfulBeginnings
 ---
-# Income
+# Draw Engine
 
-Base: 2 care tokens/round. +1 per baby Pokémon in nursery. +1 per evolved Pokémon (stacks with baby bonus = +2 total). Facility bonuses vary. Token cap: 8. Creates engine-building arc where early investments compound.
+Base draw: 5 cards/turn. +1 per evolved Pokémon in Cribs. Facility bonuses: Melody Room +1 draw. Ability bonuses: Pikachu +1 draw. Trailing Caretaker Bonus: +1 draw per evolution deficit if 2+ behind leader (max +3). Creates engine-building arc where evolving Pokémon directly increases hand size, providing both more tucking capacity and more purchasing power.
+
+Purchasing power bonuses (no additional draw): Berry Garden (+1 Care Value on Berry cards spent as currency), Chansey (once/Day +1 Care Value on a spent card), Roselia (once/Day +1 Care Value when tucking Berry), Blossom Greenhouse (tuck 3+ = next purchase costs 1 less).
