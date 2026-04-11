@@ -1,13 +1,13 @@
 # PokéNursery: Blissful Beginnings
 
-*Version: 0.1.0*
-*Last Updated: 4/5/2026, 9:01:01 PM*
+*Version: 0.2.0*
+*Last Updated: 4/8/2026, 12:00:00 AM*
 
 ---
 
 ## Core Mechanics
 
-Five interlocking mechanisms drive the nursery experience:\n\n**Hand Management** — Draw 5+ cards each turn (base 5, plus bonuses from evolved Pokémon and facilities). Each card is dual-use: tuck it under a Pokémon for its care icons, or spend it as currency (Care Value) to purchase new cards and facilities. No carry-over between turns.\n\n**Deck Building** — Start with 10 basic cards. Purchase specialized care cards (Berry, Medicine, Song, Toy) by spending cards from hand as currency. Standard shuffle-when-empty cycling. Cards spent as currency go to your discard pile and cycle back.\n\n**Set Collection** — Each baby Pokémon requires a specific combination of 3-5 care icons to evolve. Care cards played are tucked under the Pokémon, preserving progress across turns. Playing 3+ of the same type triggers a Nurture Burst bonus.\n\n**Tableau Building** — The nursery board starts with 3 slots (expandable to 5). Each slot holds one baby Pokémon accumulating care. Evolved Pokémon remain as scoring anchors with ongoing abilities and draw bonuses. Up to 3 facility upgrades available.\n\n**Draw Engine** — Base draw of 5 cards/turn, +1 per evolved Pokémon in Cribs, plus facility and ability bonuses. Evolving Pokémon directly increases your hand size, creating an engine-building arc where early investments compound.\n\n**Core Loop**: Morning Provisions (calculate draw bonuses) → Supply Run (draw cards) → Caring Hands (tuck or spend cards) → Growth Check (evolve + adopt) → Dusk Cleanup.
+Five interlocking mechanisms drive the nursery experience:\n\n**Hand Management** — Draw 5 cards each turn (base 5, plus facility and ability bonuses only). Each card is dual-use: tuck it under a Pokémon for its care icons, or spend it as currency (Care Value) to purchase new cards and facilities. No carry-over between turns.\n\n**Deck Building** — Start with 10 basic cards. Purchase specialized care cards (Berry, Medicine, Song, Toy) by spending cards from hand as currency. Standard shuffle-when-empty cycling. Cards spent as currency go to your discard pile and cycle back. A deeper, higher-quality deck is the primary engine — Bazaar cards do 2-3× the work of starting cards.\n\n**Set Collection** — Each baby Pokémon requires a specific combination of 3-5 care icons to evolve. Care cards played are tucked under the Pokémon, preserving progress across turns. Playing 3+ of the same type triggers a Nurture Burst bonus.\n\n**Tableau Building** — The nursery board starts with 3 slots (expandable to 5). Each slot holds one baby Pokémon accumulating care. Evolved Pokémon remain as scoring anchors with ongoing abilities. Up to 3 facility upgrades available.\n\n**Draw Engine** — Base draw of 5 cards/turn. Melody Room (+1) and Pikachu (+1) are the only ways to increase hand size — both require deliberate purchasing. Advantage comes from what is in your 5 cards, not how many you draw.\n\n**Core Loop**: Morning Provisions (calculate draw total) → Supply Run (draw cards) → Caring Hands (tuck or spend cards) → Growth Check (evolve + adopt) → Dusk Cleanup.
 
 ## Overview
 
@@ -17,7 +17,7 @@ Welcome to Blossom Grove Nursery, where Chansey caretakers tend to baby Pokémon
 - **Players**: 1-4
 - **Playtime**: 35-70 minutes (scales with player count)
 - **Complexity**: Medium
-- **Core Mechanisms**: Daily Schedule (Hand Management), Blossom Bazaar (Deck Building), Care Combos (Set Collection), Nursery Wing (Tableau Building), Draw Engine (Evolve to Draw More)
+- **Core Mechanisms**: Daily Schedule (Hand Management), Blossom Bazaar (Deck Building), Care Combos (Set Collection), Nursery Wing (Tableau Building), Draw Engine (Facilities and Abilities Only)
 
 ## Component Manifest
 
@@ -25,7 +25,7 @@ Welcome to Blossom Grove Nursery, where Chansey caretakers tend to baby Pokémon
 
 **Cards (140 total):**
 - 16 Baby Pokemon Cards (double-sided: baby front, evolved back) — standard poker 63x88mm
-- 40 Starting Deck Cards (10 per player: 3 Gentle Touch, 2 Berry Snack, 2 Soothing Lullaby, 2 Rattle Toy, 1 Potion Drops) — standard poker 63x88mm. Each card shows a Care Value (coin icon) for use as currency.
+- 40 Starting Deck Cards (10 per player: 2 Gentle Touch, 2 Berry Snack, 2 Soothing Lullaby, 2 Rattle Toy, 2 Potion Drops) — standard poker 63x88mm. Each card shows a Care Value (coin icon) for use as currency.
 - 56 Blossom Bazaar Care Cards (14 each of Berry, Medicine, Song, Toy; tiered at 1/2/3 icons with Care Values 1-3, plus 3 hybrid cards per type with Care Value 1) — standard poker 63x88mm. Each card is dual-use: tuck for icons or spend for Care Value.
 - 12 Facility Cards (6 types x 2 copies: Crib Expansion, Berry Garden, Melody Room, Toy Workshop, Healing Ward, Blossom Greenhouse) — standard poker 63x88mm
 - 12 Season Clock Cards (solo mode only, rounds 1-12) — mini 44x63mm
@@ -36,7 +36,7 @@ Welcome to Blossom Grove Nursery, where Chansey caretakers tend to baby Pokémon
 - 1 Start Caretaker Egg (25mm oversized wooden egg, pastel pink)
 
 **Boards (5 total):**
-- 4 Nursery Wing Player Boards (280x180mm each; 5 Crib slots [3 unlocked, 2 locked], 3 Facility slots, Draw Bonus Reference, Deck/Discard zones)
+- 4 Nursery Wing Player Boards (280x180mm each; 5 Crib slots [3 unlocked, 2 locked], 3 Facility slots, Scoring Reference, Deck/Discard zones)
 - 1 Blossom Bazaar Market Board (400x250mm; 6 Market slots, Baby Pokemon Meadow [2-3 slots depending on player count], draw piles, Reputation Track 0-30, Round Tracker [solo only])
 
 **Baby Pokemon (16 cards, double-sided):**
@@ -75,7 +75,7 @@ Each Baby Pokemon card shows: Care Requirement (3-5 icons from Berry/Medicine/So
 6. Shuffle all 12 **Facility Cards** into a face-down deck beside the board. Reveal the top 2 face-up — these are available for purchase.
 7. Each player takes:
    a. 1 **Nursery Wing** board. It has 5 Crib slots: 3 unlocked (available immediately), 2 locked (unlocked by Crib Expansion facilities).
-   b. 1 **Starting Deck** of 10 cards: 3 Gentle Touch, 2 Berry Snack, 2 Soothing Lullaby, 2 Rattle Toy, 1 Potion Drops. Shuffle and place face-down on the Deck Zone.
+   b. 1 **Starting Deck** of 10 cards: 2 Gentle Touch, 2 Berry Snack, 2 Soothing Lullaby, 2 Rattle Toy, 2 Potion Drops. Shuffle and place face-down on the Deck Zone.
    c. 1 **Reputation Tracker** meeple on the 0 space of the Reputation Track.
    d. 1 **Quick Reference Card**.
 8. Draw **5 cards** from your personal draw pile. This is your first **Daily Schedule**.
@@ -103,8 +103,7 @@ Most recently cared for a pet or child receives the Start Caretaker Egg. Fallbac
 A game is played over **Weeks** (rounds). Each Week, every player takes one **Day** (turn) clockwise from the Start Caretaker Egg holder. Each Day has 5 phases in strict order:
 
 **Phase 1: Morning Provisions (Draw Bonuses)**
-Calculate your draw total: 5 (base) + 1 per Evolved Pokémon in Cribs + facility/ability draw bonuses (Melody Room: +1, Pikachu: +1).
-**Trailing Caretaker Bonus**: If you have 2+ fewer evolutions than the leader, draw bonus cards equal to your evolution deficit minus 1 (max +3 bonus cards).
+Calculate your draw total: 5 (base) + facility/ability draw bonuses (Melody Room: +1, Pikachu: +1).
 
 **Phase 2: Supply Run (Draw)**
 If personal draw pile is empty, shuffle discard pile into a new draw pile. Draw cards equal to your Morning Provisions total. If draw pile and discard are both empty, play with however many cards you have.
@@ -158,10 +157,10 @@ All actions occur during the Caring Hands phase unless otherwise noted.
 **Scoring Sources:**
 1. Evolution Reputation (during play): Printed value per Evolved Pokémon (2-5 Rep).
 2. Facility Reputation (game end): Printed value per Facility (1-2 Rep).
-3. Togetic Bonus (during play): +1 Rep per evolution after Togetic evolved (maximum 3 bonus Rep total).
-4. Musical Mobile Bonus (during play): +1 Rep per evolution completed by Musical Mobile.
-5. Nurture Mastery Bonus (game end): 1 Rep per Pokémon that evolved using a Nurture Burst.
-6. Care Card Collection Bonus (game end): 1 Rep per complete 4-type set tucked under un-evolved Pokémon.
+3. Musical Mobile Bonus (during play): +1 Rep per evolution completed by Musical Mobile.
+4. Nurture Mastery Bonus (game end): 1 Rep per Pokémon that evolved during a Day in which you triggered at least one Nurture Burst.
+5. Care Card Collection Bonus (game end): 1 Rep per complete 4-type set tucked under un-evolved Pokémon.
+6. Stockroom Depth Bonus (game end): 1 Rep per 3 non-starting Bazaar cards in your personal deck (draw pile + discard pile + hand combined), rounded down. Starting cards (Gentle Touch, Berry Snack, Soothing Lullaby, Rattle Toy, Potion Drops) do not count.
 7. No penalty for un-evolved Baby Pokémon.
 
 **Tiebreakers (in order):**
@@ -185,14 +184,12 @@ All actions occur during the Caring Hands phase unless otherwise noted.
 
 **Evolution Glow**: When a Baby Pokémon's care requirements are fully met during Growth Check, flip to evolved side. Remove all tucked cards to personal discard. Gain printed Reputation. Evolved ability active next Day.
 
-**Trailing Caretaker Bonus**: During Morning Provisions, if you have 2+ fewer evolutions than the player with the most evolutions, draw bonus cards equal to your evolution deficit minus 1 (max +3 bonus cards). This is in addition to normal draw.
-
 **Spring Cleaning**: During Caring Hands, spend 1 card from hand to permanently remove 1 other card from your hand (out of game, not to discard). The spent card goes to your personal discard pile. Thins your deck for future draws. Must have 2+ cards in hand.
 
 **Dual-Use Cards**: Every care card has both care icons and a Care Value (coin icon). During Caring Hands, choose for each card: tuck it (use icons) or spend it (use Care Value as currency). Cards spent as currency go to personal discard. Care Value equals icon count for standard cards (1/2/3); hybrid cards have Care Value 1.
 
 **Evolved Pokémon Abilities (16):**
-- Togetic: +1 Rep per subsequent evolution (maximum 3 bonus Rep total from this ability).
+- Togetic — Harmony Bloom: Once per Day, when you trigger a Nurture Burst (tuck the 3rd+ card of the same type under any one Pokémon in one Day), gain +1 Reputation immediately.
 - Pikachu: Draw +1 card during Supply Run.
 - Clefairy: 1/Day, treat 1 Song icon as any type.
 - Jigglypuff: When tucking Song card, also tuck top card of draw pile face-down (counts as 1 wild icon).
@@ -238,16 +235,18 @@ All actions occur during the Caring Hands phase unless otherwise noted.
 | 11 | Reputation exceeds 30 | Game continues. Track above 30 with reminder token. |
 | 12 | Magmar + 3-icon Pokémon | Warmth only reduces 4+ icon requirements. 3-icon Pokémon unaffected. |
 | 13 | Spring Cleaning requires 2+ cards | Must have at least 2 cards in hand: 1 to spend (goes to discard) and 1 to remove (out of game). |
-| 14 | Trailing Caretaker Bonus tie | Only triggers if you are 2+ behind the leader. If tied for most evolutions, no bonus. |
+| 14 | Stockroom Depth Bonus counting | At game end, count all cards in your draw pile, discard pile, and remaining hand. Subtract any cards whose names are Gentle Touch, Berry Snack, Soothing Lullaby, Rattle Toy, or Potion Drops. Divide the remainder by 3, rounding down. |
 | 15 | Meadow refill timing | Meadow refills immediately when a baby is adopted AND at Dusk Cleanup if any slots empty. |
 | 16 | Overpaying for a purchase | Allowed. If you spend cards totaling more than the cost, there is no change. Plan purchases carefully. |
 | 17 | Spending and tucking same card | A card can only be used once: either tucked for icons OR spent for currency, not both. |
 | 18 | Berry Garden + Care Value stacking | Berry Garden adds +1 Care Value to Berry cards when spent as currency. A Berry Snack (base Care Value 1) becomes Care Value 2; a Sitrus Berry (base 2) becomes 3. |
+| 19 | Togetic Harmony Bloom + Chimecho stacking | Both abilities trigger independently on the same Nurture Burst. If you have both evolved, you gain +2 Rep per Nurture Burst Day (Chimecho: once/Day; Togetic Harmony Bloom: once/Day). Each is limited to once per Day. |
+| 20 | Nurture Mastery Bonus with multiple evolutions in one Day | If two Pokémon evolve on the same Day and you triggered a Nurture Burst that Day, both count toward Nurture Mastery Bonus. The burst does not need to be associated with either evolving Pokémon specifically. |
 
 ## Quick Reference Card
 
 **Day Summary:**
-1. Morning Provisions — Calculate draw total: 5 base + 1/evolved + facility/ability bonuses. Trailing bonus: +1 draw/deficit if 2+ behind leader (max +3).
+1. Morning Provisions — Calculate draw total: 5 base + facility/ability bonuses (Melody Room: +1, Pikachu: +1).
 2. Supply Run — Draw cards equal to Morning Provisions total
 3. Caring Hands — Tuck cards (icons) or spend cards (currency), buy cards/facilities, adopt babies, spring clean (any order/number)
 4. Growth Check — Evolve ready Pokémon, score Rep, check end trigger
@@ -262,7 +261,7 @@ All actions occur during the Caring Hands phase unless otherwise noted.
 
 **End:** Final Week after 8 evolutions (2-3P) or 6 evolutions (4P) or 12 Days (solo)
 
-**Draw Bonuses:** +1/evolved Pokémon, +1 Melody Room, +1 Pikachu. Trailing: +1/deficit (max +3).
+**Draw Bonuses:** +1 Melody Room, +1 Pikachu. (Hand size is otherwise flat.)
 
 **Meadow:** 2 slots (1-3P) / 3 slots (4P). Refills on adopt + at Dusk Cleanup.
 
